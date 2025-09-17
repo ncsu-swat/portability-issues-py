@@ -1,0 +1,456 @@
+%% \PassOptionsToPackage{hidelinks,unicode}{hyperref} % Example options
+
+%%%%%%%%% PACKAGES
+    
+
+% --- Preamble (place in your preamble) ---
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{placeins} % for \FloatBarrier to control float placement
+\usepackage{float}     % for [H] exact float placement
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable,listings}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Listings styles
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily\small,
+  numbers=left, numberstyle=\scriptsize, numbersep=6pt,
+  breaklines=true, breakatwhitespace=true,
+  frame=single, framerule=0.4pt,
+  tabsize=2, showstringspaces=false
+}
+\lstdefinestyle{cpp}{style=code, language=C++}
+\lstdefinestyle{json}{style=code, language=}
+\lstdefinestyle{txt}{style=code, language=}
+
+% Ensure circled step numbers in listings render reliably
+% Maps Unicode circled digits to the TikZ-based \circled{n} macro
+\lstset{literate=
+  {❶}{{\circled{1}}}1
+  {❷}{{\circled{2}}}1
+  {❸}{{\circled{3}}}1
+  {❹}{{\circled{4}}}1
+  {❺}{{\circled{5}}}1
+  {❻}{{\circled{6}}}1
+  {❼}{{\circled{7}}}1
+}
+
+% A reusable “code card” environment
+\newtcblisting{codecard}[2][]{%
+  enhanced, breakable,
+  colback=white, colframe=black!12,
+  boxrule=0.6pt, arc=2mm, left=1mm, right=1mm, top=1mm, bottom=1mm,
+  title={#2}, fonttitle=\bfseries\footnotesize,
+  listing only, listing options={#1}
+}
+
+
+
+%% \usepackage{soul}
+% xcolor is loaded by the class with the 'table' option
+\usepackage{xcolor}
+%% \usepackage{tabularx}
+%% %% Custom packages end here
+
+%% \usepackage{cite}
+%% \usepackage{amsmath}
+%% \usepackage{booktabs}
+\usepackage{wrapfig}
+\usepackage{multirow}
+\usepackage{enumitem}
+%% \usepackage{color}
+\usepackage{listings}
+%% \usepackage{graphicx}
+%% \usepackage{rotate}
+%% %% \usepackage{url}
+%% %\usepackage[hidelinks]{hyperref}
+%% \usepackage{breakurl}
+%% \usepackage{flushend}
+\usepackage{xspace}
+%% \usepackage[round-mode=places,round-precision=1,group-separator={,},group-minimum-digits={3},output-decimal-marker={.}, round-pad=false, exponent-mode = threshold, exponent-thresholds = -3:5, tight-spacing=true]{siunitx}
+\usepackage{subcaption}
+%% \usepackage{pgf-pie}
+%% \usepackage{bbding}
+%% \usepackage{pifont}
+%% \usepackage{seqsplit}
+%% \usepackage{pgfplots}
+%% \pgfplotsset{width=7cm,compat=1.8}
+%% \usepackage{datetime2}
+
+%% % Tikz Figs
+\usepackage{tikz}
+\tikzset{>=latex}
+%% %\usepackage{pgf-umlsd} % for flow diagram
+%% \usetikzlibrary{calc}
+%% \usetikzlibrary{shapes.geometric}
+%% \usetikzlibrary{decorations.pathreplacing}
+%% \usetikzlibrary{positioning}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,fill=black,text=white,inner
+            sep=0.4pt] (char) {\small #1};}}
+
+%% %%%%%%%%%% CHECKMARKS
+
+%% \newcommand{\cmark}{\color{blue}{\ding{51}}}
+%% \newcommand{\xmark}{\color{red}{\ding{55}}}
+
+%% %%%%%%%% CONCLUDING BOXES
+\usepackage[framemethod=tikz]{mdframed}
+\mdfdefinestyle{mpdframe}{
+   frametitlebackgroundcolor   =black!15,
+    frametitlerule              =true,
+    roundcorner                 =3pt,
+    middlelinewidth             =1pt,
+    skipabove                   =\topskip,
+    skipbelow                   =\topskip,
+    innermargin                 =0.1cm, % smaller makes box bigger
+    outermargin                 =0.1cm,
+    innerleftmargin             =0.1cm,
+    innerrightmargin            =0cm,
+    innertopmargin              =0.1cm,
+    innerbottommargin           =0.1cm,
+    align=center   
+}
+
+%%%%%%%%%% CODE and MACROS
+
+%\input{defs-code}
+%% \input{defs-logic}
+
+%%%%%%%%%% UNCLASSIFIED
+\newcommand{\Caption}[1]{\caption{#1}}
+\newcommand{\NAtname}{-}
+\newcommand{\specialcell}[2][c]{\begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+% Right-aligned special cell for numbers with inline deltas
+\newcommand{\specialcellr}[1]{\begin{tabular}[c]{@{}r@{}}#1\end{tabular}}
+\newcommand{\DefMacro}[2]{%
+   \expandafter\newcommand\csname rmk-#1\endcsname{#2}%
+}
+\newcommand{\UseMacro}[1]{\csname rmk-#1\endcsname}
+
+
+\newcommand{\YC}{\textcolor{blue}{\textbf{+}}} %{$\checkmark$}}
+\newcommand{\NC}{\textcolor{red}{\textbf{-}}} %\textbf{$\times$}}}
+\newcommand{\MC}{\textcolor{magenta}{\textbf{$\pm$}}}
+
+\newcommand{\eg}{e.g.}
+\newcommand{\ie}{i.e.}
+\newcommand{\Fix}[1]{\textcolor{red}{[#1]}}
+\newcommand{\Fixsd}[1]{\textcolor{purple}{SD:[#1]}}
+\newcommand{\Mar}[1]{\textcolor{magenta}{MD:~[#1]}}
+\newcommand{\Alex}[1]{\textcolor{blue}{Alex:[#1]}}
+\newcommand{\Abid}[1]{\textcolor{teal}{Abid:[#1]}}
+
+\newcommand{\TODO}[1]{{\color{red}{\bf TODO:} #1}}
+\newcommand{\Comment}[1]{}
+\newcommand{\Boldface}[1]{\textbf{#1}}
+\newcommand{\Space}[1]{}
+\newcommand{\hand}[1]{\textcolor{green}{[#1]}}
+\newcommand{\raw}[1]{\textcolor{red}{#1}}
+\newcommand{\edit}[1]{#1}
+
+\newcommand{\MeanStd}[2]{#1$\pm$#2}
+\newcommand{\MeanStdSec}[2]{#1$\pm$#2 seconds}
+\newcommand{\plus}{$+$}
+
+\newcommand{\MyPara}[1]{\vspace{1pt}\noindent\textbf{#1}.}
+\newcommand{\MyParaOnly}[1]{\noindent\textbf{#1}}
+\newcommand{\MyItPara}[1]{\noindent\textit{#1}.}
+\newcommand{\reducedstrut}{\vrule width 0pt height .9\ht\strutbox depth .9\dp\strutbox\relax}
+%\newcommand{\InputWithSpace}[1]{\bgroup\def\arraystretch{1.1}\input{#1}\egroup}
+\newcommand{\Code}[1]{{\small\ifmmode{\texttt{#1}}\else$\texttt{#1}$\fi}}
+\newcommand{\CodeIn}[1]{{\small\ifmmode{\mathtt{#1}}\else$\mathtt{#1}$\fi}}
+\newcommand{\ColorBack}[1]{%
+  \begingroup \setlength{\fboxsep}{0pt}% \colorbox{purple!20}{\reducedstrut#1\/}% \endgroup
+}
+
+%% % ----------
+%% % THIS BELOW COPIED FROM vkuncak/doc/vmcai09/defs.tex
+\definecolor{gray}{RGB}{211,211,211}
+
+%% % ----------
+%% % PAPER TEXT
+
+\newcommand{\PaperTitle}{An Empirical Analysis of Portability Issues in Python Test Cases}
+
+
+\newcommand{\RV}{RV\xspace}
+\newcommand{\specification}{spec\xspace}
+\newcommand{\specifications}{specs\xspace}
+\newcommand{\Specification}{Spec\xspace}
+\newcommand{\Specifications}{Specs\xspace}
+\newcommand{\spec}{spec\xspace}
+\newcommand{\specs}{specs\xspace}
+\newcommand{\Spec}{Spec\xspace}
+\newcommand{\Specs}{Specs\xspace}
+\newcommand{\oss}{open-source projects\xspace}
+\newcommand{\javamop}{JavaMOP\xspace}
+\newcommand{\github}{GitHub\xspace}
+%% \newcommand{\Tool}{\textsc{DEIMON}\xspace}
+%% \newcommand{\Tool}{\textsc{DEIDMON}\xspace}
+\newcommand{\x}{x\xspace}
+\newcommand{\Contrib}[1]{$\star$#1}
+\newcommand{\CSC}{CSC\xspace}
+\newcommand{\CSCFull}{SynchronizedCollection\xspace}
+\newcommand{\MUI}{MUI\xspace}
+\newcommand{\MUIFull}{Map\_UnsafeIterator\xspace}
+\newcommand{\STHM}{STHM\xspace}
+\newcommand{\STHMFull}{StringTokenizer\_HasMoreElements\xspace}
+\newcommand{\RTS}{RTS\xspace}
+\newcommand{\RVTool}{RV tool\xspace}
+\newcommand{\version}{revision\xspace}
+\newcommand{\versions}{revisions\xspace}
+\newcommand{\IMM}{IMM\xspace}
+\newcommand{\IMMs}{IMMs\xspace}
+\newcommand{\Isolated}{\textsc{Isolated}\xspace}
+\newcommand{\NonIsolated}{\textsc{Non-Isolated}\xspace}
+\newcommand{\OneUnique}{\textsc{One Unique}\xspace}
+\newcommand{\MultipleUnique}{\textsc{Multiple Unique}\xspace}
+\newcommand{\SingleTrace}{\textsc{Single}\xspace}
+\newcommand{\Raw}{\textsc{Raw}\xspace}
+\newcommand{\NoRedundant}{\textsc{No Redundant}\xspace}
+\newcommand{\Sensitive}{\textsc{Sensitive}\xspace}
+
+\newcommand{\SQ}[1]{SQ#1\xspace}
+\newcommand{\SQs}{SQs\xspace}
+\newcommand{\EQ}[1]{RQ#1\xspace}
+\newcommand{\EQs}{RQs\xspace}
+
+\newcommand{\sota}{SoTA\xspace}
+\newcommand{\cgf}{CGF\xspace}
+\newcommand{\tname}{\textsc{FlashFuzz}\xspace}
+\newcommand{\acetest}{\textsc{ACETest}\xspace}
+\newcommand{\ttfuzz}{\textsc{TitanFuzz}\xspace}
+\newcommand{\ffuzz}{\textsc{FreeFuzz}\xspace}
+\newcommand{\pathfinder}{\textsc{PathFinder}\xspace}
+\newcommand{\dl}{DL\xspace}
+\newcommand{\torch}{PyTorch\xspace}
+\newcommand{\tf}{TensorFlow\xspace}
+\newcommand{\jax}{JAX\xspace}
+
+% Versions
+\newcommand{\torchvereval}{2.2.0\xspace}
+\newcommand{\tfvereval}{2.16.1\xspace}
+\newcommand{\torchverwild}{2.7.0\xspace}
+\newcommand{\tfverwild}{2.19.0\xspace}
+
+% RQ1: Target API counts and overlaps (Table~\ref{tab:num_target_apis})
+\newcommand{\rqOneTorchTotalAPIs}{1,151\xspace}
+\newcommand{\rqOneTorchIntersectACE}{284\xspace}
+\newcommand{\rqOneTorchIntersectPathfinder}{529\xspace}
+\newcommand{\rqOneTorchIntersectTTFuzz}{469\xspace}
+
+\newcommand{\rqOneTFTotalAPIs}{662\xspace}
+\newcommand{\rqOneTFIntersectACE}{519\xspace}
+\newcommand{\rqOneTFIntersectPathfinder}{478\xspace}
+\newcommand{\rqOneTFIntersectTTFuzz}{643\xspace}
+
+\newcommand{\libfuzzer}{libFuzzer\xspace}
+\newcommand{\afl}{AFL++\xspace}
+
+\newcommand{\numTestMethods}{\#tests\xspace}
+\newcommand{\timeWithoutRV}{time\xspace}
+\newcommand{\timeWithRV}{$t^\textit{mop}$\xspace}
+\newcommand{\sloc}{SLOC\xspace}
+\newcommand{\scov}{$cov^s$\xspace}
+\newcommand{\bcov}{$cov^b$\xspace}
+\newcommand{\numCommits}{\#SHAs\xspace}
+\newcommand{\projectAge}{age\xspace}
+\newcommand{\numMonitors}{\#Mon\xspace}
+\newcommand{\numEvents}{\#Event\xspace}
+\newcommand{\numStars}{\#\FiveStar\xspace}
+\newcommand{\RepoURL}{\url{https://anonymous.4open.science/r/deep-learning-apis-cgfuzzing}}
+\newcommand{\Identifier}{\textsc{\IMM Identifier}\xspace}
+\newcommand{\Classifier}{\textsc{\IMM Classifier}\xspace}
+\newcommand{\Generator}{\textsc{Policy Generator}\xspace}
+\newcommand{\Transformer}{\textsc{Code Transformer}\xspace}
+\newcommand{\instructions}{instrumentation configurations\xspace}
+
+% numbers
+\newcommand{\numBugs}{42\xspace}
+\newcommand{\numBugsTorch}{20\xspace}
+\newcommand{\numBugsTF}{22\xspace}
+\newcommand{\numBugsFix}{8\xspace}
+
+%% Custom Macros Start Here
+
+% Define the TODO command with highlight and margin note
+\newcommand{\todo}[2][normal]{%
+  \ifdefined\showtodos
+    \ifstrequal{#1}{high}{\sethlcolor{red}}{}%
+    \ifstrequal{#1}{normal}{\sethlcolor{yellow}}{}%
+    \ifstrequal{#1}{low}{\sethlcolor{green}}{}%
+    {\hl{\textbf{TODO:} #2}}%
+    \marginpar{\textcolor{red}{\textbf{TODO}}}%
+  \fi
+}
+
+% Control visibility of TODOs with this toggle
+\newif\ifshowtodos
+\showtodostrue  % Set to \showtodosfalse before final submission
+
+
+
+
+
+
+
+
+%% Custom Macros End Here
+
+
+
+
+\DefMacro{eq-single-performance}{\EQ{1}}
+\DefMacro{eq-single-safety}{\EQ{2}}
+\DefMacro{eq-evolution-stability}{\EQ{3}}
+\DefMacro{eq-evolution-performance}{\EQ{4}}
+\DefMacro{eq-evolution-safety}{\EQ{5}}
+\DefMacro{Category}{Category}
+\DefMacro{PolicyType}{Policy Type}
+\DefMacro{Description}{Description}
+
+\newenvironment{packed_itemize}{
+\vspace{-0.1ex}
+\begin{list}{\labelitemi}{\leftmargin=1.7em}
+ \setlength{\itemsep}{0pt} \setlength{\parskip}{0pt} \setlength{\parsep}{0pt} \setlength{\headsep}{0pt} \setlength{\topskip}{0pt} \setlength{\topmargin}{0pt} \setlength{\topsep}{0pt} \setlength{\partopsep}{0pt}
+ }{\end{list}
+\vspace{-0.1ex}
+}
+
+\newenvironment{packed_enumerate}{
+\vspace{-0.7ex}
+\begin{enumerate}[label=\arabic*.,leftmargin=1.7em]%{\leftmargin=0.5em}
+ \setlength{\itemsep}{0.7pt}
+ \setlength{\parskip}{0pt}
+ \setlength{\parsep}{0pt}
+ \setlength{\headsep}{0pt}
+ \setlength{\topskip}{0pt}
+ \setlength{\topmargin}{0pt}
+ \setlength{\topsep}{0pt}
+ \setlength{\partopsep}{0pt}
+}{\end{enumerate}
+\vspace{-0.7ex}
+}
+
+%% This setting changes the "look-and-feel" of the paper. I don't
+%% think it is a good idea to do that (not part of recommendations in
+%% the CFP).  -Marcelo
+%% \usepackage{draftwatermark}
+%% \SetWatermarkText{DRAFT}
+%% \SetWatermarkScale{1}
+%% \SetWatermarkColor[gray]{0.95}
+\definecolor{SubtleColor}{rgb}{0,0,.50}
+\newcommand{\NA}[1]{\textcolor{SubtleColor}{ {\tiny \bf ($\star$)} #1}}
+
+% % PyTorch Coverage Macros
+% \newcommand{\torchCovPvalueAce}{0.0000}
+% \newcommand{\torchCovCohenAce}{0.881}
+% \newcommand{\torchCovPvaluePathfinder}{0.5805} % Keeping old value, new ones are more specific
+% \newcommand{\torchCovPvaluePathfinderMinus}{0.4472}
+% \newcommand{\torchCovCohenPathfinderMinus}{-}
+% \newcommand{\torchCovPvaluePathfinderPlus}{0.0000}
+% \newcommand{\torchCovCohenPathfinderPlus}{1.469}
+% \newcommand{\torchCovPvalueTT}{0.0000}
+% \newcommand{\torchCovCohenTT}{1.349}
+
+% % TensorFlow Coverage Macros
+% \newcommand{\tfCovPvalueAce}{0.0000}
+% \newcommand{\tfCovCohenAce}{0.950}
+% \newcommand{\tfCovPvaluePathfinder}{0.0000}
+% \newcommand{\tfCovCohenPathfinder}{$-$0.612}
+% \newcommand{\tfCovPvalueTT}{0.2223}
+% \newcommand{\tfCovCohenTT}{0.310}
+
+% % PyTorch Validity Ratio Macros
+% \newcommand{\torchVRPvalueAce}{0.8594}
+% \newcommand{\torchVRPvaluePathfinder}{0.0000}
+% \newcommand{\torchVRCohenPathfinder}{0.862}
+% \newcommand{\torchVRPvalueTT}{0.0000}
+% \newcommand{\torchVRCohenTT}{0.536}
+
+% % TensorFlow Validity Ratio Macros
+% \newcommand{\tfVRPvalueAce}{0.0004}
+% \newcommand{\tfVRCohenAce}{0.670}
+% \newcommand{\tfVRPvaluePathfinder}{0.0018}
+% \newcommand{\tfVRCohenPathfinder}{0.308}
+% \newcommand{\tfVRPvalueTT}{0.0000}
+% \newcommand{\tfVRCohenTT}{2.138}
+
+
+% ------------------------------------------------------------------
+% Aggregated Valid Input Generation Gains (overall)
+% Minimum and maximum times higher valid-input counts for \tname vs. baselines
+\newcommand{\validCountGainMin}{2.5}
+\newcommand{\validCountGainMax}{1,271.3}
+
+% TensorFlow Validity Ratio Gains (x higher)
+% Range of "x" improvement in validity ratio for \tname on \tf
+\newcommand{\tfValidRatioGainMin}{2.5}
+\newcommand{\tfValidRatioGainMax}{5.4}
+
+% ------------------------------------------------------------------
+% RQ1 Table Delta Formatting and Values
+% Usage: \deltax{\<framework>Delta<Metric><Baseline>}
+% Example: \deltax{\torchDeltaTotalAce} -> (Δ 17.1×)
+\newcommand{\deltax}[1]{(~#1$\times$)}
+
+% PyTorch (\torch) deltas
+\newcommand{\torchDeltaTotalAce}{17.1}
+\newcommand{\torchDeltaTotalPathfinder}{4.6}
+\newcommand{\torchDeltaTotalTT}{1182.0}
+
+\newcommand{\torchDeltaValidAce}{21.3}
+\newcommand{\torchDeltaValidPathfinder}{4.7}
+\newcommand{\torchDeltaValidTT}{1271.3}
+
+\newcommand{\torchDeltaRatioAce}{1.3}
+\newcommand{\torchDeltaRatioPathfinder}{1.0}
+\newcommand{\torchDeltaRatioTT}{1.1}
+
+% TensorFlow (\tf) deltas
+\newcommand{\tfDeltaTotalAce}{1.0}
+\newcommand{\tfDeltaTotalPathfinder}{1.7}
+\newcommand{\tfDeltaTotalTT}{535.3}
+
+\newcommand{\tfDeltaValidAce}{2.5}
+\newcommand{\tfDeltaValidPathfinder}{9.1}
+\newcommand{\tfDeltaValidTT}{909.2}
+
+\newcommand{\tfDeltaRatioAce}{2.5}
+\newcommand{\tfDeltaRatioPathfinder}{5.4}
+\newcommand{\tfDeltaRatioTT}{1.7}
+
+\newcommand{\torchDeltaCoverageAce}{1.36}
+\newcommand{\torchDeltaCoveragePathfinder}{1.52}
+\newcommand{\torchDeltaCoverageTT}{1.53}
+
+% lstsetting for python code
+
+\lstset{language=Python,
+    basicstyle=\scriptsize\ttfamily,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{red},
+    commentstyle=\color{green!50!black}\itshape,
+    morecomment=[l][\color{magenta}]{\#},
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    tabsize=2,
+    captionpos=b,
+    morekeywords={self, None, True, False, torch, tf, jax, float32, int32, int64, float64, uint8, uint16, uint32, uint64, complex64, complex128}
+}
+
+% coverage
+\newcommand{\covtorchffvsace}{136.32\%}
+\newcommand{\covtorchffvspf}{152.78\%}
+\newcommand{\covtorchffvstt}{153.12\%}
+\newcommand{\covtfffvsace}{102.70\%}
+\newcommand{\covtfffvspf}{212.88\%}
+\newcommand{\covtfffvstt}{101.13\%}
