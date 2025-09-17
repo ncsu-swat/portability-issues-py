@@ -7,4 +7,4 @@ pdf:
 clean:
 	ls $(NAME)* | grep -v ".tex" | grep -v ".bib" | xargs rm -f
 	rm -f *.bak *~
-	rm $(NAME).fdb_latexmk
+	rm -f $(NAME).fdb_latexmk
