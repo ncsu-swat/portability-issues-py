@@ -51,12 +51,135 @@
 
 \section{Introduction}
 \label{sec:intro}
-...
+% - Context and motivation (portability in Python, cross-platform issues)
+% - Why this matters for SE community (gap, challenges, contributions)
+% - Research questions (RQ1–RQ4.2)
+% - Contributions (bullet-style)
 
+\section{Sources of Portability Problems}
+\label{sec:sources}
+% - Background: define portability in software/testing
+% - Examples and categories of portability issues
+% - Illustrative cases from real projects (with code snippets or logs)
+% - RQ2.1 (Causes) detailed here
+% - Bridge to how these issues are addressed
+
+
+\section{Methodology}
+\label{sec:methodology}
+% - Dataset: Python projects studied, selection criteria
+% - Experimental setup: rerun across multiple operating systems
+% - Tools: linters, CodeQL, LLM-based, rerun framework
+% - Analysis strategy: quantitative + qualitative
+% - Explicit mapping of methods to each RQ
+
+\section{Evaluation}
+\label{sec:evaluation}
+% This section presents the empirical results of our study,
+% organized around the research questions (RQ1–RQ4.2).
+% For each RQ, we restate the rationale, present the findings,
+% and provide a concise quick answer.
+
+\subsection{RQ1 — Prevalence}
+\label{rq1}
+\textbf{Research Question.} How prevalent are portability issues in Python tests when executed across different operating systems?  
+
+\textbf{Rationale.} With this question, we aim to measure how often portability problems actually occur in practice. Although Python is advertised as a cross-platform language, our preliminary results suggest that many tests fail when run on different operating systems. By quantifying the frequency of such issues across a representative set of projects and applying statistical tests, we can provide stronger evidence on whether portability is a widespread concern in the Python ecosystem or only affects a small subset of projects.  
+
+\textbf{Quick Answer.} Portability issues are widespread across Python projects, affecting a significant fraction of test suites.  
+
+% Add here: statistics, tables, and plots showing the frequency and distribution of portability issues
+% For example: Table 1 (Projects analyzed, tests executed, failures observed), Figure 1 (Distribution of failures by OS)
+
+\subsection{RQ2.1 — Causes}
+\label{rq2-1}
+\textbf{Research Question.} What are the typical causes of portability?  
+
+\textbf{Rationale.} This question seeks to identify and categorize the underlying reasons why portability issues arise. Our observations indicate that differences in modules such as os, file system conventions, path handling, and environment-specific assumptions may contribute to failures. In addition, some dependencies work properly on one operating system but not on another, further aggravating the problem. Understanding these root causes is essential not only to characterize the problem but also to guide the development of best practices and tools to prevent such issues in the future.  
+
+\textbf{Quick Answer.} The most common causes stem from OS-specific APIs, filesystem and path handling, encoding differences, and dependency availability.  
+
+% Add here: categories of causes with illustrative examples (code snippets, error messages)
+% For example: Figure 2 (Breakdown of causes), Table 2 (Categories and frequency)
+
+\subsection{RQ2.2 — Fixes}
+\label{rq2-2}
+\textbf{Research Question.} What are the typical fixes to address portability issues in Python?  
+
+\textbf{Rationale.} This question focuses on how developers address portability issues once identified. Strategies include avoiding direct use of OS-specific APIs by relying on higher-level cross-platform libraries, normalizing filesystem paths with utilities such as pathlib, and handling encoding explicitly. Dependency-related problems are often mitigated by using containerization (e.g., Docker) or virtualization to ensure reproducible environments. Clear documentation of system-specific requirements also plays a key role. By analyzing these practices, we can highlight patterns that effectively reduce portability problems and help inform guidelines for the broader community.  
+
+\textbf{Quick Answer.} Common fixes include relying on cross-platform libraries, normalizing paths, explicitly handling encodings, using containerized or virtualized environments, and documenting system requirements.  
+
+% Add here: examples of fixes found in commits/PRs
+% For example: Table 3 (Fix strategies with representative examples)
+
+\subsection{RQ3 — Tool Effectiveness}
+\label{rq3}
+\textbf{Research Question.} How good are existing tools at detecting portability issues in Python projects?  
+
+\textbf{Rationale.} This question investigates to what extent existing tools help identify portability problems. Static tools, including linters, type checkers, CodeQL queries, and even large language models, can flag certain categories of issues, such as OS-dependent APIs or unsafe path handling. However, many portability issues only manifest at runtime, for example due to environment assumptions, platform-specific encodings, or dependency incompatibilities. To complement static checks, we employ a dynamic strategy—our “rerun” approach—that executes tests across multiple operating systems to reveal failures that static analysis cannot anticipate. By comparing the coverage of static and dynamic techniques, we can assess their effectiveness and identify opportunities for improving tool support in cross-platform Python development.  
+
+\textbf{Quick Answer.} Static tools (linters, CodeQL, LLM-based checkers) can detect some patterns but often miss runtime-specific issues. Dynamic approaches, such as our “rerun” framework, provide broader coverage by exposing failures across operating systems.  
+
+% Add here: quantitative comparison (coverage, precision, recall)
+% For example: Figure 3 (Venn diagram of issues detected by static vs dynamic approaches)
+
+\subsection{RQ4.1 — Applied Fixes}
+\label{rq4-1}
+\textbf{Research Question.} What types of fixes are most commonly applied to resolve portability issues, and what solution patterns can be identified?  
+
+\textbf{Rationale.} This question investigates the concrete changes developers make when addressing portability problems. For example, replacing operating-system-specific API calls, adopting cross-platform libraries, or adding conditional code that adapts to the environment. By categorizing and analyzing these changes, we can uncover recurring solution patterns that may be generalized into practical guidelines for writing more portable Python software.  
+
+\textbf{Quick Answer.} Fixes often involve replacing OS-specific APIs, adding conditional checks, or adopting cross-platform libraries.  
+
+% Add here: commit/PR analysis, with representative examples of code changes
+% For example: Table 4 (Common fix patterns with frequency and examples)
+
+\subsection{RQ4.2 — Community Reaction}
+\label{rq4-2}
+\textbf{Research Question.} How do open-source developers and project communities respond to reported portability issues (e.g., via issues, pull requests, or discussions)?  
+
+\textbf{Rationale.} This question examines how the OSS community treats portability fixes by analyzing issue trackers, pull requests, and related discussions. We investigate whether such problems are seen as important, how quickly they are addressed, and the engagement level (comments, reviews, merges) these fixes receive, helping us understand real-world awareness and prioritization of portability.  
+
+\textbf{Quick Answer.} Developers generally acknowledge portability problems as relevant issues and often welcome proposed solutions. Our analysis shows that communities appreciate concrete fixes, with discussions and reviews frequently highlighting the value of making projects more portable.
+
+
+% Add here: time-to-fix statistics, issue/PR comment analysis
+% For example: Figure 4 (Distribution of time-to-fix), Table 5 (Engagement metrics per project)
+
+
+\section{Lessons Learned}
+\label{sec:lessons}
+% - Practical guidelines distilled from study
+% - Recommendations for writing portable Python code
+% - Recommendations for tool designers and researchers
+% - General lessons beyond Python (cross-platform SE insights)
+
+\section{Threats to Validity}
+\label{sec:threats}
+% - Internal validity: correctness of rerun framework
+% - External validity: generalization beyond studied projects
+% - Construct validity: definitions of “portability” and categorization
+% - Conclusion validity: statistical soundness, possible biases
+
+
+\section{Related Work}
+\label{sec:related}
+% - Prior work on cross-platform failures, portability in SE
+% - Studies on testing across operating systems
+% - Tool support for detecting environment-specific issues
+% - Positioning of this work relative to literature
+
+\Fix{Talk about} \cite{vahabzadeh2015empirical} here. Others: \cite{rasley2015detecting, ghandorh2020systematic}
+
+Maybe: \cite{sun2016bear}. Mobile apps testing: \cite{boushehrinejadmoradi2015testing}
 
 \section{Conclusions}
 \label{sec:conclusions}
-...
+% - Recap of findings for each RQ
+% - Key contributions
+% - Long-term impact on research and practice
+% - Future directions
 
 %% \section*{Data Availability}
 
