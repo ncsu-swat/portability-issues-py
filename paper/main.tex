@@ -52,6 +52,12 @@ This paper contributes an empirical study that (i) re-executes tests across oper
   \item A taxonomy of 11 actionable portability categories (Table~\ref{tab:categories}) with ready-to-apply repair patterns.
 \end{itemize}
 
+\noindent\textbf{OS-specific pathing.} \emph{Problem:} Code that hardcodes separators (e.g., \texttt{/} vs. \texttt{\char`\\}), assumes case-insensitive filesystems, or relies on drive letters behaves differently across OSes and can break comparisons, globs, and file discovery. \emph{Why unnoticed:} Developers often build and test on a single OS (and CI may mirror it), where implicit assumptions hold and \texttt{os.path} conveniences mask differences. Mocked paths in tests also bypass real filesystem semantics. \emph{Fix:} Use \texttt{pathlib.Path} for joins and traversal, avoid hardcoded separators, and normalize before comparison (e.g., \texttt{Path(p).resolve()} or \texttt{Path(p).as\_posix()} when comparing textual forms). Prefer temporary directories and relative paths over embedded absolute paths; when comparing names across platforms, explicitly account for case sensitivity.
+
+\noindent\textbf{Method does not exist: \texttt{os.uname()}.} \emph{Problem:} \texttt{os.uname()} is unavailable on Windows; importing or calling it unguarded raises \texttt{AttributeError}. \emph{Why unnoticed:} Code is authored and exercised on Unix-like systems where \texttt{os.uname()} exists; Windows CI may be absent, and import-time checks are not covered by platform-diverse tests. \emph{Fix:} Feature-detect and fall back: use \texttt{hasattr(os, "uname")} or \texttt{try/except AttributeError}, and prefer cross-platform APIs like \texttt{platform.uname()} (or \texttt{sys.platform}, \texttt{os.name}) for capability-driven logic rather than OS string matching.
+
+\noindent\textbf{Command execution mismatch (\texttt{os.system}/\texttt{subprocess}/\texttt{popen}).} \emph{Problem:} Shell syntax, quoting, PATH resolution, and executable extensions differ across OSes; commands that assume a POSIX shell (e.g., pipelines, redirection, \texttt{sh -c}) or Unix-only binaries fail on Windows, and signal/exit-code semantics vary. \emph{Why unnoticed:} Local development shells and environments hide quoting and PATH issues; tests often mock subprocesses; the target tool may be installed locally but missing in clean CI VMs. \emph{Fix:} Prefer \texttt{subprocess.run([...], shell=False)} with an argument list, avoid shell-specific syntax, and use Python libraries for functionality where possible. When invoking external tools, resolve with \texttt{shutil.which}, set \texttt{text=True}, \texttt{encoding="utf-8"}, and \texttt{check=True}, and provide OS-specific fallbacks only where strictly necessary.
+
 \section{Sources of Portability Problems}
 \label{sec:sources}
 We define an \emph{OS portability issue} as a difference in test outcome across operating systems attributable to platform-specific APIs, environment/terminal capabilities, filesystem semantics, encodings, or native libraries. 
@@ -101,7 +107,7 @@ Differences analyzed/categorized & 2{,}421 \\
 % ========================= CATEGORIES TABLE =========================
 \begin{table*}[t]
     \centering
-    \caption{Portability categories with sub-categories (bulleted), showing aggregated counts per category. Sorted by total projects (tests + issues).}
+    \caption{Portability categories with example sub-categories. Columns: \emph{\# affected tests} counts tests from our cross-OS re-execution mapped to the category; \emph{\# projects (tests)} counts distinct projects exhibiting the category in test outcomes; \emph{\# projects (issues)} counts distinct projects where mined issues/PRs mention the category; \emph{Total projects} is the sum of the previous two project counts (tests + issues). The table is sorted by Total projects.}
     \label{tab:categories}
     \small
     \setlength{\tabcolsep}{5pt}
