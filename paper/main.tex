@@ -99,7 +99,6 @@ Differences analyzed/categorized & 2{,}421 \\
 \textbf{Findings.} Table~\ref{tab:categories} reports categories with sub-categories (bulleted). Numbers are aggregated per category (tests, issues, and totals).  
 
 % ========================= CATEGORIES TABLE =========================
-\usepackage{array} % at the preamble if not already included
 \begin{table*}[t]
     \centering
     \caption{Portability categories with sub-categories (bulleted), showing aggregated counts per category. Sorted by total projects (tests + issues).}
@@ -107,65 +106,82 @@ Differences analyzed/categorized & 2{,}421 \\
     \small
     \setlength{\tabcolsep}{5pt}
     \renewcommand{\arraystretch}{1.2}
-    \begin{tabularx}{\textwidth}{>{\centering\arraybackslash}m{0.22\textwidth} >{\raggedright\arraybackslash}m{0.45\textwidth} r r r r}
+    \begin{tabularx}{\textwidth}{
+    >{\centering\arraybackslash}m{0.22\textwidth}
+    >{\raggedright\arraybackslash}m{0.35\textwidth}
+    >{\centering\arraybackslash}m{0.07\textwidth}
+    >{\centering\arraybackslash}m{0.07\textwidth}
+    >{\centering\arraybackslash}m{0.07\textwidth}
+    >{\centering\arraybackslash}m{0.08\textwidth}
+}
     \toprule
     \textbf{Category} & \textbf{Sub-categories (examples)} & \textbf{\# affected tests} & \textbf{\# projects (tests)} & \textbf{\# projects (issues)} & \textbf{Total projects} \\
     \midrule
     
     File/path representation mismatch &
-    • OS-specific pathing \newline
-    • Line ending mismatch (LF vs.\ CRLF) \newline
-    • Filename case insensitive
+    OS-specific pathing \newline
+    Line ending mismatch (LF vs.\ CRLF) \newline
+    Filename case insensitive
     & 32 & 9 & 32 & \textbf{41} \\
+    \hline
     
     Process execution / signal mismatch &
-    • Command execution (\texttt{os.system}, \texttt{subprocess}) \newline
-    • Unix-only signals (\texttt{SIGKILL}, \texttt{SIGHUP}) \newline
-    • Address already in use
+    Command execution (\texttt{os.system}, \texttt{subprocess}) \newline
+    Unix-only signals (\texttt{SIGKILL}, \texttt{SIGHUP}) \newline
+    Address already in use
     & 19 & 9 & 16 & \textbf{25} \\
+    \hline
     
     Library availability / dynamic loading mismatch &
-    • Missing native library \newline
-    • Dynamic library extension mismatch
+    Missing native library \newline
+    Dynamic library extension mismatch
     & 30 & 4 & 17 & \textbf{21} \\
+    \hline
     
     Environment / terminal capability mismatch &
-    • No display in CI \newline
-    • GUI / window-manager differences \newline
-    • \texttt{curses} not available on Windows \newline
-    • ANSI/color capability mismatch
+    No display in CI \newline
+    GUI / window-manager differences \newline
+    \texttt{curses} not available on Windows \newline
+    ANSI/color capability mismatch
     & 9 & 6 & 8 & \textbf{14} \\
+    \hline
     
     Opened file locking &
-    • Advisory vs mandatory locks across OSes
+    Advisory vs mandatory locks across OSes
     & 8 & 5 & 4 & \textbf{9} \\
+    \hline
     
     Encoding mismatch &
-    • UTF-8 vs.\ cp1252 and related inconsistencies
+    UTF-8 vs.\ cp1252 and related inconsistencies
     & 69 & 2 & 7 & \textbf{9} \\
+    \hline
     
     Method or module unavailable &
-    • \texttt{os.uname}, \texttt{os.getuid}, \texttt{os.geteuid}, \texttt{os.getpgid} \newline
-    • Modules: \texttt{readline}, \texttt{resource}
+    \texttt{os.uname}, \texttt{os.getuid}, \texttt{os.geteuid}, \texttt{os.getpgid} \newline
+    Modules: \texttt{readline}, \texttt{resource}
     & 14 & 4 & 4 & \textbf{8} \\
+    \hline
     
     System permission / limits mismatch &
-    • Permission mismatch \newline
-    • File descriptor limits \newline
-    • Symlink privilege restrictions
+    Permission mismatch \newline
+    File descriptor limits \newline
+    Symlink privilege restrictions
     & 13 & 4 & 3 & \textbf{7} \\
+    \hline
     
     Binary wheel architecture mismatch &
-    • Pre-built wheels missing for some OS/arch
+    Pre-built wheels missing for some OS/arch
     & 3 & 0 & 3 & \textbf{3} \\
+    \hline
     
     System info source mismatch &
-    • Timezone database missing on Windows \newline
-    • \texttt{/proc} not available on macOS
+    Timezone database missing on Windows \newline
+    \texttt{/proc} not available on macOS
     & 2 & 2 & 0 & \textbf{2} \\
+    \hline
     
     File system block size mismatch &
-    • Different default block sizes across OSes
+    Different default block sizes across OSes
     & 1 & 0 & 1 & \textbf{1} \\
     \bottomrule
     \end{tabularx}
