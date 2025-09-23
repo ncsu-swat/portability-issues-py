@@ -42,7 +42,13 @@ Python is widely regarded as cross-platform, yet our cross-OS re-execution of re
 
 \section{Introduction}
 \label{sec:intro}
-Despite Python’s reputation for portability, platform-specific APIs, environment assumptions, and native dependencies routinely leak into code and tests. Cross-OS differences show up as missing functions on some platforms (e.g., \texttt{os.geteuid()} on Windows), headless CI environments lacking GUI support, filesystem and path representation mismatches, and dynamic loading issues.
+Python's cross-platform design philosophy has made it one of the world's most popular programming languages, powering everything from data science pipelines to web applications across diverse computing environments. Yet this cross-platform compatibility often breaks down in practice when code encounters different operating systems and environments. The consequences include failed deployments, broken continuous integration, and increased maintenance overhead as developers must handle platform-specific edge cases.
+
+While Python's design philosophy emphasizes portability, real-world codebases routinely contain platform-specific assumptions that render them fragile across operating systems. These failures manifest in predictable ways: missing system calls on Windows (e.g., \texttt{os.geteuid()}), GUI-dependent code failing in headless environments, filesystem path incompatibilities, and dynamic library loading issues that vary by platform. What appears to be a language-level guarantee of portability dissolves under the weight of actual usage patterns and environmental dependencies.
+
+This fragility is not merely a theoretical concern. Modern software development increasingly relies on cross-platform deployment, from containerized applications that must run consistently across different host systems to open-source projects that serve diverse user communities. When portability breaks, it creates cascading problems: delayed releases, increased maintenance burden, and reduced software accessibility.
+
+Our analysis reveals that these portability failures, while widespread, are not chaotic or unpredictable. Instead, they cluster around a small set of well-defined categories—path handling, character encoding, platform-specific APIs, and environment assumptions. This systematic nature suggests that targeted solutions are possible, transforming what appears to be an intractable problem into a manageable engineering challenge.
 
 This paper contributes an empirical study that (i) re-executes tests across operating systems for a large set of open-source projects, (ii) categorizes the root causes behind cross-OS differences, and (iii) derives concrete repair patterns.
 
@@ -227,16 +233,48 @@ Executing external commands is another area where cross-platform discrepancies a
 \subsection{RQ4.2 — Community Reaction}
 \textbf{Research Question.} How do open-source developers and project communities respond to reported portability issues (issues, pull requests, or discussions)?  
 
+To validate our findings and contribute back to the open-source ecosystem, we submitted pull requests addressing the portability issues uncovered in our study. Our contributions focused on libraries where our analysis revealed systematic portability challenges, proposing fixes to improve cross-platform compatibility and robustness.
+
+Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total of \TotalPROpened{} pull requests (PRs) spanning 8 categories of portability issues, of which \TotalPRAccepted{} had been accepted at the time of writing. The overall acceptance rate of 29\%, along with a zero rejection rate, indicates that the issues we identified correspond to genuine portability problems recognized by library maintainers. Notably, ``Method/module unavailable'' issues were the most frequent (10 PRs), reflecting substantial API inconsistencies across platforms. Conversely, "Process/signal mismatch" issues exhibited the highest acceptance rate (100\%), likely due to their critical impact on application functionality.
+
+\begin{table}[h!]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{2pt}
+    \caption{Summary of Pull Requests (PRs) by issue type, showing opened, accepted, and rejected. The last row shows totals.}
+    \label{tab:prs}
+    % Creating a compact tabular environment
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Category} & \textbf{Opened} & \textbf{Accepted} & \textbf{Rejected} \\
+        \midrule
+        Method/module unavailable & 10 & 0 & 0 \\
+        File locking & 4 & 2 & 0 \\
+        File/path mismatch & 7 & 3 & 0 \\
+        Encoding mismatch & 4 & 1 & 0 \\
+        Env/terminal mismatch & 1 & 0 & 0 \\
+        Process/signal mismatch & 2 & 2 & 0 \\
+        System info mismatch & 2 & 1 & 0 \\
+        Library/loading mismatch & 1 & 0 & 0 \\
+        \midrule
+        \textbf{Total} & \textbf{\TotalPROpened} & \textbf{\TotalPRAccepted} & \textbf{\TotalPRRejected} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 \textbf{Quick Answer.} Developers typically acknowledge portability problems but often give them lower priority than functional bugs, resulting in varied resolution times.  
 
 \section{Lessons Learned}
 \label{sec:lessons}
 
 \Ali{@Marcelo, please suggest the overall structure for this section.}
+\Den{What should developers, researchers, and tool builders keep in mind when thinking about portability issues in Python? Here are some suggestions:}
 
-\begin{itemize}
-  \item \textbf{Portability is not automatic.} Even though Python is designed to be cross-platform, real projects still often break when run on different operating systems. Portability depends on how code and environments are actually used, not just what the language promises.
-  \item \textbf{Problems fall into repeatable categories.} The failures we found were not random. They fall into a small set of categories (like paths, encodings, missing APIs). This means we can focus research and tool support on the most common categories instead of treating each bug as unique.
-\end{itemize}
+% Not in a philosophical way, but in a practical way, what are the main takeaways from our study? 
+
+% \begin{itemize}
+%   \item \textbf{Portability is not automatic.} Even though Python is designed to be cross-platform, real projects still often break when run on different operating systems. Portability depends on how code and environments are actually used, not just what the language promises.
+%   \item \textbf{Problems fall into repeatable categories.} The failures we found were not random. They fall into a small set of categories (like paths, encodings, missing APIs). This means we can focus research and tool support on the most common categories instead of treating each bug as unique.
+% \end{itemize}
 
 \end{document}
