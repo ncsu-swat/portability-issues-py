@@ -52,15 +52,7 @@ This paper contributes an empirical study that (i) re-executes tests across oper
   \item A taxonomy of 11 actionable portability categories (Table~\ref{tab:categories}) with ready-to-apply repair patterns.
 \end{itemize}
 
-\Ali{New, please check:}
 
-\noindent\textbf{OS-specific pathing.} \emph{Problem:} Code that hardcodes separators (e.g., \texttt{/} vs. \texttt{\char`\\}), assumes case-insensitive filesystems, or relies on drive letters behaves differently across OSes and can break comparisons, globs, and file discovery. \emph{Why unnoticed:} Developers often build and test on a single OS (and CI may mirror it), where implicit assumptions hold and \texttt{os.path} conveniences mask differences. Mocked paths in tests also bypass real filesystem semantics. \emph{Fix:} Use \texttt{pathlib.Path} for joins and traversal, avoid hardcoded separators, and normalize before comparison (e.g., \texttt{Path(p).resolve()} or \texttt{Path(p).as\_posix()} when comparing textual forms). Prefer temporary directories and relative paths over embedded absolute paths; when comparing names across platforms, explicitly account for case sensitivity.
-
-\noindent\textbf{Method does not exist: \texttt{os.uname()}.} \emph{Problem:} \texttt{os.uname()} is unavailable on Windows; importing or calling it unguarded raises \texttt{AttributeError}. \emph{Why unnoticed:} Code is authored and exercised on Unix-like systems where \texttt{os.uname()} exists; Windows CI may be absent, and import-time checks are not covered by platform-diverse tests. \emph{Fix:} Feature-detect and fall back: use \texttt{hasattr(os, "uname")} or \texttt{try/except AttributeError}, and prefer cross-platform APIs like \texttt{platform.uname()} (or \texttt{sys.platform}, \texttt{os.name}) for capability-driven logic rather than OS string matching.
-
-\noindent\textbf{Command execution mismatch (\texttt{os.system}/\texttt{subprocess}/\texttt{popen}).} \emph{Problem:} Shell syntax, quoting, PATH resolution, and executable extensions differ across OSes; commands that assume a POSIX shell (e.g., pipelines, redirection, \texttt{sh -c}) or Unix-only binaries fail on Windows, and signal/exit-code semantics vary. \emph{Why unnoticed:} Local development shells and environments hide quoting and PATH issues; tests often mock subprocesses; the target tool may be installed locally but missing in clean CI VMs. \emph{Fix:} Prefer \texttt{subprocess.run([...], shell=False)} with an argument list, avoid shell-specific syntax, and use Python libraries for functionality where possible. When invoking external tools, resolve with \texttt{shutil.which}, set \texttt{text=True}, \texttt{encoding="utf-8"}, and \texttt{check=True}, and provide OS-specific fallbacks only where strictly necessary.
-
-\section{Sources of Portability Problems}
 \label{sec:sources}
 We define an \emph{OS portability issue} as a difference in test outcome across operating systems attributable to platform-specific APIs, environment/terminal capabilities, filesystem semantics, encodings, or native libraries. 
 
@@ -196,6 +188,21 @@ Differences analyzed/categorized & 2{,}421 \\
     \end{table*}
     
 % ====================================================================
+
+\Ali{New, please check:}
+
+\noindent\textbf{OS-specific pathing.}
+Differences in how operating systems handle file paths are a common source of portability issues. Code that hardcodes separators (e.g., \texttt{/} in Unix or \texttt{\textbackslash} in Windows), assumes case-insensitive filesystems, or relies on drive letters often behaves inconsistently, leading to broken comparisons, globbing, or even basic file discovery failures. Such problems frequently remain unnoticed because development and testing usually take place in a single environment, where these assumptions appear valid, and because standard utilities such as \texttt{os.path} tend to hide subtle discrepancies. A more reliable practice is to rely on \texttt{pathlib.Path} for path composition and traversal, normalize paths before comparison, and prefer temporary directories or relative paths over embedded absolute ones. When comparing file names across platforms, developers should also explicitly account for case sensitivity.
+
+
+\noindent\textbf{Unavailable methods.}
+Portability problems also arise when platform-specific functions are invoked without safeguards. A typical example is \texttt{os.uname()}, which is widely available on Unix-like systems but not implemented on Windows. If called unguarded, it raises an \texttt{AttributeError}, immediately breaking execution. These errors often escape detection because the code is authored and tested exclusively on Unix-like platforms, without continuous integration that includes Windows. Robust solutions involve feature detection (e.g., checking whether the attribute exists or catching exceptions) and, whenever possible, adopting portable APIs such as \texttt{platform.uname()}, which provide similar information consistently across systems.
+
+
+\noindent\textbf{Command execution differences.}
+Executing external commands is another area where cross-platform discrepancies are pronounced. Shell syntax, quoting rules, environment resolution, and executable extensions differ substantially, so scripts that assume a POSIX shell—such as those relying on pipelines, redirection, or calls via \texttt{sh -c}—typically fail on Windows. Even when commands execute, signal handling and exit-code semantics may diverge. These issues are often masked in developer environments, where required tools are already installed, or in tests that mock subprocess calls. A recommended approach is to use \texttt{subprocess.run} with explicit argument lists and \texttt{shell=False}, thereby avoiding shell-specific parsing. When possible, external calls should be replaced by equivalent Python libraries. If invoking external tools is unavoidable, paths should be resolved with \texttt{shutil.which}, encoding specified explicitly, and OS-specific branches introduced only when strictly necessary.\section{Sources of Portability Problems}
+
+
 \subsection{RQ2.2 — Fixes}
 \textbf{Research Question.} What are the typical fixes to address portability issues in Python?  
 
@@ -223,5 +230,10 @@ Differences analyzed/categorized & 2{,}421 \\
 \textbf{Research Question.} How do open-source developers and project communities respond to reported portability issues (issues, pull requests, or discussions)?  
 
 \textbf{Quick Answer.} Developers typically acknowledge portability problems but often give them lower priority than functional bugs, resulting in varied resolution times.  
+
+
+
+
+
 
 \end{document}
