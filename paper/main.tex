@@ -387,7 +387,7 @@ textbf{Rationale.} This question investigates the concrete changes developers ma
 
 To validate our findings and contribute back to the open-source ecosystem, we submitted pull requests addressing the portability issues uncovered in our study. Our contributions focused on libraries where our analysis revealed systematic portability challenges, proposing fixes to improve cross-platform compatibility and robustness.
 
-Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total of \TotalPROpened{} pull requests (PRs) spanning 8 categories of portability issues, of which \TotalPRAccepted{} had been accepted at the time of writing. The overall acceptance rate of 29\%, along with a zero rejection rate, indicates that the issues we identified correspond to genuine portability problems recognized by library maintainers. Notably, ``Method/module unavailable'' issues were the most frequent (10 PRs), reflecting substantial API inconsistencies across platforms. Conversely, "Process/signal mismatch" issues exhibited the highest acceptance rate (100\%), likely due to their critical impact on application functionality.
+Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total of \TotalPROpened{} pull requests (PRs) spanning 8 categories of portability issues, of which \TotalPRAccepted{} had been accepted at the time of writing. The overall acceptance rate of 27\%, along with a zero rejection rate, indicates that the issues we identified correspond to genuine portability problems recognized by library maintainers. Notably, ``Method or module unavailable'' issues were the most frequent (11 PRs), reflecting substantial API inconsistencies across platforms. Conversely, ``Process execution / signal mismatch'' issues exhibited the highest acceptance rate (100\%), likely due to their critical impact on application functionality.
 
 \begin{table}[h!]
     \centering
@@ -400,14 +400,14 @@ Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total 
         \toprule
         \textbf{Category} & \textbf{Opened} & \textbf{Accepted} & \textbf{Rejected} \\
         \midrule
-        Method/module unavailable & 10 & 0 & 0 \\
-        File locking & 4 & 2 & 0 \\
-        File/path mismatch & 7 & 3 & 0 \\
+        Method or module unavailable & 11 & 0 & 0 \\
+        Opened file locking & 4 & 2 & 0 \\
+        File/path representation mismatch & 8 & 3 & 0 \\
         Encoding mismatch & 4 & 1 & 0 \\
-        Env/terminal mismatch & 1 & 0 & 0 \\
-        Process/signal mismatch & 2 & 2 & 0 \\
-        System info mismatch & 2 & 1 & 0 \\
-        Library/loading mismatch & 1 & 0 & 0 \\
+        Environment / terminal capability mismatch & 1 & 0 & 0 \\
+        Process execution / signal mismatch & 2 & 2 & 0 \\
+        System info source mismatch & 2 & 1 & 0 \\
+        Library availability / dynamic loading mismatch & 1 & 0 & 0 \\
         \midrule
         \textbf{Total} & \textbf{\TotalPROpened} & \textbf{\TotalPRAccepted} & \textbf{\TotalPRRejected} \\
         \bottomrule
