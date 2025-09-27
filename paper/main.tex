@@ -44,7 +44,7 @@ Python is widely regarded as cross-platform, yet our cross-OS re-execution of re
 \label{sec:intro}
 Python's cross-platform design philosophy has made it one of the world's most popular programming languages, powering everything from data science pipelines to web applications across diverse computing environments. Yet this cross-platform compatibility often breaks down in practice when code encounters different operating systems and environments. The consequences include failed deployments, broken continuous integration, and increased maintenance overhead as developers must handle platform-specific edge cases.
 
-While Python's design philosophy emphasizes portability, real-world codebases routinely contain platform-specific assumptions that render them fragile across operating systems. These failures manifest in predictable ways: missing system calls on Windows (e.g., \texttt{os.geteuid()}), GUI-dependent code failing in headless environments, filesystem path incompatibilities, and dynamic library loading issues that vary by platform. What appears to be a language-level guarantee of portability dissolves under the weight of actual usage patterns and environmental dependencies.
+While Python's design philosophy emphasizes portability, real-world codebases routinely contain platform-specific assumptions that render them fragile across operating systems. These failures manifest in predictable ways: missing system calls on Windows (e.g., \texttt{os.geteuid()}) \cite{python-os-3.15}, GUI-dependent code failing in headless environments, filesystem path incompatibilities, and dynamic library loading issues that vary by platform. What appears to be a language-level guarantee of portability dissolves under the weight of actual usage patterns and environmental dependencies.
 
 This fragility is not merely a theoretical concern. Modern software development increasingly relies on cross-platform deployment, from containerized applications that must run consistently across different host systems to open-source projects that serve diverse user communities. When portability breaks, it creates cascading problems: delayed releases, increased maintenance burden, and reduced software accessibility.
 
@@ -109,7 +109,8 @@ Differences analyzed/categorized & 2{,}421 \\
 
 \noindent\textbf{Quick Answer.} Portability issues are widespread across Python projects, affecting a significant fraction of test suites.
 
-\subsection{RQ2.1 — Causes}
+\subsection{RQ2 — Causes and Fixes}
+\subsubsection{RQ2.1 — Causes}
 \label{rq2-1}
 \textbf{Research Question.} What are the typical causes of portability problems?  
 \textbf{Rationale.} This question seeks to identify and categorize the underlying reasons why portability issues arise. Our observations indicate that differences in modules such as os, file system conventions, path handling, and environment-specific assumptions may contribute to failures. In addition, some dependencies work properly on one operating system but not on another, further aggravating the problem. Understanding these root causes is essential not only to characterize the problem but also to guide the development of best practices and tools to prevent such issues in the future.   
@@ -334,10 +335,9 @@ Portability problems also arise when platform-specific functions are invoked wit
 
 
 \noindent\textbf{Command execution differences.}
-Executing external commands is another area where cross-platform discrepancies are pronounced. Shell syntax, quoting rules, environment resolution, and executable extensions differ substantially, so scripts that assume a POSIX shell—such as those relying on pipelines, redirection, or calls via \texttt{sh -c}—typically fail on Windows. Even when commands execute, signal handling and exit-code semantics may diverge. These issues are often masked in developer environments, where required tools are already installed, or in tests that mock subprocess calls. A recommended approach is to use \texttt{subprocess.run} with explicit argument lists and \texttt{shell=False}, thereby avoiding shell-specific parsing. When possible, external calls should be replaced by equivalent Python libraries. If invoking external tools is unavoidable, paths should be resolved with \texttt{shutil.which}, encoding specified explicitly, and OS-specific branches introduced only when strictly necessary.\section{Sources of Portability Problems}
+Executing external commands is another area where cross-platform discrepancies are pronounced. Shell syntax, quoting rules, environment resolution, and executable extensions differ substantially, so scripts that assume a POSIX shell—such as those relying on pipelines, redirection, or calls via \texttt{sh -c}—typically fail on Windows. Even when commands execute, signal handling and exit-code semantics may diverge. These issues are often masked in developer environments, where required tools are already installed, or in tests that mock subprocess calls. A recommended approach is to use \texttt{subprocess.run} with explicit argument lists and \texttt{shell=False}, thereby avoiding shell-specific parsing. When possible, external calls should be replaced by equivalent Python libraries. If invoking external tools is unavoidable, paths should be resolved with \texttt{shutil.which}, encoding specified explicitly, and OS-specific branches introduced only when strictly necessary.
 
-
-\subsection{RQ2.2 — Fixes}
+\subsubsection{RQ2.2 — Fixes}
 \label{rq2-2}
 \textbf{Research Question.} What are the typical fixes to address portability issues in Python?  
 \textbf{Rationale.} This question focuses on how developers address portability issues once identified. Strategies include avoiding direct use of OS-specific APIs by relying on higher-level cross-platform libraries, normalizing filesystem paths with utilities such as pathlib, and handling encoding explicitly. Dependency-related problems are often mitigated by using containerization (e.g., Docker) or virtualization to ensure reproducible environments. Clear documentation of system-specific requirements also plays a key role. By analyzing these practices, we can highlight patterns that effectively reduce portability problems and help inform guidelines for the broader community.  
@@ -366,7 +366,9 @@ Executing external commands is another area where cross-platform discrepancies a
 % Add here: quantitative comparison (coverage, precision, recall)
 % For example: Figure 3 (Venn diagram of issues detected by static vs dynamic approaches)
 
-\subsection{RQ4.1 — Applied Fixes}
+\subsection{RQ4. How Do Developers Respond to Reported Portability Issues?}
+\label{sec:pr-discussion}
+\subsubsection{RQ4.1 — Applied Fixes}
 \label{rq4-1}
 \textbf{Research Question.} What types of fixes are most commonly applied to resolve portability issues, and what solution patterns can be identified?  
 textbf{Rationale.} This question investigates the concrete changes developers make when addressing portability problems. For example, replacing operating-system-specific API calls, adopting cross-platform libraries, or adding conditional code that adapts to the environment. By categorizing and analyzing these changes, we can uncover recurring solution patterns that may be generalized into practical guidelines for writing more portable Python software.  
@@ -377,7 +379,7 @@ textbf{Rationale.} This question investigates the concrete changes developers ma
 
 \textbf{Quick Answer.} Fixes often involve replacing OS-specific APIs, adding conditional checks, or adopting cross-platform libraries.  
 
-\subsection{RQ4.2 — Community Reaction}
+\subsubsection{RQ4.2 — Community Reaction}
 \label{rq4-2}
 \textbf{Research Question.} How do open-source developers and project communities respond to reported portability issues (issues, pull requests, or discussions)?  
 \textbf{Rationale.} This question examines how the OSS community treats portability fixes by analyzing issue trackers, pull requests, and related discussions. We investigate whether such problems are seen as important, how quickly they are addressed, and the engagement level (comments, reviews, merges) these fixes receive, helping us understand real-world awareness and prioritization of portability.  
@@ -417,8 +419,7 @@ Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total 
 \textbf{Quick Answer.} Developers typically acknowledge portability problems but often give them lower priority than functional bugs, resulting in varied resolution times.  
 
 
-\subsection{How Do Developers Respond to Reported Portability Issues?}
-\label{sec:pr-discussion}
+
 \Den{Please review.}
 To better understand how open-source developers and project communities react when portability issues are reported, we submitted pull requests (PRs) across different projects. The responses we received illustrate a spectrum of engagement patterns, from prompt acceptance to rejection or non-merge due to project inactivity.
 
