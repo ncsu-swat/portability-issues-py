@@ -15,7 +15,7 @@
 \title{\PaperTitle}
 
 \begin{abstract}
-Python is widely regarded as cross-platform, yet our cross-OS re-execution of real project tests reveals frequent portability gaps. We study 1{,}979 repositories (currently an estimated 500 analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 11 actionable categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
+Python is widely regarded as cross-platform, yet our cross-OS re-execution of real project tests reveals frequent portability gaps. We study \NumProjects{} repositories (currently an estimated 500 analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 11 actionable categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
 \end{abstract}
 
 \begin{CCSXML}
@@ -54,7 +54,7 @@ This paper contributes an empirical study that (i) re-executes tests across oper
 
 \paragraph{Contributions.}
 \begin{itemize}
-  \item Cross-OS re-execution of Python tests across a large sample (1{,}979 repositories, with results reported so far from an estimated 500).
+  \item Cross-OS re-execution of Python tests across a large sample (\NumProjects{} repositories, with results reported so far from an estimated 500).
   \item A taxonomy of 11 actionable portability categories (Table~\ref{tab:categories}) with ready-to-apply repair patterns.
 \end{itemize}
 
@@ -64,7 +64,36 @@ We define an \emph{OS portability issue} as a difference in test outcome across 
 
 \section{Methodology}
 \label{sec:methodology}
-\textbf{Dataset.} We sampled 1{,}979 Python repositories; the analyses reported here reflect the first $\sim$500 analyzed.  
+\textbf{Dataset.} We sampled \NumProjects{} Python repositories; the analyses reported here reflect the first $\sim$500 analyzed.  
+
+
+
+\begin{table}[H]
+
+\centering
+\caption{Stats on \NumProjects{} evaluated projects: no. of tests (\#Tests), size (SLOC), no. of commits (\#Sha), age in years (Age), no. of GitHub stars ($\star$).\label{tab:project-stats}}
+\begin{tabular}{lrrrrr}
+\hline
+Statistic & \#Tests & SLOC & \#Sha & Age & $\star$ \\
+\hline
+Mean & 583.94 & 42,467.26 & 2,883.25 & 6.24 & 6,147.88 \\
+Median & 72 & 7,478 & 426.50 & 5.87 & 83.50 \\
+Min & 1 & 2 & 2 & 0.3 & 2 \\
+Max & 36,588 & 3,237,895 & 194,153 & 17.27 & 366,472 \\
+Sum & 1,169,056 & 85,019,457 & - & - & - \\
+\hline
+\end{tabular}
+\end{table}
+
+
+Table~\ref{tab:project-stats} summarizes key characteristics of the \NumProjects{} evaluated projects. 
+On average, each project comprises approximately 584 tests and 42K lines of Python code (SLOC), with a median of 72 tests and 7.5K SLOC, indicating a distribution skewed by a few very large systems. Regarding repository activity, projects have on average 2.9K commits, a median of 427, and span a mean lifetime of 6.2 years. The number of GitHub stars varies widely, with an average of 6.1K, a median of only 84, and a maximum exceeding 366K, reflecting the presence of both niche and highly popular projects. 
+
+Overall, the dataset covers a diverse range of software systems, from small-scale repositories with only 
+a handful of commits to large, long-lived, and widely adopted projects.
+
+
+
 
 \textbf{Cross-OS re-execution.} For each project we run the test suite on multiple operating systems and record divergent outcomes. We then triage failures via logs and small code inspections, mapping each instance to a concrete category.  
 
@@ -99,7 +128,7 @@ We applied AND across axes and OR within each axis, so matches typically require
 \label{tab:dataset}
 \begin{tabular}{l r}
 \toprule
-Projects analyzed (of 1{,}979) & $\sim$500 \\
+Projects analyzed (of \NumProjects{}) & $\sim$500 \\
 Total tests executed & 440{,}728 \\
 Tests with cross-OS differences & 9{,}508 \\
 Differences analyzed/categorized & 2{,}421 \\
