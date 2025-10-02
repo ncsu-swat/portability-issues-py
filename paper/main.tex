@@ -175,8 +175,8 @@ Differences analyzed/categorized & 2{,}421 \\
     File/path representation mismatch &
     \begin{tabular}[c]{@{}l@{}}
     OS-specific pathing \\
-    Line ending mismatch (LF vs.\ CRLF) \\
-    Filename case insensitive
+    Line ending mismatch \\
+    Filename case insensitivite
     \end{tabular}
     & \begin{tabular}[c]{@{}r@{}}
     27 \\
@@ -194,8 +194,8 @@ Differences analyzed/categorized & 2{,}421 \\
     
     Process execution / signal mismatch &
     \begin{tabular}[c]{@{}l@{}}
-    Command execution (\texttt{os.system}, \texttt{subprocess}) \\
-    Unix-only signals (SIGKILL, SIGHUP) \\
+    Command execution mismatch (os.system / subprocess / popen) \\
+    Signal handling (e.g., SIGKILL, SIGHUP) \\
     Address already in use
     \end{tabular}
     & \begin{tabular}[c]{@{}r@{}}
@@ -214,8 +214,8 @@ Differences analyzed/categorized & 2{,}421 \\
     
     Library availability / dynamic loading mismatch &
     \begin{tabular}[c]{@{}l@{}}
-    lib \texttt{fcntl} not on Windows \\
-    Missing native library \\
+    lib fcntl dont works in windows \\
+    Missing a lib \\
     Dynamic library loading mismatch
     \end{tabular}
     & \begin{tabular}[c]{@{}r@{}}
@@ -234,10 +234,10 @@ Differences analyzed/categorized & 2{,}421 \\
     
     \begin{tabular}[c]{@{}c@{}}Environment / terminal capability mismatch\end{tabular} &
     \begin{tabular}[c]{@{}l@{}}
-    No display in CI \\
-    GUI/window-manager differences \\
-    \texttt{curses} not available on Windows \\
-    ANSI/color capability mismatch
+    no display avaliable in github ci for linux \\
+    GUI / window-manager differences \\
+    Curses maybe not avaliable Win \\
+    Terminal capability mismatch
     \end{tabular}
     & \begin{tabular}[c]{@{}r@{}}
     2 \\
@@ -256,7 +256,7 @@ Differences analyzed/categorized & 2{,}421 \\
     \hline
     
     Opened file locking &
-    \begin{tabular}[c]{@{}l@{}}Advisory vs mandatory file locks\end{tabular}
+    \begin{tabular}[c]{@{}l@{}}-\end{tabular}
     & \begin{tabular}[t]{@{}r@{}}4\end{tabular}
     & \begin{tabular}[c]{@{}c@{}}4\end{tabular}
     & \begin{tabular}[t]{@{}r@{}}5\end{tabular}
@@ -264,7 +264,7 @@ Differences analyzed/categorized & 2{,}421 \\
     \hline
     
     Encoding mismatch &
-    \begin{tabular}[c]{@{}l@{}}UTF-8 vs cp1252 inconsistencies\end{tabular}
+    \begin{tabular}[c]{@{}l@{}}-\end{tabular}
     & \begin{tabular}[t]{@{}r@{}}7\end{tabular}
     & \begin{tabular}[c]{@{}c@{}}7\end{tabular}
     & \begin{tabular}[t]{@{}r@{}}2\end{tabular}
@@ -273,12 +273,12 @@ Differences analyzed/categorized & 2{,}421 \\
     
     Method or module unavailable &
     \begin{tabular}[c]{@{}l@{}}
-    os.uname() \\
-    os.geteuid() \\
-    os.getuid() \\
-    os.getpgid() \\
-    Module: readline \\
-    Module: resource
+    method does not exist: os.uname() \\
+    method does not exist: os.geteuid() \\
+    method does not exist: os.getuid() \\
+    Method does not exist: os.getpgid() \\
+    module does not exist: readline \\
+    module does not exist: resource
     \end{tabular}
     & \begin{tabular}[c]{@{}r@{}}
     1 \\
@@ -321,7 +321,7 @@ Differences analyzed/categorized & 2{,}421 \\
     \hline
     
     Binary wheel architecture mismatch &
-    \begin{tabular}[c]{@{}l@{}}Pre-built wheels missing on some OS/arch\end{tabular}
+    \begin{tabular}[c]{@{}l@{}}-\end{tabular}
     & \begin{tabular}[t]{@{}r@{}}3\end{tabular}
     & \begin{tabular}[c]{@{}c@{}}3\end{tabular}
     & \begin{tabular}[t]{@{}r@{}}0\end{tabular}
@@ -330,7 +330,7 @@ Differences analyzed/categorized & 2{,}421 \\
     
     System info source mismatch &
     \begin{tabular}[c]{@{}l@{}}
-    /proc unavailable on macOS \\
+    /proc not available on macOS \\
     Timezone database missing on Windows
     \end{tabular}
     & \begin{tabular}[c]{@{}r@{}}
@@ -346,7 +346,7 @@ Differences analyzed/categorized & 2{,}421 \\
     \hline
     
     File system block size mismatch &
-    \begin{tabular}[c]{@{}l@{}}Different default block sizes across OSes\end{tabular}
+    \begin{tabular}[c]{@{}l@{}}-\end{tabular}
     & \begin{tabular}[t]{@{}r@{}}1\end{tabular}
     & \begin{tabular}[c]{@{}c@{}}1\end{tabular}
     & \begin{tabular}[t]{@{}r@{}}0\end{tabular}
