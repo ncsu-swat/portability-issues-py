@@ -42,13 +42,63 @@ Python is widely regarded as cross-platform, yet our cross-OS re-execution of re
 
 \section{Introduction}
 \label{sec:intro}
-Python is widely regarded as cross-platform, powering diverse applications from data science pipelines to web applications across computing environments, and consistently ranking as the most popular programming language in surveys~\cite{stackoverflow2025,githuboctoverse2024,pypl2025}. Yet this compatibility often breaks down in practice when code encounters different operating systems and environments~\cite{mince2023}. The consequences include failed deployments, broken continuous integration, increased maintenance overhead, and broader implications like uneven progress in software development as developers handle platform-specific edge cases~\cite{mince2023,kiuwancodeportability}.
+Python is widely regarded as cross-platform, powering applications
+from diverse domains (e.g., data science pipelines, web applications,
+etc.) and consistently ranks among the most popular programming
+languages of
+today~\cite{stackoverflow2025,githuboctoverse2024,pypl2025}. Yet,
+platform portability is not a guarantee. For example, Mince \etal{}
+found that 40\% of ML library functionality does not perform
+consistently across different hardware (\eg{}, CPU and
+TPU)~\cite{mince2023}. Similar problem exists at the OS level.
+%% While
+%% Python's design philosophy emphasizes portability through standardized
+%% interfaces in modules like \texttt{os}~\cite{pymotwos,geeksos2025},
+%% real-world codebases routinely contain platform-specific assumptions
+%% that render them fragile across operating systems.
+For example, the Python function \texttt{os.geteuid()} is unavailable
+on Python distributions for Windows. Overall, non-portable code
+results in failed deployments and disrupts develpment
+productivity~\cite{mince2023,kiuwancodeportability,peng2024,job2024}. Container
+technology (e.g., Docker and Singularity) can mitigate this problem
+but we find that most open source projects are not containerized,
+i.e., they lack Dockerfile or Singularity recipe to create
+images. Only 19.9\% of \NumProjects{} \github projects in Python we
+analyze contain Dockerfile or Docker compose
+configurations.\Mar{Ali/Denini, please check/revise!}
 
-While Python's design philosophy emphasizes portability through standardized interfaces in modules like \texttt{os}~\cite{pymotwos,geeksos2025}, real-world codebases routinely contain platform-specific assumptions that render them fragile across operating systems. These failures manifest in predictable ways: missing system calls on Windows (e.g., \texttt{os.geteuid()}) \cite{pythonos315}, GUI-dependent code failing in headless environments, filesystem path incompatibilities, and dynamic library loading issues that vary by platform \Fix{Cite}. What appears to be a language-level guarantee of portability dissolves under the weight of actual usage patterns and environmental dependencies~\cite{peng2024,job2024}.
+%% (e.g., broken
+%% continuous integration, increased maintenance overhead, and broader
+%% implications like 
+%% These failures manifest in
+%% predictable ways: missing system calls on Windows
+%% (e.g., \texttt{os.geteuid()}) \cite{pythonos315}, GUI-dependent code
+%% failing in headless environments, filesystem path incompatibilities,
+%% and dynamic library loading issues that vary by
+%% platform \Fix{Cite}. What appears to be a language-level guarantee of
+%% portability dissolves under the weight of actual usage patterns and
+%% environmental dependencies~\cite{peng2024,job2024}.
 
-Our analysis of \NumProjects{} Python projects reveals significant insights regarding containerization adoption in the open-source ecosystem. Among these projects, only 345 utilize Docker through either Dockerfiles or Docker Compose configurations, representing approximately 16.9\% of the total dataset. This relatively low adoption rate highlights a critical concern: the vast majority of Python projects (83.1\%) remain potentially vulnerable to portability issues. Projects without containerization face inherent challenges in maintaining consistent execution environments across different systems, dependency management complications, and deployment reproducibility problems. The absence of Docker containerization means that these projects rely heavily on local environment configurations, Python version compatibility, and system-specific dependencies, which can lead to the infamous ``it works on my machine'' syndrome. This portability gap becomes particularly problematic when projects need to be deployed across different operating systems, cloud platforms, or when team members work with varying development setups, ultimately hindering collaboration and increasing the likelihood of environment-related bugs and deployment failures.
 
-This fragility is not merely a theoretical concern. Modern software development increasingly relies on cross-platform deployment, from containerized applications that must run consistently across different host systems to open-source projects that serve diverse user communities. When portability breaks, it creates cascading problems: delayed releases, increased maintenance burden, and reduced software accessibility.
+%%% This is way too long (distracting) to add in an introduction.
+%%%
+%% Our analysis of \NumProjects{} Python projects reveals significant insights regarding containerization adoption in the open-source ecosystem. Among these projects, only 345 utilize Docker through either Dockerfiles or Docker Compose configurations, representing approximately 16.9\% of the total dataset. This relatively low adoption rate highlights a critical concern: the vast majority of Python projects (83.1\%) remain potentially vulnerable to portability issues. Projects without containerization face inherent challenges in maintaining consistent execution environments across different systems, dependency management complications, and deployment reproducibility problems. The absence of Docker containerization means that these projects rely heavily on local environment configurations, Python version compatibility, and system-specific dependencies, which can lead to the infamous ``it works on my machine'' syndrome. This portability gap becomes particularly problematic when projects need to be deployed across different operating systems, cloud platforms, or when team members work with varying development setups, ultimately hindering collaboration and increasing the likelihood of environment-related bugs and deployment failures.
+
+%% This fragility is not merely a theoretical concern. Modern software
+%% development increasingly relies on cross-platform deployment, from
+%% containerized applications that must run consistently across
+%% different host systems to open-source projects that serve diverse
+%% user communities. When portability breaks, it creates cascading
+%% problems: delayed releases, increased maintenance burden, and
+%% reduced software accessibility.
+
+This paper reports on a study about portability issues in Python
+tests\Mar{is it tests or code? considering the text above...why
+tests?}. More precisely, we analyze prevalence, root causes of
+failures, their fixes, and the reaction of developers toward the pull
+requests we opened to fix portability issues in their code. We
+conclude with a set of lessons we learn, including \Mar{try to
+integrate with next paragraph...}
 
 Our analysis reveals that these portability failures, while widespread, are not chaotic or unpredictable. Instead, they cluster around a small set of well-defined categories—path handling, character encoding, platform-specific APIs, and environment assumptions. This systematic nature suggests that targeted solutions are possible, transforming what appears to be an intractable problem into a manageable engineering challenge.
 
