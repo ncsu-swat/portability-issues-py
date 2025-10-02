@@ -357,6 +357,64 @@ Differences analyzed/categorized & 2{,}421 \\
     
 % ====================================================================
 
+\noindent\textbf{Symptom signatures.} For subcategories with concrete signals, we list verbatim exceptions or OS-specific error texts that reliably identify the underlying cause in test/CI logs. Not every subcategory has a unique signature; we include only those with specific, reproducible messages (e.g., \texttt{AttributeError: module 'os' has no attribute 'uname'}, \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x..}). These signatures are meant to speed triage and help developers and tools quickly recognize portability issues; they are not exhaustive of all possible manifestations (see Table~\ref{tab:symptoms}).  
+
+\begin{table*}[t]
+    \centering
+    \caption{Diagnostic symptom signatures for selected portability subcategories. Only concrete, reproducible errors are listed.}
+    \label{tab:symptoms}
+    \scriptsize
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}m{0.22\textwidth}
+        >{\raggedright\arraybackslash}m{0.30\textwidth}
+        >{\raggedright\arraybackslash}X
+    }
+    \toprule
+    \textbf{Category} & \textbf{Subcategory} & \textbf{Symptom (verbatim error / message)} \\
+    \midrule
+    \textbf{Method or module unavailable} &
+    method does not exist: os.uname() &
+    \texttt{AttributeError: module 'os' has no attribute 'uname'} \\
+    & method does not exist: os.geteuid() & \texttt{AttributeError: module 'os' has no attribute 'geteuid'} \\
+    & method does not exist: os.getuid() & \texttt{AttributeError: module 'os' has no attribute 'getuid'} \\
+    & Method does not exist: os.getpgid() & \texttt{AttributeError: module 'os' has no attribute 'getpgid'} \\
+    & module does not exist: readline & \texttt{ModuleNotFoundError: No module named 'readline'} \\
+    & module does not exist: resource & \texttt{ModuleNotFoundError: No module named 'resource'} \\
+    \midrule
+    \textbf{System permission/limits mismatch} &
+    File descriptor limits & \texttt{OSError: [Errno 24] Too many open files} \\
+    & Symlink privilege restrictions & \texttt{OSError: symbolic link privilege not held: 'src' -> 'dst'} \\
+    \midrule
+    \textbf{Environment / terminal capability mismatch} &
+    Curses maybe not avaliable Win & \texttt{ModuleNotFoundError: No module named '\_curses'} \\
+    \midrule
+    \textbf{System info source mismatch} &
+    /proc not available on macOS & \texttt{FileNotFoundError: [Errno 2] No such file or directory: '/proc/...'} \\
+    & Timezone database missing on Windows & \texttt{zoneinfo.\_common.ZoneInfoNotFoundError: 'No time zone found with key ...'} \\
+    \midrule
+    \textbf{Process execution / signal mismatch} &
+    Signal handling (e.g., SIGKILL, SIGHUP) & \texttt{AttributeError: module 'signal' has no attribute 'SIGHUP'} \\
+    & Address already in use & \texttt{OSError: [Errno 98] Address already in use} (Linux) \; / \; \texttt{OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted} (Windows) \\
+    \midrule
+    \textbf{File/path representation mismatch} &
+    Line ending mismatch & \texttt{AssertionError: '\textbackslash r\textbackslash n' != '\textbackslash n'} \\
+    & Filename case insensitivite & \texttt{FileNotFoundError: [Errno 2] No such file or directory: 'Readme.md'} \\
+    \midrule
+    \textbf{Library availability / dynamic loading mismatch} &
+    lib fcntl dont works in windows & \texttt{ModuleNotFoundError: No module named 'fcntl'} \\
+    & Dynamic library loading mismatch & \texttt{OSError: [WinError 126] The specified module could not be found} \\
+    \midrule
+    \textbf{Opened file locking} &
+    - & \texttt{PermissionError: [Errno 13] Permission denied: 'filename'} \\
+    \midrule
+    \textbf{Encoding mismatch} &
+    - & \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x\{XX\} in position N: invalid start byte} \\
+    \bottomrule
+    \end{tabularx}
+    \end{table*}   
+
 \noindent\textbf{OS-specific pathing.}
 Differences in how operating systems handle file paths are a common source of portability issues. Code that hardcodes separators (e.g., \texttt{/} in Unix or \texttt{\textbackslash} in Windows), assumes case-insensitive filesystems, or relies on drive letters often behaves inconsistently, leading to broken comparisons, globbing, or even basic file discovery failures. Such problems frequently remain unnoticed because development and testing usually take place in a single environment, where these assumptions appear valid, and because standard utilities such as \texttt{os.path} tend to hide subtle discrepancies. A more reliable practice is to rely on \texttt{pathlib.Path} for path composition and traversal, normalize paths before comparison, and prefer temporary directories or relative paths over embedded absolute ones. When comparing file names across platforms, developers should also explicitly account for case sensitivity.
 
