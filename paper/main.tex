@@ -280,11 +280,67 @@ Differences analyzed/categorized & 2{,}421 \\
 
 % ====================================================================
 
+\textbf{Concrete example (PR fix).} \Fix{We will insert a specific PR and code diff illustrating the applied fix.}
+
+
 \noindent\textbf{Symptom signatures.} For subcategories with concrete signals, we list verbatim exceptions or OS-specific error texts that reliably identify the underlying cause in test/CI logs. Not every subcategory has a unique signature; we include only those with specific, reproducible messages (e.g., \texttt{AttributeError: module 'os' has no attribute 'uname'}, \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x..}). These signatures are meant to speed triage and help developers and tools quickly recognize portability issues; they are not exhaustive of all possible manifestations (see Table~\ref{tab:symptoms}).  
 
-Across projects, we observe that fixes consistently reduce to four general patterns: (i) \textbf{Defensive checks}, which add guards, fallbacks, \texttt{try/except}, or conditional imports to avoid crashes when APIs or modules are missing; (ii) \textbf{Portable APIs}, which replace OS-specific constructs with cross-platform abstractions (e.g., \texttt{pathlib}, \texttt{platform}, \texttt{psutil}) and safer subprocess usage; (iii) \textbf{Normalization}, which standardizes encodings, line endings, paths, or filenames before comparison to prevent spurious differences; and (iv) \textbf{Environment handling}, which adapts code and tests to runtime conditions (e.g., skipping GUI in headless CI, handling permissions/dependencies, or using containers/virtual environments). These patterns are simple, teachable, and cover the majority of fixes we observed.
+Across projects, we find that portability issues are often resolved through a small set of recurring strategies. Figure~\ref{fig:patterns} illustrates representative examples of these fixes, drawn from real-world projects.
 
-\textbf{Concrete example (PR fix).} [Placeholder: We will insert a specific PR and code diff illustrating the applied fix.]
+Specifically, we observe four general patterns. (i)  \textbf{Defensive checks}, which add guards, fallbacks, \texttt{try/except}, or conditional imports to avoid crashes when APIs or modules are missing (see Listing~\ref{lst:defensive}); 
+(ii) \textbf{Portable APIs}, which replace OS-specific constructs with cross-platform abstractions (e.g., \texttt{pathlib}, \texttt{platform}, \texttt{psutil}) and safer subprocess usage (Listing~\ref{lst:portable});
+(iii) \textbf{Normalization} which standardizes encodings, line endings, paths, or filenames before comparison to prevent spurious differences (Listing~\ref{lst:normalization}); 
+and \textbf{Environment handling}, which adapts code and tests to runtime conditions (e.g., skipping tests in restricted environments, handling permissions/dependencies, or using containers/virtual environments) is illustrated in Listing~\ref{lst:environment}. These patterns are simple, teachable, and cover the majority of fixes we observed.
+
+\begin{figure*}[!ht]
+\centering
+
+% Defensive Checks
+\begin{subfigure}{0.48\textwidth}
+\begin{lstlisting}[caption={Defensive check for optional library}, label={lst:defensive}]
+- import readline
++ try:
++     import readline
++ except ImportError:
++     readline = None  # Fallback if readline is unavailable
+\end{lstlisting}
+\end{subfigure}
+\hfill
+% Portable APIs
+\begin{subfigure}{0.48\textwidth}
+\begin{lstlisting}[caption={Portable APIs: Using pathlib for cross-platform paths}, label={lst:portable}]
+- import os
+- home_dir = os.path.expanduser('~')
++ from pathlib import Path
++ home_dir = Path.home()  # Cross-platform home directory
+\end{lstlisting}
+\end{subfigure}
+
+\vspace{0.2cm}
+
+% Normalization
+\begin{subfigure}{0.48\textwidth}
+\begin{lstlisting}[caption={Normalization: Normalizing file paths}, label={lst:normalization}]
+- file_path = "data/file.txt"
++ import os
++ file_path = "data" + os.path.sep + "file.txt"  # Consistent path
+\end{lstlisting}
+\end{subfigure}
+\hfill
+% Environment Handling
+\begin{subfigure}{0.48\textwidth}
+\begin{lstlisting}[caption={Environment handling: Using pytest skip}, label={lst:environment}]
++ import platform
++ @pytest.mark.skipif(platform.system() == "Darwin", reason="Not supported on macOS")
+def test_special_case():
+    ...
+\end{lstlisting}
+\end{subfigure}
+
+\caption{Representative fix patterns for portability issues: (a) Defensive checks, (b) Portable APIs, (c) Normalization, and (d) Environment handling.}
+\label{fig:patterns}
+\end{figure*}
+
 
 \begin{table*}[t]
     \centering
