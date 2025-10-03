@@ -190,14 +190,11 @@ Differences analyzed/categorized & 2{,}421 \\
 
 \noindent\textbf{Quick Answer.} Portability issues are widespread across Python projects, affecting a significant fraction of test suites.
 
-\subsection{RQ2 — Causes and Fixes}
+\subsection{RQ2 — Causes, Symptoms, and Fixes}
 \subsubsection{RQ2.1 — Causes}
 \label{rq2-1}
 \textbf{Research Question.} What are the typical causes of portability problems?  
 \textbf{Rationale.} This question seeks to identify and categorize the underlying reasons why portability issues arise. Our observations indicate that differences in modules such as os, file system conventions, path handling, and environment-specific assumptions may contribute to failures. In addition, some dependencies work properly on one operating system but not on another, further aggravating the problem. Understanding these root causes is essential not only to characterize the problem but also to guide the development of best practices and tools to prevent such issues in the future.   
-
-% Add here: categories of causes with illustrative examples (code snippets, error messages)
-% For example: Figure 2 (Breakdown of causes), Table 2 (Categories and frequency)
 
 \textbf{Findings.} Table~\ref{tab:categories} reports root-cause categories with sub-categories (bulleted). Numbers are aggregated per category (tests, issues, and totals).  
 
@@ -285,58 +282,76 @@ Differences analyzed/categorized & 2{,}421 \\
 
 \noindent\textbf{Symptom signatures.} For subcategories with concrete signals, we list verbatim exceptions or OS-specific error texts that reliably identify the underlying cause in test/CI logs. Not every subcategory has a unique signature; we include only those with specific, reproducible messages (e.g., \texttt{AttributeError: module 'os' has no attribute 'uname'}, \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x..}). These signatures are meant to speed triage and help developers and tools quickly recognize portability issues; they are not exhaustive of all possible manifestations (see Table~\ref{tab:symptoms}).  
 
+Across projects, we observe that fixes consistently reduce to four general patterns: (i) \textbf{Defensive checks}, which add guards, fallbacks, \texttt{try/except}, or conditional imports to avoid crashes when APIs or modules are missing; (ii) \textbf{Portable APIs}, which replace OS-specific constructs with cross-platform abstractions (e.g., \texttt{pathlib}, \texttt{platform}, \texttt{psutil}) and safer subprocess usage; (iii) \textbf{Normalization}, which standardizes encodings, line endings, paths, or filenames before comparison to prevent spurious differences; and (iv) \textbf{Environment handling}, which adapts code and tests to runtime conditions (e.g., skipping GUI in headless CI, handling permissions/dependencies, or using containers/virtual environments). These patterns are simple, teachable, and cover the majority of fixes we observed.
+
+\textbf{Concrete example (PR fix).} [Placeholder: We will insert a specific PR and code diff illustrating the applied fix.]
+
 \begin{table*}[t]
     \centering
-    \caption{Diagnostic symptom signatures for selected portability subcategories.}
+    \caption{Diagnostic symptom signatures and general fix patterns for portability sub-categories.}
     \label{tab:symptoms}
     \scriptsize
     \setlength{\tabcolsep}{3pt}
     \renewcommand{\arraystretch}{1.15}
     \begin{tabularx}{\textwidth}{
-        >{\raggedright\arraybackslash}m{0.22\textwidth}
-        >{\raggedright\arraybackslash}m{0.30\textwidth}
+        >{\raggedright\arraybackslash}m{0.20\textwidth}
+        >{\raggedright\arraybackslash}m{0.28\textwidth}
         >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}m{0.22\textwidth}
     }
     \toprule
-    \textbf{Root-cause category} & \textbf{Sub-categories} & \textbf{Symptom (verbatim error / message)} \\
+    \textbf{Root-cause category} & \textbf{Sub-categories} & \textbf{Symptom (verbatim error / message)} & \textbf{General Fix Pattern} \\
     \midrule
     File and Directories &
-    Line ending & \texttt{AssertionError: '\textbackslash r\textbackslash n' != '\textbackslash n'} \\
-    & Case sensitivity & \texttt{FileNotFoundError: [Errno 2] No such file or directory: 'Readme.md'} \\
+    Path name convention & No specific signature & Normalization — normalize paths with pathlib \\
+    & Line ending & \texttt{AssertionError: '\textbackslash r\textbackslash n' != '\textbackslash n'} & Normalization — normalize line endings \\
+    & Case sensitivity & \texttt{FileNotFoundError: [Errno 2] No such file or directory: 'Readme.md'} & Normalization — case-normalize filenames \\
     \midrule
     Process execution / signal mismatch &
-    Signal handling (e.g., SIGKILL, SIGHUP) & \texttt{AttributeError: module 'signal' has no attribute 'SIGHUP'} \\
-    & Address already in use & \texttt{OSError: [Errno 98] Address already in use} (Linux) \; / \; \texttt{OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted} (Windows) \\
+    Command execution mismatch (os.system / subprocess / popen) & No specific signature & Portable APIs — use subprocess.run shell=False \\
+    & Signal handling (e.g., SIGKILL, SIGHUP) & \texttt{AttributeError: module 'signal' has no attribute 'SIGHUP'} & Defensive checks — guard signals per platform \\
+    & Address already in use & \texttt{OSError: [Errno 98] Address already in use} (Linux) \; / \; \texttt{OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted} (Windows) & Environment handling — retry or bind ephemeral port \\
     \midrule
     Library availability / dynamic loading mismatch &
-    lib fcntl dont works in windows & \texttt{ModuleNotFoundError: No module named 'fcntl'} \\
-    & Dynamic library loading mismatch & \texttt{OSError: [WinError 126] The specified module could not be found} \\
+    lib fcntl dont works in windows & \texttt{ModuleNotFoundError: No module named 'fcntl'} & Defensive checks — conditional import provide fallback \\
+    & Missing a lib & \texttt{ModuleNotFoundError: No module named '...'} & Environment handling — conditionally install optional dependency \\
+    & Dynamic library loading mismatch & \texttt{OSError: [WinError 126] The specified module could not be found} & Defensive checks — guard loading prefer pure-Python \\
     \midrule
     Environment / terminal capability mismatch &
-    Curses maybe not avaliable Win & \texttt{ModuleNotFoundError: No module named '\_curses'} \\
+    no display avaliable in github ci for linux & \texttt{TclError: no display name and no \$DISPLAY environment variable} & Environment handling — skip GUI tests in CI \\
+    & GUI / window-manager differences & No specific signature & Environment handling — skip or mock GUI features \\
+    & Curses maybe not avaliable Win & \texttt{ModuleNotFoundError: No module named '\_curses'} & Defensive checks — conditional import with stub fallback \\
+    & Terminal capability mismatch & No specific signature & Environment handling — detect capabilities degrade gracefully \\
     \midrule
     Opened file locking &
-    - & \texttt{PermissionError: [Errno 13] Permission denied: 'filename'} \\
+    - & \texttt{PermissionError: [Errno 13] Permission denied: 'filename'} & Environment handling — close files retry on Windows \\
     \midrule
     Encoding mismatch &
-    - & \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x\{XX\} in position N: invalid start byte} \\
+    - & \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x\{XX\} in position N: invalid start byte} & Normalization — set explicit UTF-8 encoding \\
     \midrule
     Method or module unavailable &
     method does not exist: os.uname() &
-    \texttt{AttributeError: module 'os' has no attribute 'uname'} \\
-    & method does not exist: os.geteuid() & \texttt{AttributeError: module 'os' has no attribute 'geteuid'} \\
-    & method does not exist: os.getuid() & \texttt{AttributeError: module 'os' has no attribute 'getuid'} \\
-    & method does not exist: os.getpgid() & \texttt{AttributeError: module 'os' has no attribute 'getpgid'} \\
-    & module does not exist: readline & \texttt{ModuleNotFoundError: No module named 'readline'} \\
-    & module does not exist: resource & \texttt{ModuleNotFoundError: No module named 'resource'} \\
+    \texttt{AttributeError: module 'os' has no attribute 'uname'} & Portable APIs — use platform.uname instead \\
+    & method does not exist: os.geteuid() & \texttt{AttributeError: module 'os' has no attribute 'geteuid'} & Defensive checks — guard call provide fallback \\
+    & method does not exist: os.getuid() & \texttt{AttributeError: module 'os' has no attribute 'getuid'} & Defensive checks — guard call provide fallback \\
+    & Method does not exist: os.getpgid() & \texttt{AttributeError: module 'os' has no attribute 'getpgid'} & Defensive checks — guard call provide fallback \\
+    & module does not exist: readline & \texttt{ModuleNotFoundError: No module named 'readline'} & Defensive checks — guard import use alternatives \\
+    & module does not exist: resource & \texttt{ModuleNotFoundError: No module named 'resource'} & Defensive checks — guard import use alternatives \\
     \midrule
     System permission / limits mismatch &
-    File descriptor limits & \texttt{OSError: [Errno 24] Too many open files} \\
-    & Symlink privilege restrictions & \texttt{OSError: symbolic link privilege not held: 'src' -> 'dst'} \\
+    Permission mismatch & \texttt{PermissionError: [Errno 13] Permission denied: '...'} & Environment handling — handle permissions document requirements \\
+    & File descriptor limits & \texttt{OSError: [Errno 24] Too many open files} & Environment handling — close files adjust ulimit \\
+    & Symlink privilege restrictions & \texttt{OSError: symbolic link privilege not held: 'src' -> 'dst'} & Environment handling — detect support and use copies \\
+    \midrule
+    Binary wheel architecture mismatch &
+    - & No specific signature & Environment handling — install platform-appropriate wheel \\
     \midrule
     System info source mismatch &
-    /proc not available on macOS & \texttt{FileNotFoundError: [Errno 2] No such file or directory: '/proc/...'} \\
-    & Timezone database missing on Windows & \texttt{zoneinfo.\_common.ZoneInfoNotFoundError: 'No time zone found with key ...'} \\
+    /proc not available on macOS & \texttt{FileNotFoundError: [Errno 2] No such file or directory: '/proc/...'} & Portable APIs — use psutil or platform APIs \\
+    & Timezone database missing on Windows & \texttt{zoneinfo.\_common.ZoneInfoNotFoundError: 'No time zone found with key ...'} & Normalization — install tzdata or fallback \\
+    \midrule
+    File system block size mismatch &
+    - & No specific signature & Normalization — normalize computations avoid assumptions \\
     \bottomrule
     \end{tabularx}
     \end{table*}   
@@ -359,16 +374,14 @@ Executing external commands is another area where cross-platform discrepancies a
 
 \textbf{Quick Answer.} Common fixes include relying on cross-platform libraries, normalizing paths, explicitly handling encodings, using containerized or virtualized environments, and documenting system requirements.  
 
-% Add here: examples of fixes found in commits/PRs
-% For example: Table 3 (Fix strategies with representative examples)
 
 \begin{itemize}
-  \item \textbf{Guards and fallbacks:} e.g., \texttt{hasattr(os,"uname")}, try/except around \texttt{ImportError}.  
-  \item \textbf{Cross-platform APIs:} prefer \texttt{pathlib}, avoid Unix-only \texttt{fcntl}.  
-  \item \textbf{Normalization:} line endings, encodings, ANSI escape stripping.  
-  \item \textbf{Environment-aware tests:} skip GUI/\texttt{curses} on Windows or headless CI.  
-  \item \textbf{Robust subprocess use:} avoid shell-only features, handle port-binding races.  
+  \item \textbf{Defensive checks:} add guards, fallbacks, \texttt{try/except}, or conditional imports to avoid crashes when APIs or modules are missing.
+  \item \textbf{Portable APIs:} prefer cross-platform abstractions such as \texttt{pathlib}, \texttt{platform}, or \texttt{psutil}, and use safer subprocess calls with explicit arguments.
+  \item \textbf{Normalization:} standardize encodings, line endings, paths, or filenames before comparison to prevent spurious differences.
+  \item \textbf{Environment handling:} adapt code and tests to runtime conditions (e.g., skip GUI in headless CI, manage permissions/dependencies, or use containers/virtual environments).
 \end{itemize}
+
 
 \subsection{RQ3 — Tool Effectiveness}
 \label{rq3}
