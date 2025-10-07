@@ -15,7 +15,7 @@
 \title{\PaperTitle}
 
 \begin{abstract}
-Python is widely regarded as cross-platform, yet our cross-OS re-execution of real project tests reveals frequent portability gaps. We study \NumProjects{} repositories (currently an estimated 500 analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 11 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
+Python is widely regarded as cross-platform, yet our cross-OS re-execution of real project tests reveals frequent portability gaps. We study \NumProjects{} repositories (currently an estimated 500 analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
 \end{abstract}
 
 \begin{CCSXML}
@@ -107,7 +107,7 @@ This paper contributes an empirical study that (i) re-executes tests across oper
 \paragraph{Contributions.}
 \begin{itemize}
   \item Cross-OS re-execution of Python tests across a large sample (\NumProjects{} repositories, with results reported so far from an estimated 500).
-  \item A taxonomy of 11 actionable root-cause categories (Table~\ref{tab:categories}) with ready-to-apply repair patterns.
+  \item A taxonomy of 7 actionable root-cause categories (Table~\ref{tab:categories}) with ready-to-apply repair patterns.
 \end{itemize}
 
 
@@ -201,79 +201,68 @@ Differences analyzed/categorized & 2{,}421 \\
 % ========================= CATEGORIES TABLE =========================
 \begin{table*}[t]
     \centering
-    \caption{Each row lists a root-cause category with representative sub-categories. Columns report: (i) distinct projects per sub-category observed in mined issues and in test outcomes; and (ii) the overall total (issues + tests).}
+    \caption{\Ali{Should we convert this to a single-column table instead, so it only takes half of the page width? } Each row lists a root-cause category with representative sub-categories. Columns report: (i) distinct projects per sub-category observed in mined issues and in test outcomes; and (ii) the overall total (issues + tests).}
     \label{tab:categories}
     \scriptsize
     \setlength{\tabcolsep}{3pt}
     \renewcommand{\arraystretch}{1.15}
     \begin{tabularx}{\textwidth}{
-    >{\raggedright\arraybackslash}p{0.25\textwidth}
+    >{\raggedright\arraybackslash}m{0.06\textwidth}
+    >{\raggedright\arraybackslash}p{0.20\textwidth}
     >{\raggedright\arraybackslash}X
-    >{\centering\arraybackslash}m{0.12\textwidth}
-    >{\centering\arraybackslash}m{0.12\textwidth}
-    >{\centering\arraybackslash}m{0.08\textwidth}
+    >{\centering\arraybackslash}m{0.11\textwidth}
+    >{\centering\arraybackslash}m{0.11\textwidth}
+    >{\centering\arraybackslash}m{0.07\textwidth}
 }
     \toprule
-    \textbf{Root-cause category} & \textbf{Sub-categories} & \textbf{Sub-category projects (tests)} & \textbf{Sub-category projects (issues)} & \textbf{Total projects} \\
+    \textbf{Acronym} & \textbf{Root-cause category} & \textbf{Sub-categories} & \textbf{Sub-category projects (tests)} & \textbf{Sub-category projects (issues)} & \textbf{Total projects} \\
     \midrule
     
-    \multirow[t]{3}{*}{File and Directories} 
-    & Path name convention & 27 & 7 & \multirow{3}{*}{41} \\
-    & Line ending          & 4  & 1 &                      \\
-    & Case sensitivity     & 1  & 1 &                      \\
+    \multirow[t]{6}{*}{\textbf{FILE}} & \multirow[t]{6}{*}{File and Directories} 
+    & Path separators & 27 & 7 & \multirow{6}{*}{59} \\
+    & & Line endings & 4  & 1 &                      \\
+    & & Case sensitivity & 1  & 1 &                      \\
+    & & File locking & 4 & 5 &                      \\
+    & & Encoding & 7 & 2 &                      \\
+    & & Filesystem block size & 1 & 0 &                      \\
     \midrule
     
-    \multirow[t]{3}{*}{Process execution / signal mismatch}
-    & Command execution mismatch (os.system / subprocess / popen) & 14 & 5 & \multirow{3}{*}{25} \\
-    & Signal handling (e.g., SIGKILL, SIGHUP)                     & 2  & 3 &                      \\
-    & Address already in use                                      & 0  & 1 &                      \\
+    \multirow[t]{3}{*}{\textbf{PROC}} & \multirow[t]{3}{*}{Process and Signals}
+    & Shell command execution & 14 & 5 & \multirow{3}{*}{25} \\
+    & & Missing signals & 2  & 3 &                      \\
+    & & Address already in use & 0  & 1 &                      \\
     \midrule
     
-    \multirow[t]{3}{*}{Library availability / dynamic loading mismatch}
-    & lib fcntl dont works in windows  & 1  & 2 & \multirow{3}{*}{21} \\
-    & Missing a lib                    & 11 & 2 &                      \\
-    & Dynamic library loading mismatch & 5  & 0 &                      \\
+    \multirow[t]{4}{*}{\textbf{LIB}} & \multirow[t]{4}{*}{Library Dependencies}
+    & Platform-specific libraries (e.g. fcntl) & 1  & 2 & \multirow{4}{*}{24} \\
+    & & Missing libraries & 11 & 2 &                      \\
+    & & Dynamic library loading & 5  & 0 &                      \\
+    & & Binary wheel mismatch & 3 & 0 &                      \\
     \midrule
     
-    \multirow[t]{4}{*}{Environment / terminal capability mismatch}
-    & no display avaliable in github ci for linux & 2 & 3 & \multirow{4}{*}{14} \\
-    & GUI / window-manager differences            & 4 & 0 &                      \\
-    & Curses maybe not avaliable Win              & 0 & 1 &                      \\
-    & Terminal capability mismatch                & 2 & 2 &                      \\
+    \multirow[t]{4}{*}{\textbf{ENV}} & \multirow[t]{4}{*}{Environment and Display}
+    & No display in github CI (linux) & 2 & 3 & \multirow{4}{*}{14} \\
+    & & GUI differences & 4 & 0 &                      \\
+    & & Missing curses & 0 & 1 &                      \\
+    & & Terminal capabilities & 2 & 2 &                      \\
     \midrule
     
-    Opened file locking & - & 4 & 5 & 9 \\
+    \multirow[t]{2}{*}{\textbf{API}} & \multirow[t]{2}{*}{API Availability}
+    & Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() & 2 & 4 & \multirow{2}{*}{8} \\
+    & & Modules: readline, resource & 2 & 0 &                      \\
     \midrule
     
-    Encoding mismatch & - & 7 & 2 & 9 \\
+    \multirow[t]{3}{*}{\textbf{PERM}} & \multirow[t]{3}{*}{Permissions and Limits}
+    & Permission & 1 & 3 & \multirow{3}{*}{7} \\
+    & & File descriptor limits & 1 & 0 &                     \\
+    & & Symlink privileges & 1 & 1 &                     \\
     \midrule
     
-    \multirow[t]{6}{*}{Method or module unavailable}
-    & method does not exist: os.uname()   & 1 & 2 & \multirow{6}{*}{8} \\
-    & method does not exist: os.geteuid() & 0 & 1 &                      \\
-    & method does not exist: os.getuid()  & 0 & 1 &                      \\
-    & Method does not exist: os.getpgid() & 1 & 0 &                      \\
-    & module does not exist: readline     & 1 & 0 &                      \\
-    & module does not exist: resource     & 1 & 0 &                      \\
+    \multirow[t]{2}{*}{\textbf{SYS}} & \multirow[t]{2}{*}{System Information}
+    & /proc filesystem & 0 & 1 & \multirow{2}{*}{2} \\
+    & & Timezone database & 0 & 1 &                      \\
     \midrule
-    
-    \multirow[t]{3}{*}{System permission / limits mismatch}
-    & Permission mismatch           & 1 & 3 & \multirow{3}{*}{7} \\
-    & File descriptor limits        & 1 & 0 &                     \\
-    & Symlink privilege restrictions& 1 & 1 &                     \\
-    \midrule
-    
-    Binary wheel architecture mismatch & - & 3 & 0 & 3 \\
-    \midrule
-    
-    \multirow[t]{2}{*}{System info source mismatch}
-    & /proc not available on macOS         & 0 & 1 & \multirow{2}{*}{2} \\
-    & Timezone database missing on Windows & 0 & 1 &                      \\
-    \midrule
-    
-    File system block size mismatch & - & 1 & 0 & 1 \\
-    \midrule
-    \textbf{Total} & - & \textbf{95} & \textbf{45} & \textbf{140} \\
+    \textbf{} & \textbf{Total} & - & \textbf{95} & \textbf{45} & \textbf{140} \\
     \bottomrule
     \end{tabularx}
 \end{table*}
@@ -350,64 +339,52 @@ def test_special_case():
     \setlength{\tabcolsep}{3pt}
     \renewcommand{\arraystretch}{1.15}
     \begin{tabularx}{\textwidth}{
-        >{\raggedright\arraybackslash}m{0.20\textwidth}
-        >{\raggedright\arraybackslash}m{0.28\textwidth}
+        >{\raggedright\arraybackslash}m{0.05\textwidth}
+        >{\raggedright\arraybackslash}m{0.18\textwidth}
         >{\raggedright\arraybackslash}X
-        >{\raggedright\arraybackslash}m{0.22\textwidth}
+        >{\raggedright\arraybackslash}m{0.32\textwidth}
     }
     \toprule
-    \textbf{Root-cause category} & \textbf{Sub-categories} & \textbf{Symptom (verbatim error / message)} & \textbf{General Fix Pattern} \\
+    \textbf{Cause} & \textbf{Sub-categories} & \textbf{Symptom (verbatim error / message)} & \textbf{General Fix Pattern} \\
     \midrule
-    File and Directories &
-    Path name convention & No specific signature & Normalization — normalize paths with pathlib \\
-    & Line ending & \texttt{AssertionError: '\textbackslash r\textbackslash n' != '\textbackslash n'} & Normalization — normalize line endings \\
+    \textbf{FILE} &
+    Path separators & No specific signature & Normalization — normalize paths with pathlib \\
+    & Line endings & \texttt{AssertionError: '\textbackslash r\textbackslash n' != '\textbackslash n'} & Normalization — normalize line endings \\
     & Case sensitivity & \texttt{FileNotFoundError: [Errno 2] No such file or directory: 'Readme.md'} & Normalization — case-normalize filenames \\
+    & File locking & \texttt{PermissionError: [Errno 13] Permission denied: 'filename'} & Environment handling — close files retry on Windows \\
+    & Encoding & \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x\{XX\} in position N: invalid start byte} & Normalization — set explicit UTF-8 encoding \\
+    & Filesystem block size & No specific signature & Normalization — normalize computations avoid assumptions \\
     \midrule
-    Process execution / signal mismatch &
-    Command execution mismatch (os.system / subprocess / popen) & No specific signature & Portable APIs — use subprocess.run shell=False \\
-    & Signal handling (e.g., SIGKILL, SIGHUP) & \texttt{AttributeError: module 'signal' has no attribute 'SIGHUP'} & Defensive checks — guard signals per platform \\
+    \textbf{PROC} &
+    Shell command execution & No specific signature & Portable APIs — use subprocess.run shell=False \\
+    & Missing signals & \texttt{AttributeError: module 'signal' has no attribute 'SIGHUP'} & Defensive checks — guard signals per platform \\
     & Address already in use & \texttt{OSError: [Errno 98] Address already in use} (Linux) \; / \; \texttt{OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted} (Windows) & Environment handling — retry or bind ephemeral port \\
     \midrule
-    Library availability / dynamic loading mismatch &
-    lib fcntl dont works in windows & \texttt{ModuleNotFoundError: No module named 'fcntl'} & Defensive checks — conditional import provide fallback \\
-    & Missing a lib & \texttt{ModuleNotFoundError: No module named '...'} & Environment handling — conditionally install optional dependency \\
-    & Dynamic library loading mismatch & \texttt{OSError: [WinError 126] The specified module could not be found} & Defensive checks — guard loading prefer pure-Python \\
+    \textbf{LIB} &
+    Platform-specific libraries (e.g. fcntl) & \texttt{ModuleNotFoundError: No module named 'fcntl'} & Defensive checks — conditional import provide fallback \\
+    & Missing libraries & \texttt{ModuleNotFoundError: No module named '...'} & Environment handling — conditionally install optional dependency \\
+    & Dynamic library loading & \texttt{OSError: [WinError 126] The specified module could not be found} & Defensive checks — guard loading prefer pure-Python \\
+    & Binary wheel mismatch & No specific signature & Environment handling — install platform-appropriate wheel \\
     \midrule
-    Environment / terminal capability mismatch &
-    no display avaliable in github ci for linux & \texttt{TclError: no display name and no \$DISPLAY environment variable} & Environment handling — skip GUI tests in CI \\
-    & GUI / window-manager differences & No specific signature & Environment handling — skip or mock GUI features \\
-    & Curses maybe not avaliable Win & \texttt{ModuleNotFoundError: No module named '\_curses'} & Defensive checks — conditional import with stub fallback \\
-    & Terminal capability mismatch & No specific signature & Environment handling — detect capabilities degrade gracefully \\
+    \textbf{ENV} &
+    No display in github CI (linux) & \texttt{TclError: no display name and no \$DISPLAY environment variable} & Environment handling — skip GUI tests in CI \\
+    & GUI differences & No specific signature & Environment handling — skip or mock GUI features \\
+    & Missing curses & \texttt{ModuleNotFoundError: No module named '\_curses'} & Defensive checks — conditional import with stub fallback \\
+    & Terminal capabilities & No specific signature & Environment handling — detect capabilities degrade gracefully \\
     \midrule
-    Opened file locking &
-    - & \texttt{PermissionError: [Errno 13] Permission denied: 'filename'} & Environment handling — close files retry on Windows \\
+    \textbf{API} &
+    Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() &
+    \texttt{AttributeError: module 'os' has no attribute 'uname'} (example) & Portable APIs — use platform.uname or defensive checks \\
+    & Modules: readline, resource & \texttt{ModuleNotFoundError: No module named 'readline'} (example) & Defensive checks — guard import use alternatives \\
     \midrule
-    Encoding mismatch &
-    - & \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x\{XX\} in position N: invalid start byte} & Normalization — set explicit UTF-8 encoding \\
-    \midrule
-    Method or module unavailable &
-    method does not exist: os.uname() &
-    \texttt{AttributeError: module 'os' has no attribute 'uname'} & Portable APIs — use platform.uname instead \\
-    & method does not exist: os.geteuid() & \texttt{AttributeError: module 'os' has no attribute 'geteuid'} & Defensive checks — guard call provide fallback \\
-    & method does not exist: os.getuid() & \texttt{AttributeError: module 'os' has no attribute 'getuid'} & Defensive checks — guard call provide fallback \\
-    & Method does not exist: os.getpgid() & \texttt{AttributeError: module 'os' has no attribute 'getpgid'} & Defensive checks — guard call provide fallback \\
-    & module does not exist: readline & \texttt{ModuleNotFoundError: No module named 'readline'} & Defensive checks — guard import use alternatives \\
-    & module does not exist: resource & \texttt{ModuleNotFoundError: No module named 'resource'} & Defensive checks — guard import use alternatives \\
-    \midrule
-    System permission / limits mismatch &
-    Permission mismatch & \texttt{PermissionError: [Errno 13] Permission denied: '...'} & Environment handling — handle permissions document requirements \\
+    \textbf{PERM} &
+    Permission & \texttt{PermissionError: [Errno 13] Permission denied: '...'} & Environment handling — handle permissions document requirements \\
     & File descriptor limits & \texttt{OSError: [Errno 24] Too many open files} & Environment handling — close files adjust ulimit \\
-    & Symlink privilege restrictions & \texttt{OSError: symbolic link privilege not held: 'src' -> 'dst'} & Environment handling — detect support and use copies \\
+    & Symlink privileges & \texttt{OSError: symbolic link privilege not held: 'src' -> 'dst'} & Environment handling — detect support and use copies \\
     \midrule
-    Binary wheel architecture mismatch &
-    - & No specific signature & Environment handling — install platform-appropriate wheel \\
-    \midrule
-    System info source mismatch &
-    /proc not available on macOS & \texttt{FileNotFoundError: [Errno 2] No such file or directory: '/proc/...'} & Portable APIs — use psutil or platform APIs \\
-    & Timezone database missing on Windows & \texttt{zoneinfo.\_common.ZoneInfoNotFoundError: 'No time zone found with key ...'} & Normalization — install tzdata or fallback \\
-    \midrule
-    File system block size mismatch &
-    - & No specific signature & Normalization — normalize computations avoid assumptions \\
+    \textbf{SYS} &
+    /proc filesystem & \texttt{FileNotFoundError: [Errno 2] No such file or directory: '/proc/...'} & Portable APIs — use psutil or platform APIs \\
+    & Timezone database & \texttt{zoneinfo.\_common.ZoneInfoNotFoundError: 'No time zone found with key ...'} & Normalization — install tzdata or fallback \\
     \bottomrule
     \end{tabularx}
     \end{table*}   
@@ -426,7 +403,7 @@ Executing external commands is another area where cross-platform discrepancies a
 \subsubsection{RQ2.2 — Fixes}
 \label{rq2-2}
 \textbf{Research Question.} What are the typical fixes to address portability issues in Python?  
-\textbf{Rationale.} This question focuses on how developers address portability issues once identified. Strategies include avoiding direct use of OS-specific APIs by relying on higher-level cross-platform libraries, normalizing filesystem paths with utilities such as pathlib, and handling encoding explicitly. Dependency-related problems are often mitigated by using containerization (e.g., Docker) or virtualization to ensure reproducible environments. Clear documentation of system-specific requirements also plays a key role. By analyzing these practices, we can highlight patterns that effectively reduce portability problems and help inform guidelines for the broader community.  
+\textbf{Rationale.} This question focuses on how developers address portability issu    es once identified. Strategies include avoiding direct use of OS-specific APIs by relying on higher-level cross-platform libraries, normalizing filesystem paths with utilities such as pathlib, and handling encoding explicitly. Dependency-related problems are often mitigated by using containerization (e.g., Docker) or virtualization to ensure reproducible environments. Clear documentation of system-specific requirements also plays a key role. By analyzing these practices, we can highlight patterns that effectively reduce portability problems and help inform guidelines for the broader community.  
 
 \textbf{Quick Answer.} Common fixes include relying on cross-platform libraries, normalizing paths, explicitly handling encodings, using containerized or virtualized environments, and documenting system requirements.  
 
@@ -518,7 +495,7 @@ textbf{Rationale.} This question investigates the concrete changes developers ma
 
 To validate our findings and contribute back to the open-source ecosystem, we submitted pull requests addressing the portability issues uncovered in our study. Our contributions focused on libraries where our analysis revealed systematic portability challenges, proposing fixes to improve cross-platform compatibility and robustness.
 
-Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total of \TotalPROpened{} pull requests (PRs) spanning 8 categories of portability issues, of which \TotalPRAccepted{} had been accepted at the time of writing. The overall acceptance rate of 27\%, along with a zero rejection rate, indicates that the issues we identified correspond to genuine portability problems recognized by library maintainers. Notably, ``Method or module unavailable'' issues were the most frequent (11 PRs), reflecting substantial API inconsistencies across platforms. Conversely, ``Process execution / signal mismatch'' issues exhibited the highest acceptance rate (100\%), likely due to their critical impact on application functionality.
+Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total of \TotalPROpened{} pull requests (PRs) spanning 6 categories of portability issues, of which \TotalPRAccepted{} had been accepted at the time of writing. The overall acceptance rate of 33\%, along with a zero rejection rate, indicates that the issues we identified correspond to genuine portability problems recognized by library maintainers. Notably, ``File and Directories'' issues were the most frequent (18 PRs), reflecting the prevalence of path, encoding, and file handling inconsistencies across platforms. Conversely, ``Process and Signals'' issues exhibited the highest acceptance rate (100\%), likely due to their critical impact on application functionality.
 
 \begin{table}[h!]
     \centering
@@ -531,14 +508,12 @@ Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total 
         \toprule
         \textbf{Category} & \textbf{Opened} & \textbf{Accepted} & \textbf{Rejected} \\
         \midrule
-        Method or module unavailable & 11 & 0 & 0 \\
-        Opened file locking & 4 & 2 & 0 \\
-        File/path representation mismatch & 8 & 3 & 0 \\
-        Encoding mismatch & 4 & 1 & 0 \\
-        Environment / terminal capability mismatch & 1 & 0 & 0 \\
-        Process execution / signal mismatch & 2 & 2 & 0 \\
-        System info source mismatch & 2 & 1 & 0 \\
-        Library availability / dynamic loading mismatch & 1 & 0 & 0 \\
+        File and Directories & 18 & 6 & 0 \\
+        API Availability & 12 & 2 & 0 \\
+        Process and Signals & 2 & 2 & 0 \\
+        System Information & 2 & 1 & 0 \\
+        Library Dependencies & 1 & 1 & 0 \\
+        Environment and Display & 1 & 0 & 0 \\
         \midrule
         \textbf{Total} & \textbf{\TotalPROpened} & \textbf{\TotalPRAccepted} & \textbf{\TotalPRRejected} \\
         \bottomrule
