@@ -450,6 +450,43 @@ Our analysis revealed that, among these tools, only Ruff provides a rule that di
 
 \textbf{Motivation for LLM Evaluation.} Given the limited support for portability checks in existing static tools, we extended our evaluation to large language models (LLMs). We designed an experiment in which LLMs are presented with real Python code snippets exhibiting both portable and non-portable behavior. By comparing the models' predictions against the known classification of each snippet, we can quantitatively assess their ability to detect portability issues. Specifically, we calculate precision and recall for each model, providing an objective measure of performance in identifying cross-platform hazards that traditional static tools largely fail to capture. This approach allows us to explore whether LLMs can serve as a complementary analysis layer for improving cross-platform Python development practices.
 
+% results LLMs:
+
+Table~\ref{tab:llm_performance} presents the quantitative results for the four evaluated LLMs across 51 Python code samples, of which 17 were portable and 34 non-portable. Overall, the models exhibit moderate yet encouraging ability to identify cross-platform issues, suggesting potential for complementary use alongside traditional static analyzers.
+
+\begin{table}[h!]
+\centering
+\caption{Performance metrics for each evaluated LLM in detecting Python portability issues.}
+\label{tab:llm_performance}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & Precision & Recall & F1-Score & Accuracy & Samples \\
+\midrule
+\texttt{llama-3.3-70b-instruct} & 0.545 & 0.353 & 0.429 & 0.686 & 51 \\
+\texttt{grok-4-fast} & 0.548 & 1.000 & 0.708 & 0.725 & 51 \\
+\texttt{gpt-4o-mini} & 0.818 & 0.529 & 0.643 & 0.804 & 51 \\
+\texttt{deepseek-chat-v3.1} & 0.684 & 0.765 & 0.722 & 0.804 & 51 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The \texttt{Llama-3.3-70B-Instruct} model achieved the lowest recall (0.353) and F1-score (0.429), indicating that while it correctly identified some portability violations, it frequently failed to recognize others. This suggests limited sensitivity to OS-specific patterns or file-handling idiosyncrasies. The confusion matrix confirms that it misclassified many truly portable samples as non-portable, evidencing a tendency toward conservative classification.
+
+\texttt{Grok-4-Fast} reached perfect recall (1.000) but comparatively low precision (0.548), meaning it successfully captured all truly portable cases but also misclassified a considerable number of non-portable snippets as portable. This overgeneralization may stem from the model’s heuristic bias toward permissive judgments when uncertain, emphasizing recall at the expense of specificity. Its behavior mirrors an “inclusive” classification approach that prioritizes coverage rather than accuracy.
+
+In contrast, \texttt{GPT-4o-Mini} exhibited the highest precision (0.818) and overall accuracy (0.804), indicating that when it predicted portability, it was usually correct. However, its recall (0.529) reveals that it missed several truly portable instances. This conservative profile suggests that the model prefers to err on the side of caution, labeling code as non-portable unless the evidence of portability is explicit. Such behavior could be advantageous in a practical context, where false negatives (i.e., missed portability) are less problematic than false positives.
+
+The \texttt{DeepSeek-Chat-v3.1} model achieved the best F1-score (0.722), representing the most balanced trade-off between precision (0.684) and recall (0.765). Its performance suggests an ability to generalize across various forms of cross-platform behavior while maintaining a reasonable error rate. Unlike Grok-4-Fast, DeepSeek did not rely on excessive positive classification but instead demonstrated a nuanced understanding of environment-dependent operations.
+
+Comparing these outcomes reveals different inferential ``styles'' among LLMs. Llama tended toward under-detection, Grok favored over-detection, GPT-4o adopted a cautious filtering approach, and DeepSeek found a middle ground. This behavioral diversity highlights that LLMs are not homogeneous analyzers but systems that exhibit distinct operational trade-offs shaped by their alignment, instruction-tuning, and domain exposure.
+
+From a broader perspective, all models demonstrated at least partial awareness of portability-related concepts such as file I/O encodings, OS-specific path separators, and dependency on environment variables. However, they struggled to identify more subtle forms of non-portability, including locale-dependent string handling, subprocess calls, or reliance on unavailable system commands. This limitation underscores that while LLMs possess broad reasoning capabilities, their implicit software knowledge remains probabilistic and incomplete.
+
+Interestingly, the models occasionally provided correct justifications for their decisions—even when the final classification was wrong. For example, some outputs identified potential encoding issues or noted that “file paths might differ across systems” but still concluded with “Portable!!!”. This pattern suggests that LLMs can reason about the relevant dimension but fail to consistently map that reasoning to the correct final label, a challenge that could be addressed through targeted prompt calibration or reinforcement feedback.
+
+In aggregate, these findings indicate that LLMs are capable of performing basic reasoning about cross-platform hazards, achieving results that surpass random guessing by a substantial margin. Although no model reached expert-level reliability, the observed F1-scores between 0.43 and 0.72 demonstrate meaningful signal extraction from the task, validating the experimental premise that LLMs can detect portability-related cues even without explicit static rules.
+
+Finally, the results highlight a promising research avenue: integrating LLMs as auxiliary components within static analysis pipelines. Their probabilistic insights could help prioritize inspection of code segments with higher cross-platform risk, complementing deterministic linters that lack such reasoning capacity. Thus, while current performance remains limited, the overall evidence supports the view that LLM-assisted analysis represents a viable, if early-stage, approach toward improving Python portability assessment.
 
 
 \textbf{Quick Answer.} \Fix{turn this into a box anwser:}Static tools (linters, CodeQL, LLM prompts) can detect some issues but miss runtime failures. Dynamic re-execution across OSes (our approach) provides broader coverage.
