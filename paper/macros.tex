@@ -4,6 +4,7 @@
     
 
 % --- Preamble (place in your preamble) ---
+% \usepackage[switch]{lineno}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{placeins} % for \FloatBarrier to control float placement
@@ -175,7 +176,7 @@
 %% % ----------
 %% % PAPER TEXT
 
-\newcommand{\PaperTitle}{An Empirical Analysis of Portability Issues in Python Tests}
+\newcommand{\PaperTitle}{An Empirical Analysis of Portability Issues in Python}
 
 
 \newcommand{\RV}{RV\xspace}
@@ -237,6 +238,24 @@
 \newcommand{\tfvereval}{2.16.1\xspace}
 \newcommand{\torchverwild}{2.7.0\xspace}
 \newcommand{\tfverwild}{2.19.0\xspace}
+
+% RQS OF THE PAPER
+\newcommand{\RQOne}{\EQ{1}: How prevalent are portability issues in Python tests when executed across different operating systems?}
+
+\newcommand{\RQTwo}{\EQ{2}: What are the characteristics and causes of portability problems in Python software?}
+
+
+\newcommand{\RQTwoOne}{\EQ{2.1}: What are the root causes of portability problems in Python?}
+
+\newcommand{\RQTwoTwo}{\EQ{2.2}: How do portability issues manifest and how can they be detected?}
+
+\newcommand{\RQThree}{\EQ{3}: How good are existing tools at detecting portability issues in Python projects?}
+
+\newcommand{\RQFour}{\EQ{4}: How Do Developers Respond to Reported Portability Issues?}
+\newcommand{\RQFourOne}{\EQ{4.1}: What types of fixes are most commonly applied to resolve portability issues, and what solution patterns can be identified?}
+\newcommand{\RQFourTwo}{\EQ{4.2}: How do open-source developers and project communities respond to reported portability issues (issues, pull requests, or discussions)?}
+
+
 
 % NUMBERS OF THE PAPER
 \newcommand{\NumProjects}{2,042}

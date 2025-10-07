@@ -12,13 +12,15 @@
 
 \begin{document}
 
+% \renewcommand\linenumberfont{\normalfont\bfseries\small\color{red}}
+
 \pagestyle{plain} % simple page style with numbers
 \fancyfoot{}
 
 \title{\PaperTitle}
 
 \begin{abstract}
-Python is widely regarded as cross-platform, yet our cross-OS re-execution of real project tests reveals frequent portability gaps. We study \NumProjects{} repositories (currently an estimated 500 analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
+Python is broadly used across operating systems, but our cross-OS test re-execution reveals persistent portability issues. We study \NumProjects{} repositories (currently an estimated 500 analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
 \end{abstract}
 
 \begin{CCSXML}
@@ -160,8 +162,68 @@ a handful of commits to large, long-lived, and widely adopted projects.
 
 We applied AND across axes and OR within each axis, so matches typically required an OS reference plus a failure/fix cue, optionally reinforced by test or cause terms. We searched titles, bodies, and comments, with extra weight to title and close-proximity matches. Light triage (brief summaries and negative filters for off-topic mentions) kept the set precise. Candidate issues were normalized into consistent records (project, link, date, summary, compact tags like OS=, FIX=, TEST=, CAUSE=), duplicates removed, and full text (title, description, comments) archived for analysis.  
 
-\section{Evaluation}
-\label{sec:evaluation}
+\section{Methods and Objects of analysis}
+
+This section describes the projects we used (\ref{sec:projects}), the
+setup of our experiments (\ref{sec:setup}), and the research questions
+we posed (\ref{sec:questions}).
+
+\subsection{Projects}
+\label{sec:projects}
+
+\subsection{Setup}
+\label{sec:setup}
+
+\subsection{Research Questions and Methodology}
+\label{sec:questions}
+
+We aim to answer the following key research questions:
+
+
+\noindent\textit{\RQOne{}}
+
+
+\textbf{Rationale.} With this question, we aim to measure how often portability problems actually occur in practice. Although Python is advertised as a cross-platform language, our preliminary results suggest that many tests fail when run on different operating systems. By quantifying the frequency of such issues across a representative set of projects and applying statistical tests, we can provide stronger evidence on whether portability is a widespread concern in the Python ecosystem or only affects a small subset of projects.  
+
+
+\textbf{Methodology.} \Fix{Describe here the methodology to answer RQ1.}
+\par
+
+\textit{\RQTwo{}}
+
+\textbf{Rationale.} This question is important to justify further investigation on portability problems in Python software. If we find that these problems are rare or have no consistent causes or manifestations, then further investigation is meaningless. To understand how and why portability issues occur in Python programs, we aim to answer two questions: 
+
+
+\noindent\textit{\RQTwoOne{}}
+% \textbf{Rationale.} This question seeks to identify and categorize the underlying reasons why portability issues arise. Our observations indicate that differences in modules such as os, file system conventions, path handling, and environment-specific assumptions may contribute to failures. In addition, some dependencies work properly on one operating system but not on another, further aggravating the problem. Understanding these root causes is essential not only to characterize the problem but also to guide the development of best practices and tools to prevent such issues in the future.  
+
+% \textbf{Rationale.} Recognizing diagnostic signatures helps developers quickly triage failures and identify the underlying portability issue from test logs or CI output. While not all issues produce unique error messages, many exhibit specific, reproducible patterns that enable rapid diagnosis.
+
+\noindent\textit{\RQTwoTwo{}}
+
+\textbf{Methodology.} \Fix{Describe here the methodology to answer RQ2}
+
+\noindent\textit{\RQThree{}}
+
+\textbf{Rationale.} This question investigates to what extent existing tools help identify portability problems. Static tools, including linters, type checkers, CodeQL queries, and even large language models, can flag certain categories of issues, such as OS-dependent APIs or unsafe path handling. However, many portability issues only manifest at runtime, for example due to environment assumptions, platform-specific encodings, or dependency incompatibilities. To complement static checks, we employ a dynamic strategy—our ``rerun'' approach—that executes tests across multiple operating systems to reveal failures that static analysis cannot anticipate. By comparing the coverage of static and dynamic techniques, we can assess their effectiveness and identify opportunities for improving tool support in cross-platform Python development. 
+
+\textbf{Methodology.} \Fix{Describe here the methodology to answer RQ3}
+
+
+\noindent\textit{\RQFour{}}
+
+\textbf{Rationale.} This question is important to justify further investigation on how developers handle portability issues in real projects. If developers rarely fix such problems or do not discuss them actively, further investigation is meaningless. To understand both the technical and social dimensions of how portability issues are addressed, we aim to answer two questions: 
+
+\noindent\textit{\RQFourOne{}}
+
+\noindent\textit{\RQFourTwo{}}
+
+\textbf{Methodology.} \Fix{Describe here the methodology to answer RQ4}
+
+
+
+\section{Results}
+\label{sec:results}
 % This section presents the empirical results of our study,
 % organized around the research questions (RQ1–RQ4.2).
 % For each RQ, we restate the rationale, present the findings,
@@ -169,12 +231,10 @@ We applied AND across axes and OR within each axis, so matches typically require
 
 \subsection{RQ1 — Prevalence}
 \label{rq1}
-\textbf{Rationale.} With this question, we aim to measure how often portability problems actually occur in practice. Although Python is advertised as a cross-platform language, our preliminary results suggest that many tests fail when run on different operating systems. By quantifying the frequency of such issues across a representative set of projects and applying statistical tests, we can provide stronger evidence on whether portability is a widespread concern in the Python ecosystem or only affects a small subset of projects.  
+\RQOne{}
 
 % add here: statistics, tables, and plots showing the frequency and distribution of portability issues
 % for example: Table 1 (Projects analyzed, tests executed, failures observed), Figure 1 (Distribution of failures by OS)
-
-\textbf{Research Question.} How prevalent are portability issues in Python tests when executed across different operating systems?  
 
 \textbf{Snapshot.}
 \begin{table}[h]
@@ -196,8 +256,8 @@ Differences analyzed/categorized & 2{,}421 \\
 \subsection{RQ2 — Causes, Symptoms, and Fixes}
 \subsubsection{RQ2.1 — Root Causes}
 \label{rq2-1}
-\textbf{Research Question.} What are the root causes of portability problems in Python?  
-\textbf{Rationale.} This question seeks to identify and categorize the underlying reasons why portability issues arise. Our observations indicate that differences in modules such as os, file system conventions, path handling, and environment-specific assumptions may contribute to failures. In addition, some dependencies work properly on one operating system but not on another, further aggravating the problem. Understanding these root causes is essential not only to characterize the problem but also to guide the development of best practices and tools to prevent such issues in the future.   
+\RQTwoOne{}
+ 
 
 \textbf{Findings.} Table~\ref{tab:categories} reports root-cause categories with sub-categories (bulleted). Numbers are aggregated per category (tests, issues, and totals).  
 
@@ -405,10 +465,11 @@ def test_special_case():
 
 \subsubsection{RQ2.2 — Symptoms}
 \label{rq2-2}
-\textbf{Research Question.} How do portability issues manifest and how can they be detected?  
-\textbf{Rationale.} Recognizing diagnostic signatures helps developers quickly triage failures and identify the underlying portability issue from test logs or CI output. While not all issues produce unique error messages, many exhibit specific, reproducible patterns that enable rapid diagnosis.
+\RQTwoTwo{}
 
-\noindent\textbf{Symptom signatures.} For subcategories with concrete signals, we list verbatim exceptions or OS-specific error texts that reliably identify the underlying cause in test/CI logs. Not every subcategory has a unique signature; we include only those with specific, reproducible messages (e.g., \texttt{AttributeError: module 'os' has no attribute 'uname'}, \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x..}). These signatures are meant to speed triage and help developers and tools quickly recognize portability issues; they are not exhaustive of all possible manifestations (see Table~\ref{tab:symptoms}).  
+\subsection{Symptom signatures} 
+
+For subcategories with concrete signals, we list verbatim exceptions or OS-specific error texts that reliably identify the underlying cause in test/CI logs. Not every subcategory has a unique signature; we include only those with specific, reproducible messages (e.g., \texttt{AttributeError: module 'os' has no attribute 'uname'}, \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x..}). These signatures are meant to speed triage and help developers and tools quickly recognize portability issues; they are not exhaustive of all possible manifestations (see Table~\ref{tab:symptoms}).  
 
 \textbf{Quick Answer.} Most portability issues produce distinctive error signatures that enable quick diagnosis and categorization.
 
@@ -439,8 +500,8 @@ Table~\ref{tab:symptoms} maps each root-cause category to its recommended fix pa
 
 \subsection{RQ3 — Tool Effectiveness}
 \label{rq3}
-\textbf{Research Question.} How good are existing tools at detecting portability issues in Python projects?  
-\textbf{Rationale.} This question investigates to what extent existing tools help identify portability problems. Static tools, including linters, type checkers, CodeQL queries, and even large language models, can flag certain categories of issues, such as OS-dependent APIs or unsafe path handling. However, many portability issues only manifest at runtime, for example due to environment assumptions, platform-specific encodings, or dependency incompatibilities. To complement static checks, we employ a dynamic strategy—our ``rerun'' approach—that executes tests across multiple operating systems to reveal failures that static analysis cannot anticipate. By comparing the coverage of static and dynamic techniques, we can assess their effectiveness and identify opportunities for improving tool support in cross-platform Python development. 
+\RQThree{}
+
 
 \textbf{Analysis of Static Tools.} To evaluate the effectiveness of static analysis tools in detecting Python portability issues, we systematically examined the rules and capabilities of several widely used linters and type checkers. Specifically, we considered Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright}.
 
@@ -493,12 +554,12 @@ Finally, the results highlight a promising research avenue: integrating LLMs as 
 % Add here: quantitative comparison (coverage, precision, recall)
 % For example: Figure 3 (Venn diagram of issues detected by static vs dynamic approaches)
 
-\subsection{RQ4. How Do Developers Respond to Reported Portability Issues?}
+\subsection{RQ4. \RQFour{}}
 \label{sec:pr-discussion}
 \subsubsection{RQ4.1 — Applied Fixes}
 \label{rq4-1}
-\textbf{Research Question.} What types of fixes are most commonly applied to resolve portability issues, and what solution patterns can be identified?  
-textbf{Rationale.} This question investigates the concrete changes developers make when addressing portability problems. For example, replacing operating-system-specific API calls, adopting cross-platform libraries, or adding conditional code that adapts to the environment. By categorizing and analyzing these changes, we can uncover recurring solution patterns that may be generalized into practical guidelines for writing more portable Python software.  
+\textbf{Research Question.} \RQFourOne{}
+ 
 
 % Add here: commit/PR analysis, with representative examples of code changes
 % For example: Table 4 (Common fix patterns with frequency and examples)
@@ -508,8 +569,8 @@ textbf{Rationale.} This question investigates the concrete changes developers ma
 
 \subsubsection{RQ4.2 — Community Reaction}
 \label{rq4-2}
-\textbf{Research Question.} How do open-source developers and project communities respond to reported portability issues (issues, pull requests, or discussions)?  
-\textbf{Rationale.} This question examines how the OSS community treats portability fixes by analyzing issue trackers, pull requests, and related discussions. We investigate whether such problems are seen as important, how quickly they are addressed, and the engagement level (comments, reviews, merges) these fixes receive, helping us understand real-world awareness and prioritization of portability.  
+\textbf{Research Question.} \RQFourTwo{}
+
 
 % Add here: time-to-fix statistics, issue/PR comment analysis
 % For example: Figure 4 (Distribution of time-to-fix), Table 5 (Engagement metrics per project)
