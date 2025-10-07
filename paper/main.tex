@@ -2,6 +2,8 @@
 \PassOptionsToPackage{table}{xcolor}
 \documentclass[sigconf,review,anonymous]{acmart}
 
+
+
 \usepackage{tabularx}   % flexible X column
 \usepackage{booktabs}   % rules
 \usepackage{array}      % for m{} column type
@@ -10,6 +12,7 @@
 
 \begin{document}
 
+\pagestyle{plain} % simple page style with numbers
 \fancyfoot{}
 
 \title{\PaperTitle}
@@ -449,7 +452,7 @@ Our analysis revealed that, among these tools, only Ruff provides a rule that di
 
 Table~\ref{tab:llm_performance} presents the quantitative results for the four evaluated LLMs across 51 Python code samples, of which 17 were portable and 34 non-portable. Overall, the models exhibit moderate yet encouraging ability to identify cross-platform issues, suggesting potential for complementary use alongside traditional static analyzers.
 
-\begin{table}[h!]
+\begin{table*}[h!]
 \centering
 \caption{Performance metrics for each evaluated LLM in detecting Python portability issues.}
 \label{tab:llm_performance}
@@ -463,7 +466,7 @@ Model & Precision & Recall & F1-Score & Accuracy & Samples \\
 \texttt{deepseek-chat-v3.1} & 0.684 & 0.765 & 0.722 & 0.804 & 51 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 The \texttt{Llama-3.3-70B-Instruct} model achieved the lowest recall (0.353) and F1-score (0.429), indicating that while it correctly identified some portability violations, it frequently failed to recognize others. This suggests limited sensitivity to OS-specific patterns or file-handling idiosyncrasies. The confusion matrix confirms that it misclassified many truly portable samples as non-portable, evidencing a tendency toward conservative classification.
 
@@ -515,7 +518,7 @@ To validate our findings and contribute back to the open-source ecosystem, we su
 
 Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total of \TotalPROpened{} pull requests (PRs) spanning 6 categories of portability issues, of which \TotalPRAccepted{} had been accepted at the time of writing. The overall acceptance rate of 33\%, along with a zero rejection rate, indicates that the issues we identified correspond to genuine portability problems recognized by library maintainers. Notably, ``File and Directories'' issues were the most frequent (18 PRs), reflecting the prevalence of path, encoding, and file handling inconsistencies across platforms. Conversely, ``Process and Signals'' issues exhibited the highest acceptance rate (100\%), likely due to their critical impact on application functionality.
 
-\begin{table}[h!]
+\begin{table*}[h!]
     \centering
     \footnotesize
     \setlength{\tabcolsep}{2pt}
@@ -536,7 +539,7 @@ Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total 
         \textbf{Total} & \textbf{\TotalPROpened} & \textbf{\TotalPRAccepted} & \textbf{\TotalPRRejected} \\
         \bottomrule
     \end{tabular}
-\end{table}
+\end{table*}
 
 \textbf{Quick Answer.} Developers typically acknowledge portability problems but often give them lower priority than functional bugs, resulting in varied resolution times.  
 
