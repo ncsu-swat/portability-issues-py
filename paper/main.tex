@@ -20,7 +20,7 @@
 \title{\PaperTitle}
 
 \begin{abstract}
-Python is broadly used across operating systems, but our cross-OS test re-execution reveals persistent portability issues. We study \NumProjects{} repositories (currently an estimated 500 analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
+Python is broadly used across operating systems, but our cross-OS test re-execution reveals persistent portability issues. We study \NumProjects{} repositories (currently an estimated 500 analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (e.g., guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
 \end{abstract}
 
 \begin{CCSXML}
@@ -121,9 +121,20 @@ We define an \emph{OS portability issue} as a difference in test outcome across 
 
 \section{Methodology}
 \label{sec:methodology}
+
+
+\section{Methods and Objects of analysis}
+
+This section describes the projects we used (\ref{sec:projects}), the
+setup of our experiments (\ref{sec:setup}), and the research questions
+we posed (\ref{sec:questions}).
+
+\subsection{Projects}
+\label{sec:projects}
+
 \textbf{Dataset.} We sampled \NumProjects{} Python repositories; the analyses reported here reflect the first $\sim$500 analyzed.  
-
-
+\subsection{Selection criteria.} We selected projects based on the following criteria: \Fix{DO IT!}
+% i) \textbf{Language:} Python as primary language; ii) \textbf{Activity:} at least 100 commits and 10 contributors; iii) \textbf{Testing:} presence of an automated test suite (e.g., pytest, unittest); iv) \textbf{Popularity:} at least 50 stars on GitHub; v) \textbf{Diversity:} a mix of application domains (web, data science, utilities, etc.); vi) \textbf{Non-containerized:} absence of Dockerfile or Singularity recipe to create images.
 
 \begin{table}[H]
 
@@ -152,7 +163,7 @@ a handful of commits to large, long-lived, and widely adopted projects.
 
 
 
-\textbf{Cross-OS re-execution.} For each project we run the test suite on multiple operating systems and record divergent outcomes. We then triage failures via logs and small code inspections, mapping each instance to a concrete category.  
+\subsection{Methods}\textbf{Cross-OS re-execution.} For each project we run the test suite on multiple operating systems and record divergent outcomes. We then triage failures via logs and small code inspections, mapping each instance to a concrete category.\Fix{Explain what is a category.}  
 
 \textbf{Mining portability-related issues.} To complement test-based findings, we also mine GitHub issues and pull requests. We built a “candidate finder” combining multiple keyword axes:  
 (a) OS/platform indicators (e.g., Windows, Linux, macOS, specific distros/architectures),  
@@ -162,17 +173,13 @@ a handful of commits to large, long-lived, and widely adopted projects.
 
 We applied AND across axes and OR within each axis, so matches typically required an OS reference plus a failure/fix cue, optionally reinforced by test or cause terms. We searched titles, bodies, and comments, with extra weight to title and close-proximity matches. Light triage (brief summaries and negative filters for off-topic mentions) kept the set precise. Candidate issues were normalized into consistent records (project, link, date, summary, compact tags like OS=, FIX=, TEST=, CAUSE=), duplicates removed, and full text (title, description, comments) archived for analysis.  
 
-\section{Methods and Objects of analysis}
-
-This section describes the projects we used (\ref{sec:projects}), the
-setup of our experiments (\ref{sec:setup}), and the research questions
-we posed (\ref{sec:questions}).
-
-\subsection{Projects}
-\label{sec:projects}
-
 \subsection{Setup}
 \label{sec:setup}
+
+\Den{I don't know if it's necessary and I also don't know if the text is clear enough. Please check/revise!}
+All experiments were conducted across three operating systems to ensure compatibility. The Linux setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Ubuntu 24.04 LTS.
+
+The macOS setup ran on an Apple M2 Pro chip (Arm64) with 5 CPU cores, 8 GPU cores, 14 GB unified memory, and macOS 15. The Windows setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Windows Server 2025.
 
 \subsection{Research Questions and Methodology}
 \label{sec:questions}
@@ -505,7 +512,7 @@ Table~\ref{tab:symptoms} maps each root-cause category to its recommended fix pa
 
 \textbf{Analysis of Static Tools.} To evaluate the effectiveness of static analysis tools in detecting Python portability issues, we systematically examined the rules and capabilities of several widely used linters and type checkers. Specifically, we considered Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright}.
 
-Our analysis revealed that, among these tools, only Ruff provides a rule that directly addresses potential portability concerns, namely the \texttt{unspecified-encoding} check~\cite{encruff}. This rule helps identify cases where files are opened without explicitly specifying an encoding, which may lead to cross-platform inconsistencies. The remaining tools focus primarily on style, type correctness, security, and general code quality, without offering rules specifically designed to detect operating-system-dependent behaviors or other portability issues.
+Our analysis revealed that, among these tools, only Ruff provides a rule that directly addresses potential portability concerns, namely the \texttt{unspecified-encoding} check~\cite{encruff} That maps to your subcategory \Fix{@Ali, please add the name here}. This rule helps identify cases where files are opened without explicitly specifying an encoding, which may lead to cross-platform inconsistencies. The remaining tools focus primarily on style, type correctness, security, and general code quality, without offering rules specifically designed to detect operating-system-dependent behaviors or other portability issues.
 
 \textbf{Motivation for LLM Evaluation.} Given the limited support for portability checks in existing static tools, we extended our evaluation to large language models (LLMs). We designed an experiment in which LLMs are presented with real Python code snippets exhibiting both portable and non-portable behavior. By comparing the models' predictions against the known classification of each snippet, we can quantitatively assess their ability to detect portability issues. Specifically, we calculate precision and recall for each model, providing an objective measure of performance in identifying cross-platform hazards that traditional static tools largely fail to capture. This approach allows us to explore whether LLMs can serve as a complementary analysis layer for improving cross-platform Python development practices.
 
@@ -519,7 +526,7 @@ Table~\ref{tab:llm_performance} presents the quantitative results for the four e
 \label{tab:llm_performance}
 \begin{tabular}{lrrrrr}
 \toprule
-Model & Precision & Recall & F1-Score & Accuracy & Samples \\
+Model & Precision & Recall & F1-Score & Accuracy & \# Samples \\
 \midrule
 \texttt{llama-3.3-70b-instruct} & 0.545 & 0.353 & 0.429 & 0.686 & 51 \\
 \texttt{grok-4-fast} & 0.548 & 1.000 & 0.708 & 0.725 & 51 \\
@@ -578,6 +585,9 @@ Finally, the results highlight a promising research avenue: integrating LLMs as 
 To validate our findings and contribute back to the open-source ecosystem, we submitted pull requests addressing the portability issues uncovered in our study. Our contributions focused on libraries where our analysis revealed systematic portability challenges, proposing fixes to improve cross-platform compatibility and robustness.
 
 Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total of \TotalPROpened{} pull requests (PRs) spanning 6 categories of portability issues, of which \TotalPRAccepted{} had been accepted at the time of writing. The overall acceptance rate of 33\%, along with a zero rejection rate, indicates that the issues we identified correspond to genuine portability problems recognized by library maintainers. Notably, ``File and Directories'' issues were the most frequent (18 PRs), reflecting the prevalence of path, encoding, and file handling inconsistencies across platforms. Conversely, ``Process and Signals'' issues exhibited the highest acceptance rate (100\%), likely due to their critical impact on application functionality.
+
+
+From this number of PRs, we observe that the fix was applied in \TotalPRInTestsCode{} cases to the test code only, in \TotalPRInProgramCode{} cases to the program code only, and in \TotalPRInBothCode{} cases to both the test and program code. This distribution suggests that while some portability issues can be resolved by adjusting tests to be more environment-aware, many require changes to the application logic itself to ensure consistent behavior across platforms.
 
 \begin{table*}[h!]
     \centering
