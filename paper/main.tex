@@ -271,68 +271,68 @@ Differences analyzed/categorized & 2{,}421 \\
 % ========================= CATEGORIES TABLE =========================
 \begin{table*}[t]
     \centering
-    \caption{\Ali{Should we convert this to a single-column table instead, so it only takes half of the page width? } Each row lists a root-cause category with representative sub-categories. Columns report: (i) distinct projects per sub-category observed in mined issues and in test outcomes; and (ii) the overall total (issues + tests).}
+    \caption{Taxonomy of portability issues showing root-cause categories, subcategories, brief descriptions, and number of distinct projects observed in test execution and mined GitHub issues.}
     \label{tab:categories}
     \scriptsize
     \setlength{\tabcolsep}{3pt}
     \renewcommand{\arraystretch}{1.15}
     \begin{tabularx}{\textwidth}{
-    >{\raggedright\arraybackslash}m{0.06\textwidth}
-    >{\raggedright\arraybackslash}p{0.20\textwidth}
+    >{\raggedright\arraybackslash}p{0.18\textwidth}
     >{\raggedright\arraybackslash}X
-    >{\centering\arraybackslash}m{0.11\textwidth}
-    >{\centering\arraybackslash}m{0.11\textwidth}
+    >{\raggedright\arraybackslash}p{0.23\textwidth}
+    >{\centering\arraybackslash}m{0.08\textwidth}
+    >{\centering\arraybackslash}m{0.08\textwidth}
     >{\centering\arraybackslash}m{0.07\textwidth}
 }
     \toprule
-    \textbf{Acronym} & \textbf{Root-cause category} & \textbf{Sub-categories} & \textbf{Sub-category projects (tests)} & \textbf{Sub-category projects (issues)} & \textbf{Total projects} \\
+    \textbf{Root-cause category (Acronym)} & \textbf{Sub-categories} & \textbf{Description} & \textbf{\# of tests found} & \textbf{\# of issues found} & \textbf{Total} \\
     \midrule
     
-    \multirow[t]{6}{*}{\textbf{FILE}} & \multirow[t]{6}{*}{File and Directories} 
-    & Path separators & 27 & 7 & \multirow{6}{*}{59} \\
-    & & Line endings & 4  & 1 &                      \\
-    & & Case sensitivity & 1  & 1 &                      \\
-    & & File locking & 4 & 5 &                      \\
-    & & Encoding & 7 & 2 &                      \\
-    & & Filesystem block size & 1 & 0 &                      \\
+    \multirow[t]{6}{*}{File and Directories (FILE)} 
+    & Path separators & Forward vs. backslash differences & 27 & 7 & \multirow{6}{*}{59} \\
+    & Line endings & CRLF vs. LF mismatch & 4  & 1 &                      \\
+    & Case sensitivity & Filename case handling varies & 1  & 1 &                      \\
+    & File locking & Windows locks open files & 4 & 5 &                      \\
+    & Encoding & UTF-8 not default everywhere & 7 & 2 &                      \\
+    & Filesystem block size & Block size assumptions differ & 1 & 0 &                      \\
     \midrule
     
-    \multirow[t]{3}{*}{\textbf{PROC}} & \multirow[t]{3}{*}{Process and Signals}
-    & Shell command execution & 14 & 5 & \multirow{3}{*}{25} \\
-    & & Missing signals & 2  & 3 &                      \\
-    & & Address already in use & 0  & 1 &                      \\
+    \multirow[t]{3}{*}{Process and Signals (PROC)}
+    & Shell command execution & Shell behavior differs across OS & 14 & 5 & \multirow{3}{*}{25} \\
+    & Missing signals & Signals unavailable on Windows & 2  & 3 &                      \\
+    & Address already in use & Port binding conflicts vary & 0  & 1 &                      \\
     \midrule
     
-    \multirow[t]{4}{*}{\textbf{LIB}} & \multirow[t]{4}{*}{Library Dependencies}
-    & Platform-specific libraries (e.g. fcntl) & 1  & 2 & \multirow{4}{*}{24} \\
-    & & Missing libraries & 11 & 2 &                      \\
-    & & Dynamic library loading & 5  & 0 &                      \\
-    & & Binary wheel mismatch & 3 & 0 &                      \\
+    \multirow[t]{4}{*}{Library Dependencies (LIB)}
+    & Platform-specific libraries (e.g. fcntl) & Unix-only libraries missing elsewhere & 1  & 2 & \multirow{4}{*}{24} \\
+    & Missing libraries & Dependencies not universally available & 11 & 2 &                      \\
+    & Dynamic library loading & DLL vs. SO file issues & 5  & 0 &                      \\
+    & Binary wheel mismatch & Architecture-specific wheel incompatibilities & 3 & 0 &                      \\
     \midrule
     
-    \multirow[t]{4}{*}{\textbf{ENV}} & \multirow[t]{4}{*}{Environment and Display}
-    & No display in github CI (linux) & 2 & 3 & \multirow{4}{*}{14} \\
-    & & GUI differences & 4 & 0 &                      \\
-    & & Missing curses & 0 & 1 &                      \\
-    & & Terminal capabilities & 2 & 2 &                      \\
+    \multirow[t]{4}{*}{Environment and Display (ENV)}
+    & No display in github CI (linux) & Headless CI lacks display server & 2 & 3 & \multirow{4}{*}{14} \\
+    & GUI differences & Window manager behavior varies & 4 & 0 &                      \\
+    & Missing curses & Curses unavailable on Windows & 0 & 1 &                      \\
+    & Terminal capabilities & Terminal features differ across systems & 2 & 2 &                      \\
     \midrule
     
-    \multirow[t]{2}{*}{\textbf{API}} & \multirow[t]{2}{*}{API Availability}
-    & Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() & 2 & 4 & \multirow{2}{*}{8} \\
-    & & Modules: readline, resource & 2 & 0 &                      \\
+    \multirow[t]{2}{*}{API Availability (API)}
+    & Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() & OS methods missing on Windows & 2 & 4 & \multirow{2}{*}{8} \\
+    & Modules: readline, resource & Optional modules not everywhere & 2 & 0 &                      \\
     \midrule
     
-    \multirow[t]{3}{*}{\textbf{PERM}} & \multirow[t]{3}{*}{Permissions and Limits}
-    & Permission & 1 & 3 & \multirow{3}{*}{7} \\
-    & & File descriptor limits & 1 & 0 &                     \\
-    & & Symlink privileges & 1 & 1 &                     \\
+    \multirow[t]{3}{*}{Permissions and Limits (PERM)}
+    & Permission & Permission models differ by OS & 1 & 3 & \multirow{3}{*}{7} \\
+    & File descriptor limits & Resource limits vary across systems & 1 & 0 &                     \\
+    & Symlink privileges & Windows requires admin for symlinks & 1 & 1 &                     \\
     \midrule
     
-    \multirow[t]{2}{*}{\textbf{SYS}} & \multirow[t]{2}{*}{System Information}
-    & /proc filesystem & 0 & 1 & \multirow{2}{*}{2} \\
-    & & Timezone database & 0 & 1 &                      \\
+    \multirow[t]{2}{*}{System Information (SYS)}
+    & /proc filesystem & /proc missing on macOS/Windows & 0 & 1 & \multirow{2}{*}{2} \\
+    & Timezone database & Timezone data not always installed & 0 & 1 &                      \\
     \midrule
-    \textbf{} & \textbf{Total} & - & \textbf{95} & \textbf{45} & \textbf{140} \\
+    \textbf{Total} & - & - & \textbf{95} & \textbf{45} & \textbf{140} \\
     \bottomrule
     \end{tabularx}
 \end{table*}
@@ -420,30 +420,30 @@ def test_special_case():
     \setlength{\tabcolsep}{3pt}
     \renewcommand{\arraystretch}{1.15}
     \begin{tabularx}{\textwidth}{
-        >{\raggedright\arraybackslash}m{0.05\textwidth}
+        >{\raggedright\arraybackslash}m{0.06\textwidth}
         >{\raggedright\arraybackslash}m{0.18\textwidth}
         >{\raggedright\arraybackslash}X
-        >{\raggedright\arraybackslash}m{0.32\textwidth}
+        >{\raggedright\arraybackslash}m{0.3\textwidth}
     }
     \toprule
-    \textbf{Cause} & \textbf{Sub-categories} & \textbf{Symptom (verbatim error / message)} & \textbf{General Fix Pattern} \\
+    \textbf{Root-cause category} & \textbf{Sub-categories} & \textbf{Symptom (verbatim error / message)} & \textbf{General Fix Pattern} \\
     \midrule
     \textbf{FILE} &
     Path separators & No specific signature & Normalization — normalize paths with pathlib \\
     & Line endings & \texttt{AssertionError: '\textbackslash r\textbackslash n' != '\textbackslash n'} & Normalization — normalize line endings \\
     & Case sensitivity & \texttt{FileNotFoundError: [Errno 2] No such file or directory: 'Readme.md'} & Normalization — case-normalize filenames \\
-    & File locking & \texttt{PermissionError: [Errno 13] Permission denied: 'filename'} & Environment handling — close files retry on Windows \\
+    & File locking & \texttt{PermissionError: [Errno 13] Permission denied: 'filename'} & Environment handling — use context managers, explicit close \\
     & Encoding & \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x\{XX\} in position N: invalid start byte} & Normalization — set explicit UTF-8 encoding \\
     & Filesystem block size & No specific signature & Normalization — normalize computations avoid assumptions \\
     \midrule
     \textbf{PROC} &
     Shell command execution & No specific signature & Portable APIs — use subprocess.run shell=False \\
     & Missing signals & \texttt{AttributeError: module 'signal' has no attribute 'SIGHUP'} & Defensive checks — guard signals per platform \\
-    & Address already in use & \texttt{OSError: [Errno 98] Address already in use} (Linux) \; / \; \texttt{OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted} (Windows) & Environment handling — retry or bind ephemeral port \\
+    & Address already in use & \texttt{OSError: [Errno 98] Address already in use} (Linux) \; / \; \texttt{OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted} (Windows) & Defensive checks + Environment handling — catch OS-specific errors, use port 0 \\
     \midrule
     \textbf{LIB} &
     Platform-specific libraries (e.g. fcntl) & \texttt{ModuleNotFoundError: No module named 'fcntl'} & Defensive checks — conditional import provide fallback \\
-    & Missing libraries & \texttt{ModuleNotFoundError: No module named '...'} & Environment handling — conditionally install optional dependency \\
+    & Missing libraries & \texttt{ModuleNotFoundError: No module named '...'} & Defensive checks — optional import with fallback \\
     & Dynamic library loading & \texttt{OSError: [WinError 126] The specified module could not be found} & Defensive checks — guard loading prefer pure-Python \\
     & Binary wheel mismatch & No specific signature & Environment handling — install platform-appropriate wheel \\
     \midrule
@@ -455,12 +455,12 @@ def test_special_case():
     \midrule
     \textbf{API} &
     Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() &
-    \texttt{AttributeError: module 'os' has no attribute 'uname'} (example) & Portable APIs — use platform.uname or defensive checks \\
+    \texttt{AttributeError: module 'os' has no attribute 'uname'} (example) & Portable APIs + Defensive checks — use platform.uname, hasattr guards \\
     & Modules: readline, resource & \texttt{ModuleNotFoundError: No module named 'readline'} (example) & Defensive checks — guard import use alternatives \\
     \midrule
     \textbf{PERM} &
-    Permission & \texttt{PermissionError: [Errno 13] Permission denied: '...'} & Environment handling — handle permissions document requirements \\
-    & File descriptor limits & \texttt{OSError: [Errno 24] Too many open files} & Environment handling — close files adjust ulimit \\
+    Permission & \texttt{PermissionError: [Errno 13] Permission denied: '...'} & Defensive checks + Environment handling — check permissions, skip restricted tests \\
+    & File descriptor limits & \texttt{OSError: [Errno 24] Too many open files} & Environment handling — close files promptly, raise limits in CI \\
     & Symlink privileges & \texttt{OSError: symbolic link privilege not held: 'src' -> 'dst'} & Environment handling — detect support and use copies \\
     \midrule
     \textbf{SYS} &
