@@ -638,7 +638,6 @@ Overall, these three cases demonstrate that responses to portability contributio
 \section{Lessons Learned}
 \label{sec:lessons}
 
-\Ali{@Marcelo, please suggest the overall structure for this section.}
 \Den{What should developers, researchers, and tool builders keep in mind when thinking about portability issues in Python? Here are some suggestions:}
 % - Practical guidelines distilled from study
 % - Recommendations for writing portable Python code
@@ -651,6 +650,14 @@ Overall, these three cases demonstrate that responses to portability contributio
 %   \item \textbf{Portability is not automatic.} Even though Python is designed to be cross-platform, real projects still often break when run on different operating systems. Portability depends on how code and environments are actually used, not just what the language promises.
 %   \item \textbf{Problems fall into repeatable categories.} The failures we found were not random. They fall into a small set of categories (like paths, encodings, missing APIs). This means we can focus research and tool support on the most common categories instead of treating each bug as unique.
 % \end{itemize}
+
+This section distills practical insights from our study for developers and researchers working with cross-platform Python code.
+
+\noindent\textbf{Prioritize file and directory handling.}
+File-related issues (FILE) were both the most common category in our taxonomy (59 instances) and the most frequent target of our pull requests (18 PRs). Path separators, line endings, encoding defaults, and file locking behavior vary significantly across platforms. Use cross-platform abstractions such as \texttt{pathlib} for paths and explicitly specify encoding when opening files. Avoid hardcoding path separators or making assumptions about filesystem case sensitivity.
+
+\noindent\textbf{Process and signal issues are rare but critical.}
+While process and signal-related problems (PROC) accounted for only 2 pull requests, they achieved a 100\% acceptance rate from maintainers. When such issues occur, they typically have severe functional impact—crashes, hangs, or incorrect behavior. Developers should test subprocess invocation, signal handling, and process management across platforms early in development, as these issues are immediately recognized as critical by the community.
 
 
 
