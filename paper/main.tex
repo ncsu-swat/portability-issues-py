@@ -20,7 +20,7 @@
 \title{\PaperTitle}
 
 \begin{abstract}
-Python is broadly used across operating systems, but our cross-OS test re-execution reveals persistent portability issues. We study \NumProjects{} repositories (currently an estimated 500 analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (e.g., guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
+Python is broadly used across operating systems, but our cross-OS test re-execution reveals persistent portability issues. We study \NumProjects{} repositories (currently \NumProjectsAnalyzed{} projects analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (e.g., guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
 \end{abstract}
 
 \begin{CCSXML}
@@ -111,7 +111,7 @@ This paper contributes an empirical study that (i) re-executes tests across oper
 
 \paragraph{Contributions.}
 \begin{itemize}
-  \item Cross-OS re-execution of Python tests across a large sample (\NumProjects{} repositories, with results reported so far from an estimated 500).
+  \item Cross-OS re-execution of Python tests across a large sample (\NumProjects{} repositories, with results reported so far from \NumProjectsAnalyzed{}).
   \item A taxonomy of 7 actionable root-cause categories (Table~\ref{tab:categories}) with ready-to-apply repair patterns.
 \end{itemize}
 
@@ -132,7 +132,7 @@ we posed (\ref{sec:questions}).
 \subsection{Projects}
 \label{sec:projects}
 
-\textbf{Dataset.} We sampled \NumProjects{} Python repositories; the analyses reported here reflect the first $\sim$500 analyzed.  
+\textbf{Dataset.} We sampled \NumProjects{} Python repositories; the analyses reported here reflect the first \NumProjectsAnalyzed{} analyzed.  
 \textbf{Selection criteria.} We selected projects using GitHub's REST API, focusing on repositories primarily implemented in Python that show evidence of testing activity (e.g., use of pytest or unittest), have at least one star, and contain at least one test case that can be executed successfully. This filtering ensures that the analyzed projects are active, testable, and representative of real-world Python software.
 % i) \textbf{Language:} Python as primary language; ii) \textbf{Activity:} at least 100 commits and 10 contributors; iii) \textbf{Testing:} presence of an automated test suite (e.g., pytest, unittest); iv) \textbf{Popularity:} at least 50 stars on GitHub; v) \textbf{Diversity:} a mix of application domains (web, data science, utilities, etc.); vi) \textbf{Non-containerized:} absence of Dockerfile or Singularity recipe to create images.
 
@@ -252,7 +252,7 @@ We aim to answer the following key research questions:
 \label{tab:dataset}
 \begin{tabular}{l r}
 \toprule
-Projects analyzed (of \NumProjects{}) & $\sim$500 \\
+Projects analyzed (of \NumProjects{}) & \NumProjectsAnalyzed{} \\
 Total tests executed & 440{,}728 \\
 Tests with cross-OS differences & 9{,}508 \\
 Differences analyzed/categorized & 2{,}421 \\
@@ -287,7 +287,7 @@ Differences analyzed/categorized & 2{,}421 \\
     >{\centering\arraybackslash}m{0.07\textwidth}
 }
     \toprule
-    \textbf{Root-cause category (Acronym)} & \textbf{Sub-categories} & \textbf{Description} & \textbf{\# of tests found} & \textbf{\# of issues found} & \textbf{Total} \\
+    \textbf{Root-cause category (Acronym)} & \textbf{Sub-categories} & \textbf{Description} & \textbf{\# of projects in tests } & \textbf{\# of projects in issues} & \textbf{Total} \\
     \midrule
     
     \multirow[t]{6}{*}{File and Directories (FILE)} 
