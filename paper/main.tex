@@ -133,7 +133,7 @@ we posed (\ref{sec:questions}).
 \label{sec:projects}
 
 \textbf{Dataset.} We sampled \NumProjects{} Python repositories; the analyses reported here reflect the first $\sim$500 analyzed.  
-\subsection{Selection criteria.} We selected projects based on the following criteria: \Fix{DO IT!}
+\textbf{Selection criteria.} We selected projects using GitHub's REST API, focusing on repositories primarily implemented in Python that show evidence of testing activity (e.g., use of pytest or unittest), have at least one star, and contain at least one test case that can be executed successfully. This filtering ensures that the analyzed projects are active, testable, and representative of real-world Python software.
 % i) \textbf{Language:} Python as primary language; ii) \textbf{Activity:} at least 100 commits and 10 contributors; iii) \textbf{Testing:} presence of an automated test suite (e.g., pytest, unittest); iv) \textbf{Popularity:} at least 50 stars on GitHub; v) \textbf{Diversity:} a mix of application domains (web, data science, utilities, etc.); vi) \textbf{Non-containerized:} absence of Dockerfile or Singularity recipe to create images.
 
 \begin{table}[H]
@@ -179,7 +179,7 @@ We applied AND across axes and OR within each axis, so matches typically require
 \Den{I don't know if it's necessary and I also don't know if the text is clear enough. Please check/revise!}
 All experiments were conducted across three operating systems to ensure compatibility. The Linux setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Ubuntu 24.04 LTS.
 
-The macOS setup ran on an Apple M2 Pro chip (Arm64) with 5 CPU cores, 8 GPU cores, 14 GB unified memory, and macOS 15. The Windows setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Windows Server 2025.
+The macOS setup ran on an Apple M2 Pro chip (Arm64) with 5 CPU cores, 8 GPU cores, 14 GB RAM, and macOS 15. The Windows setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Windows Server 2025.
 
 \subsection{Research Questions and Methodology}
 \label{sec:questions}
