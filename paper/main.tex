@@ -133,13 +133,13 @@ we posed (\ref{sec:questions}).
 \label{sec:projects}
 
 \textbf{Dataset.} We sampled \NumProjects{} Python repositories; the analyses reported here reflect the first \NumProjectsAnalyzed{} analyzed.  
-\textbf{Selection criteria.} We selected projects using GitHub's REST API, focusing on repositories primarily implemented in Python that show evidence of testing activity (e.g., use of pytest or unittest), have at least one star, and contain at least one test case that can be executed successfully. This filtering ensures that the analyzed projects are active, testable, and representative of real-world Python software.
-% i) \textbf{Language:} Python as primary language; ii) \textbf{Activity:} at least 100 commits and 10 contributors; iii) \textbf{Testing:} presence of an automated test suite (e.g., pytest, unittest); iv) \textbf{Popularity:} at least 50 stars on GitHub; v) \textbf{Diversity:} a mix of application domains (web, data science, utilities, etc.); vi) \textbf{Non-containerized:} absence of Dockerfile or Singularity recipe to create images.
+\textbf{Selection criteria.} We selected projects using \github{}'s REST API, focusing on repositories primarily implemented in Python that show evidence of testing activity (e.g., use of pytest or unittest), have at least one star, and contain at least one test case that can be executed successfully. This filtering ensures that the analyzed projects are active, testable, and representative of real-world Python software.
+% i) \textbf{Language:} Python as primary language; ii) \textbf{Activity:} at least 100 commits and 10 contributors; iii) \textbf{Testing:} presence of an automated test suite (e.g., pytest, unittest); iv) \textbf{Popularity:} at least 50 stars on \github{}; v) \textbf{Diversity:} a mix of application domains (web, data science, utilities, etc.); vi) \textbf{Non-containerized:} absence of Dockerfile or Singularity recipe to create images.
 
 \begin{table}[H]
 
 \centering
-\caption{Stats on \NumProjects{} evaluated projects: no. of tests (\#Tests), size (SLOC), no. of commits (\#Sha), age in years (Age), no. of GitHub stars ($\star$).\label{tab:project-stats}}
+\caption{Stats on \NumProjects{} evaluated projects: no. of tests (\#Tests), size (SLOC), no. of commits (\#Sha), age in years (Age), no. of \github{} stars ($\star$).\label{tab:project-stats}}
 \begin{tabular}{lrrrrr}
 \hline
 Statistic & \#Tests & SLOC & \#Sha & Age & $\star$ \\
@@ -155,7 +155,7 @@ Sum & 1,169,056 & 85,019,457 & - & - & - \\
 
 
 Table~\ref{tab:project-stats} summarizes key characteristics of the \NumProjects{} evaluated projects. 
-On average, each project comprises approximately 584 tests and 42K lines of Python code (SLOC), with a median of 72 tests and 7.5K SLOC, indicating a distribution skewed by a few very large systems. Regarding repository activity, projects have on average 2.9K commits, a median of 427, and span a mean lifetime of 6.2 years. The number of GitHub stars varies widely, with an average of 6.1K, a median of only 84, and a maximum exceeding 366K, reflecting the presence of both niche and highly popular projects. 
+On average, each project comprises approximately 584 tests and 42K lines of Python code (SLOC), with a median of 72 tests and 7.5K SLOC, indicating a distribution skewed by a few very large systems. Regarding repository activity, projects have on average 2.9K commits, a median of 427, and span a mean lifetime of 6.2 years. The number of \github{} stars varies widely, with an average of 6.1K, a median of only 84, and a maximum exceeding 366K, reflecting the presence of both niche and highly popular projects. 
 
 Overall, the dataset covers a diverse range of software systems, from small-scale repositories with only 
 a handful of commits to large, long-lived, and widely adopted projects.
@@ -165,16 +165,19 @@ a handful of commits to large, long-lived, and widely adopted projects.
 
 \subsection{Methods}\textbf{Cross-OS re-execution.} For each project we run the test suite on multiple operating systems and record divergent outcomes. We then triage failures via logs and small code inspections, mapping each instance to a concrete category.\Fix{Explain what is a category.}  
 
-\textbf{Mining portability-related issues.} To complement test-based findings, we also mine GitHub issues and pull requests. We built a “candidate finder” combining multiple keyword axes:  
+\textbf{Mining portability-related issues.} To complement test-based findings, we also mine \github{} issues and pull requests. We built a “candidate finder” combining multiple keyword axes:  
 (a) OS/platform indicators (e.g., Windows, Linux, macOS, specific distros/architectures),  
 (b) failure/fix language (e.g., fails, error, bug, fix, workaround),  
-(c) testing/CI context (pytest, CI, GitHub Actions), and  
+(c) testing/CI context (pytest, CI, \github{} Actions), and  
 (d) common portability causes (e.g., path separators, chmod/permissions, encodings/UTF-8, dynamic libraries like \texttt{.dll}/\texttt{.so}).  
 
 We applied AND across axes and OR within each axis, so matches typically required an OS reference plus a failure/fix cue, optionally reinforced by test or cause terms. We searched titles, bodies, and comments, with extra weight to title and close-proximity matches. Light triage (brief summaries and negative filters for off-topic mentions) kept the set precise. Candidate issues were normalized into consistent records (project, link, date, summary, compact tags like OS=, FIX=, TEST=, CAUSE=), duplicates removed, and full text (title, description, comments) archived for analysis.  
 
 \subsection{Setup}
 \label{sec:setup}
+
+\Mar{HEY, this is not what you are doing. You need to explain how you
+used \github{} Actions/Cloud to create VMs for different OSes.}
 
 \Den{I don't know if it's necessary and I also don't know if the text is clear enough. Please check/revise!}
 All experiments were conducted across three operating systems to ensure compatibility. The Linux setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Ubuntu 24.04 LTS.
@@ -186,9 +189,7 @@ The macOS setup ran on an Apple M2 Pro chip (Arm64) with 5 CPU cores, 8 GPU core
 
 We aim to answer the following key research questions:
 
-
 \noindent\textit{\RQOne{}}
-
 
 \textbf{Rationale.} With this question, we aim to measure how often portability problems actually occur in practice. Although Python is advertised as a cross-platform language, our preliminary results suggest that many tests fail when run on different operating systems. By quantifying the frequency of such issues across a representative set of projects and applying statistical tests, we can provide stronger evidence on whether portability is a widespread concern in the Python ecosystem or only affects a small subset of projects.  
 
@@ -238,31 +239,80 @@ We aim to answer the following key research questions:
 % For each RQ, we restate the rationale, present the findings,
 % and provide a concise quick answer.
 
-\subsection{RQ1 — Prevalence}
+This section provides answering to the posed research questions.
+
+\subsection{Answering \RQOne{}}
 \label{rq1}
-\RQOne{}
 
 % add here: statistics, tables, and plots showing the frequency and distribution of portability issues
 % for example: Table 1 (Projects analyzed, tests executed, failures observed), Figure 1 (Distribution of failures by OS)
 
-\textbf{Snapshot.}
-\begin{table}[h]
-\centering
-\caption{Dataset snapshot (in progress).}
-\label{tab:dataset}
-\begin{tabular}{l r}
-\toprule
-Projects analyzed (of \NumProjects{}) & \NumProjectsAnalyzed{} \\
-Total tests executed & 440{,}728 \\
-Tests with cross-OS differences & 9{,}508 \\
-Differences analyzed/categorized & 2{,}421 \\
-\bottomrule
-\end{tabular}
+\begin{table}[t!]
+  \centering
+  \caption{\label{tab:dataset}Prevalence of portability problems.}  
+  \begin{subtable}[t]{\linewidth}
+    \centering
+    \caption{\label{tab:dataset-a}Detected problems with test re-execution.}
+    \begin{tabular}{lr}
+    \toprule
+    Total number of projects mined & \NumProjects{} \\
+    Total number of projects selected & \NumProjectsAnalyzed{} \\
+    \hspace{2ex}Total number of projects with OS differences & \Fix{95??} \\    
+    Total number of tests executed & 440,728 \\
+    \hspace{2ex}Total number of test runs with OS differences & 9,508 \\
+    %Total number of differences analyzed & 2,421 \\
+    \bottomrule
+    \end{tabular}
+  \end{subtable}
+  \vspace{1ex} % space between subtables
+  \begin{subtable}[t]{\linewidth}
+    \centering
+    \caption{\label{tab:dataset-b}Detected problems with manual inspection.}
+    \begin{tabular}{lc}
+      \toprule
+      Total number of issues mined & 2,617 \\
+      Total number of issues analyzed & 240 \\
+      Total number of issues related & 102\\
+      \bottomrule
+    \end{tabular}
+  \end{subtable}
 \end{table}
 
-\noindent\textbf{Quick Answer.} Portability issues are widespread across Python projects, affecting a significant fraction of test suites.
+Table~\ref{tab:dataset} reports on the prevalence of portability
+problems in \github{} Python projects. Table~\ref{tab:dataset-a}
+details the results we obtain when re-executing test cases whereas
+Table~\ref{tab:dataset-b} details the results we obtain when
+inspecting issues from projects. Table~\ref{tab:dataset-a} shows that
+we mined a total of \NumProjects{} but re-executed test suites of
+nearly 25\% of them, \ie{}, \NumProjectsAnalyzed{} projects. Recalll
+from Section~\ref{sec:setup} that each test suite is executed on three
+different virtual machines and the outcomes of each test cases is
+compared for discrepancy. The \NumProjectsAnalyzed{} projects whose
+test suites were executed included a total of 440,728 test cases. Of
+those, we found discrepant outcomes (\ie{}, there was no agreement
+across all three OSes that we considered) in 9,508 cases, which
+corresponds to 2.16\%\Mar{please, add macros!}. It is worth noting
+that test execution method is precise, \ie{}, we found no cases of
+false positives. All discrepancies we find indicate with this method
+indicate real portability issues. In contrast to the test re-execution
+method, the issue mining method is imprecise due to the inherent
+innacuracy of text mining. As such, we require to manually analyze the
+discussion threads of the issues to understand if they indicate real
+portability issues. Table~\ref{tab:dataset-b}\Fix{...}\Mar{@Ali, please,
+explain your table as we do above.}
 
-\subsection{RQ2 — Causes, Symptoms, and Fixes}
+\begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
+\textbf{RQ\textsubscript{1} (prevalence)}: We find that portability
+issues are relatively prevalent. For example, of the \Fix{500}
+projects whose tests we re-executed in different OSes we find
+that \Fix{4.7\%} of them have tests with portability problems.
+\end{tcolorbox}
+
+\subsection{Answering \RQTwo}
+
+This section elaborates the characteristics of portability problems:
+root causes, symptoms, and fixes.
+
 \subsubsection{RQ2.1 — Root Causes}
 \label{rq2-1}
 \RQTwoOne{}
@@ -273,7 +323,7 @@ Differences analyzed/categorized & 2{,}421 \\
 % ========================= CATEGORIES TABLE =========================
 \begin{table*}[t]
     \centering
-    \caption{Taxonomy of portability issues showing root-cause categories, subcategories, brief descriptions, and number of distinct projects observed in test execution and mined GitHub issues.}
+    \caption{Taxonomy of portability issues showing root-cause categories, subcategories, brief descriptions, and number of distinct projects observed in test execution and mined \github{} issues.}
     \label{tab:categories}
     \scriptsize
     \setlength{\tabcolsep}{3pt}
@@ -364,9 +414,8 @@ Platform-specific system information sources cause failures when code assumes /p
 
 \textbf{Quick Answer.} Portability issues cluster around 7 main categories: file handling, process execution, library dependencies, environment mismatches, API availability, permissions, and system information sources.
 
-\begin{figure*}[!ht]
+\begin{figure}[!ht]
 \centering
-
 % Defensive Checks
 \begin{subfigure}{0.48\textwidth}
 \begin{lstlisting}[caption={Defensive check for optional library}, label={lst:defensive}]
@@ -387,9 +436,7 @@ Platform-specific system information sources cause failures when code assumes /p
 + home_dir = Path.home()  # Cross-platform home directory
 \end{lstlisting}
 \end{subfigure}
-
 \vspace{0.2cm}
-
 % Normalization
 \begin{subfigure}{0.48\textwidth}
 \begin{lstlisting}[caption={Normalization: Normalizing file paths}, label={lst:normalization}]
@@ -408,10 +455,9 @@ def test_special_case():
     ...
 \end{lstlisting}
 \end{subfigure}
-
-\caption{Representative fix patterns for portability issues: (a) Defensive checks, (b) Portable APIs, (c) Normalization, and (d) Environment handling.}
+\caption{Representative examples of fixes for portability issues: (a) Defensive checks, (b) Portable APIs, (c) Normalization, and (d) Environment handling.}
 \label{fig:patterns}
-\end{figure*}
+\end{figure}
 
 
 \begin{table*}[t]

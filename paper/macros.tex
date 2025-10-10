@@ -1,7 +1,9 @@
 %% \PassOptionsToPackage{hidelinks,unicode}{hyperref} % Example options
 
 %%%%%%%%% PACKAGES
-    
+
+\usepackage{booktabs}     % for nice horizontal lines
+%\usepackage{caption}
 
 % --- Preamble (place in your preamble) ---
 % \usepackage[switch]{lineno}
@@ -176,7 +178,8 @@
 %% % ----------
 %% % PAPER TEXT
 
-\newcommand{\PaperTitle}{An Empirical Analysis of Portability Issues in Python}
+\newcommand{\PaperTitle}{An Empirical Analysis of Portability Issues
+in Python Projects}
 
 
 \newcommand{\RV}{RV\xspace}
@@ -240,16 +243,11 @@
 \newcommand{\tfverwild}{2.19.0\xspace}
 
 % RQS OF THE PAPER
-\newcommand{\RQOne}{\EQ{1}: How prevalent are portability issues in Python tests when executed across different operating systems?}
+\newcommand{\RQOne}{\EQ{1}:~How prevalent are portability problems in Python projects?}
 
-\newcommand{\RQTwo}{\EQ{2}: What are the characteristics, causes, manifestations, and fixes of portability problems in Python software?}
-
-
-
+\newcommand{\RQTwo}{\EQ{2}:~What are the causes, symptoms, and fixes of portability problems?}
 \newcommand{\RQTwoOne}{\EQ{2.1}: What are the root causes of portability problems in Python?}
-
 \newcommand{\RQTwoTwo}{\EQ{2.2}: How do portability issues manifest and how can they be detected?}
-
 \newcommand{\RQTwoThree}{\EQ{2.3}: What are effective fix patterns for addressing portability issues?}
 
 \newcommand{\RQThree}{\EQ{3}: How good are existing tools at detecting portability issues in Python projects?}
