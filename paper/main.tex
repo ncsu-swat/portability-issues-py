@@ -198,7 +198,8 @@ We aim to answer the following key research questions:
 
 \textit{\RQTwo{}}
 
-\textbf{Rationale.} This question is important to justify further investigation on portability problems in Python software. If we find that these problems are rare or have no consistent causes or manifestations, then further investigation is meaningless. To understand how and why portability issues occur in Python programs, we aim to answer two questions: 
+\textbf{Rationale.} This question is important to justify further investigation on portability problems in Python software. If we find that these problems are rare or have no consistent causes or manifestations, then further investigation is meaningless. To understand how and why portability issues occur in Python programs, and how they can be effectively addressed, we aim to answer three sub-questions:
+
 
 
 \noindent\textit{\RQTwoOne{}}
@@ -207,6 +208,7 @@ We aim to answer the following key research questions:
 % \textbf{Rationale.} Recognizing diagnostic signatures helps developers quickly triage failures and identify the underlying portability issue from test logs or CI output. While not all issues produce unique error messages, many exhibit specific, reproducible patterns that enable rapid diagnosis.
 
 \noindent\textit{\RQTwoTwo{}}
+\noindent\textit{\RQTwoThree{}}
 
 \textbf{Methodology.} \Fix{Describe here the methodology to answer RQ2}
 
@@ -474,7 +476,7 @@ def test_special_case():
 \label{rq2-2}
 \RQTwoTwo{}
 
-\subsection{Symptom signatures} 
+\textbf{Symptom signatures} 
 
 For subcategories with concrete signals, we list verbatim exceptions or OS-specific error texts that reliably identify the underlying cause in test/CI logs. Not every subcategory has a unique signature; we include only those with specific, reproducible messages (e.g., \texttt{AttributeError: module 'os' has no attribute 'uname'}, \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x..}). These signatures are meant to speed triage and help developers and tools quickly recognize portability issues; they are not exhaustive of all possible manifestations (see Table~\ref{tab:symptoms}).  
 
@@ -482,8 +484,8 @@ For subcategories with concrete signals, we list verbatim exceptions or OS-speci
 
 \subsubsection{RQ2.3 — Fix Patterns}
 \label{rq2-3}
-\textbf{Research Question.} What are effective fix patterns for addressing portability issues?  
-\textbf{Rationale.} Identifying reusable solutions helps developers apply proven strategies to resolve portability problems. By analyzing fixes across projects, we can distill common patterns that effectively address cross-platform issues without requiring extensive platform-specific code.
+\RQTwoThree{} 
+% \textbf{Rationale.} Identifying reusable solutions helps developers apply proven strategies to resolve portability problems. By analyzing fixes across projects, we can distill common patterns that effectively address cross-platform issues without requiring extensive platform-specific code.
 
 \textbf{Concrete example (PR fix).} \Fix{We will insert a specific PR and code diff illustrating the applied fix.}
 
