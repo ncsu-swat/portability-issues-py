@@ -293,7 +293,7 @@ details the results we obtain when re-executing test cases whereas
 Table~\ref{tab:dataset-b} details the results we obtain when
 inspecting issues from projects. Table~\ref{tab:dataset-a} shows that
 we mined a total of \NumProjects{} but re-executed test suites of
-nearly 25\% of them, \ie{}, \NumProjectsAnalyzed{} projects. Recalll
+nearly 25\% of them, \ie{}, \NumProjectsAnalyzed{} projects. Recall
 from Section~\ref{sec:setup} that each test suite is executed on three
 different virtual machines and the outcomes of each test cases is
 compared for discrepancy. The \NumProjectsAnalyzed{} projects whose
@@ -325,7 +325,7 @@ comprehensive test coverage. Importantly, the \NumIssuesRelated{}
 confirmed issues come from projects with no overlap with those analyzed 
 in Table~\ref{tab:dataset-a}, demonstrating that portability problems 
 extend beyond our test execution sample and affect a broader range of 
-the Python ecosystem.
+the Python ecosystem. \Ali{Please revise the issue mining part.}
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
 \textbf{RQ\textsubscript{1} (prevalence)}: We find that portability
@@ -339,11 +339,15 @@ problems affect a broad range of the Python ecosystem.
 
 \subsection{\textbf{Answering} \RQTwo{}}
 
+\Ali{Please revise the structure of RQ2.}
+
 This section elaborates the characteristics of portability problems:
 root causes, symptoms, and fixes.
 
 \subsubsection{\textbf{Answering \RQTwoOne{}}}
-\label{rq2-1} 
+\label{rq2-1}
+
+~
 
 \noindent Table~\ref{tab:categories} presents our taxonomy of portability issues 
 organized by root-cause categories. Each row groups related sub-categories
@@ -549,7 +553,9 @@ def test_special_case():
 
 \subsubsection{\textbf{Answering \RQTwoThree{}}}
 
-\noindent Figure~\ref{fig:patterns} illustrates representative examples of fix patterns for portability issues, drawn from real-world projects. Each subfigure demonstrates a different repair strategy applied to actual code. The figure shows before (lines prefixed with \texttt{-}) and after (lines prefixed with \texttt{+}) versions of code snippets. The four patterns demonstrated are: (a) defensive checks using try/except for optional imports, (b) portable APIs replacing OS-specific constructs with cross-platform abstractions, (c) normalization using path separators correctly, and (d) environment handling using platform-aware test skipping.
+\noindent
+
+Figure~\ref{fig:patterns} illustrates representative examples of fix patterns for portability issues, drawn from real-world projects. Each subfigure demonstrates a different repair strategy applied to actual code. The figure shows before (lines prefixed with \texttt{-}) and after (lines prefixed with \texttt{+}) versions of code snippets. The four patterns demonstrated are: (a) defensive checks using try/except for optional imports, (b) portable APIs replacing OS-specific constructs with cross-platform abstractions, (c) normalization using path separators correctly, and (d) environment handling using platform-aware test skipping.
 
 Across projects, portability issues are resolved through four recurring strategies: \textbf{(i) Defensive checks} add guards, fallbacks, \texttt{try/except}, or conditional imports to handle missing APIs or modules gracefully (Listing~\ref{lst:defensive}); \textbf{(ii) Portable APIs} replace OS-specific constructs with cross-platform abstractions like \texttt{pathlib}, \texttt{platform}, or \texttt{psutil} (Listing~\ref{lst:portable}); \textbf{(iii) Normalization} standardizes encodings, line endings, paths, or filenames to prevent spurious differences (Listing~\ref{lst:normalization}); and \textbf{(iv) Environment handling} adapts code and tests to runtime conditions, such as skipping GUI tests in headless CI or managing platform-specific permissions (Listing~\ref{lst:environment}). 
 
