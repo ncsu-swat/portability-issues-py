@@ -177,13 +177,20 @@ We applied AND across axes and OR within each axis, so matches typically require
 \subsection{Setup}
 \label{sec:setup}
 
-\Mar{HEY, this is not what you are doing. You need to explain how you
-used \github{} Actions/Cloud to create VMs for different OSes.}
+% \Mar{HEY, this is not what you are doing. You need to explain how you
+% used \github{} Actions/Cloud to create VMs for different OSes.}
 
-\Den{I don't know if it's necessary and I also don't know if the text is clear enough. Please check/revise!}
-All experiments were conducted across three operating systems to ensure compatibility. The Linux setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Ubuntu 24.04 LTS.
+\Den{Updated: Please check/revise!}
 
-The macOS setup ran on an Apple M2 Pro chip (Arm64) with 5 CPU cores, 8 GPU cores, 14 GB RAM, and macOS 15. The Windows setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Windows Server 2025.
+
+All experiments were executed on ephemeral virtual machines provided by GitHub-hosted runners~\cite{github_actions_runners}. Each virtual machine is automatically provisioned with 4~CPUs and 16~GB of RAM. We implemented a single GitHub Actions workflow (YAML) that uses a matrix strategy to run the test-suite on Ubuntu 24.04 LTS, macOS 15, and Windows Server 2025 (each job runs in a fresh VM image). Each job installs dependencies, runs the Python tests with \texttt{pytest}~\cite{pytest_tool} and the \texttt{pytest-json-report} plugin~\cite{pytest_json_report} to create JSON reports, and finally uploads the JSON files as workflow artifacts for later analysis. This approach ensures reproducible, parallel cross-platform testing while GitHub manages VM provisioning and maintenance.
+
+
+
+% \Den{I don't know if it's necessary and I also don't know if the text is clear enough. Please check/revise!}
+% All experiments were conducted across three operating systems to ensure compatibility. The Linux setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Ubuntu 24.04 LTS.
+
+% The macOS setup ran on an Apple M2 Pro chip (Arm64) with 5 CPU cores, 8 GPU cores, 16 GB RAM, and macOS 15. The Windows setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Windows Server 2025.
 
 \subsection{Research Questions and Methodology}
 \label{sec:questions}
@@ -721,6 +728,8 @@ immediately recognized as critical by the community.
 % - External validity: generalization beyond studied projects
 % - Construct validity: definitions of “portability” and categorization
 % - Conclusion validity: statistical soundness, possible biases
+
+\Fix{one thing we remember is that we do not explore other versions of OSs}
 
 
 \section{Related Work}
