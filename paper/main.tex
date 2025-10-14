@@ -1,26 +1,27 @@
-% Ensure xcolor loads with table option before the class loads it.
-\PassOptionsToPackage{table}{xcolor}
-\documentclass[sigconf,review,anonymous]{acmart}
+% \documentclass[acmsmall,screen,review]{acmart} % OOPSLA
+\documentclass[sigconf,review,anonymous]{acmart} % MSR
 
+%%%%%
+%% We will need to add this in camera-ready
+%%%%%
+%% \setcopyright{none} % to remove the copyright notice
+%% \settopmatter{printacmref=false} % to remove the ACM Reference Format
+%% \renewcommand\footnotetextcopyrightpermission[1]{} % to remove copyright box
+\usepackage{comment}
 
-
-\usepackage{tabularx}   % flexible X column
-\usepackage{booktabs}   % rules
-\usepackage{array}      % for m{} column type
-
+\usepackage{lipsum}
 \input{macros}
+
+%% add page numbers
+\pagestyle{plain}
 
 \begin{document}
 
-% \renewcommand\linenumberfont{\normalfont\bfseries\small\color{red}}
-
-\pagestyle{plain} % simple page style with numbers
-\fancyfoot{}
-
-\title{\PaperTitle}
+\title{\PaperTitle{}}
 
 \begin{abstract}
-Python is broadly used across operating systems, but our cross-OS test re-execution reveals persistent portability issues. We study \NumProjects{} repositories (currently \NumProjectsAnalyzed{} projects analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (e.g., guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.
+  \sloppy
+Python is broadly used across operating systems, but our cross-OS test re-execution reveals persistent portability issues. We study \NumProjects{} repositories (currently \NumProjectsAnalyzed{} projects analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (e.g., guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.  
 \end{abstract}
 
 \begin{CCSXML}
@@ -44,6 +45,9 @@ Python is broadly used across operating systems, but our cross-OS test re-execut
 \keywords{Mining Software Repositories, Python, Cross-Platform, Portability, Test Re-execution, Repair Patterns}
 
 \maketitle
+
+\section{Introduction}
+\label{sec:intro}
 
 \section{Introduction}
 \label{sec:intro}
@@ -119,11 +123,8 @@ This paper contributes an empirical study that (i) re-executes tests across oper
 \label{sec:sources}
 We define an \emph{OS portability issue} as a difference in test outcome across operating systems attributable to platform-specific APIs, environment/terminal capabilities, filesystem semantics, encodings, or native libraries. 
 
-\section{Methodology}
-\label{sec:methodology}
-
-
 \section{Methods and Objects of analysis}
+\label{sec:methodology}
 
 This section describes the projects we used (\ref{sec:projects}), the
 setup of our experiments (\ref{sec:setup}), and the research questions
@@ -678,8 +679,11 @@ A different outcome emerged in a PR where we attempted to resolve a dependency p
 
 Finally, in another project, the response was shaped less by technical considerations and more by the project's state of maintenance. The maintainer acknowledged the validity of the patch but declined to merge it, noting: \emph{``I do somewhat view that project as archived and inactive... My concern about merging is that an updated last commit date would make the project seem more active than it really is.''} This case illustrates how project activity levels and community sustainability strongly influence whether portability improvements are accepted, even if the technical changes are sound.
 
-Overall, these three cases demonstrate that responses to portability contributions vary significantly: active projects may readily adopt fixes, maintainers may prefer design simplifications over platform-specific adjustments, and inactive projects may resist merging altogether to avoid signaling misleading project vitality.
-
+Overall, these three cases demonstrate that responses to portability
+contributions vary significantly: active projects may readily adopt
+fixes, maintainers may prefer design simplifications over
+platform-specific adjustments, and inactive projects may resist
+merging altogether to avoid signaling misleading project vitality.
 
 \section{Lessons Learned}
 \label{sec:lessons}
@@ -703,9 +707,13 @@ This section distills practical insights from our study for developers and resea
 File-related issues (FILE) were both the most common category in our taxonomy (59 instances) and the most frequent target of our pull requests (18 PRs). Path separators, line endings, encoding defaults, and file locking behavior vary significantly across platforms. Use cross-platform abstractions such as \texttt{pathlib} for paths and explicitly specify encoding when opening files. Avoid hardcoding path separators or making assumptions about filesystem case sensitivity.
 
 \noindent\textbf{Process and signal issues are rare but critical.}
-While process and signal-related problems (PROC) accounted for only 2 pull requests, they achieved a 100\% acceptance rate from maintainers. When such issues occur, they typically have severe functional impact—crashes, hangs, or incorrect behavior. Developers should test subprocess invocation, signal handling, and process management across platforms early in development, as these issues are immediately recognized as critical by the community.
-
-
+While process and signal-related problems (PROC) accounted for only 2
+pull requests, they achieved a 100\% acceptance rate from
+maintainers. When such issues occur, they typically have severe
+functional impact—crashes, hangs, or incorrect behavior. Developers
+should test subprocess invocation, signal handling, and process
+management across platforms early in development, as these issues are
+immediately recognized as critical by the community.
 
 \section{Threats to Validity}
 \label{sec:threats}
@@ -737,10 +745,11 @@ Maybe: \cite{sun2016bear}. Mobile apps testing: \cite{boushehrinejadmoradi2015te
 
 %% The artifacts -- including datasets and scripts -- are publicly available~\cite{ourrepo}.
 
+\onecolumn \begin{multicols}{2}
+%\balance
 \bibliographystyle{ACM-Reference-Format}
-% Allow underscores in BibTeX keys within the .bbl without math mode errors
-\begingroup\catcode`\_=12 \relax
+%% \bibliography{references}
 \bibliography{ref}
-\endgroup
+\end{multicols}
 
 \end{document}
