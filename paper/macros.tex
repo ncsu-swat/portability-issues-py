@@ -260,8 +260,33 @@ in Python Projects}
 
 
 % NUMBERS OF THE PAPER
+
+% ========================================
+% Test Re-execution Approach (RQ1 table a)
+% ========================================
 \newcommand{\NumProjects}{2,042}
 \newcommand{\NumProjectsAnalyzed}{500}
+\newcommand{\NumProjectsWithOSDiffInTests}{45}
+\newcommand{\NumTestsExecuted}{440,728}
+\newcommand{\NumTestRunsWithOSDiff}{9,508}
+\newcommand{\PercentDiscrepantTests}{2.16\%}
+
+% Calculated percentage: projects with portability issues from test re-execution
+\usepackage{xfp}
+\newcommand{\PercentProjectsWithPortabilityReExecution}{%
+  \fpeval{round(45/500*100, 1)}\%}
+
+% ========================================
+% Issue Mining Approach (RQ1 - Table b)
+% ========================================
+\newcommand{\NumProjectsWithOSDiffInIssues}{95}
+\newcommand{\NumIssuesMined}{2,617}
+\newcommand{\NumIssuesAnalyzed}{240}
+\newcommand{\NumIssuesRelated}{102}
+
+% ========================================
+% Pull Request Statistics (RQ4)
+% ========================================
 \newcommand{\TotalPROpened}{36}
 \newcommand{\TotalPRAccepted}{12}
 \newcommand{\TotalPRRejected}{0}

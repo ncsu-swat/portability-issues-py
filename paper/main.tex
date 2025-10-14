@@ -202,7 +202,7 @@ We aim to answer the following key research questions:
 \textbf{Rationale.} With this question, we aim to measure how often portability problems actually occur in practice. Although Python is advertised as a cross-platform language, our preliminary results suggest that many tests fail when run on different operating systems. By quantifying the frequency of such issues across a representative set of projects and applying statistical tests, we can provide stronger evidence on whether portability is a widespread concern in the Python ecosystem or only affects a small subset of projects.  
 
 
-\textbf{Methodology.} \Fix{Describe here the methodology to answer RQ1.}
+% \textbf{Methodology.} \Fix{Describe here the methodology to answer RQ1.}
 \par
 
 \textit{\RQTwo{}}
@@ -219,13 +219,13 @@ We aim to answer the following key research questions:
 \noindent\textit{\RQTwoTwo{}}
 \noindent\textit{\RQTwoThree{}}
 
-\textbf{Methodology.} \Fix{Describe here the methodology to answer RQ2}
+% \textbf{Methodology.} \Fix{Describe here the methodology to answer RQ2}
 
 \noindent\textit{\RQThree{}}
 
 \textbf{Rationale.} This question investigates to what extent existing tools help identify portability problems. Static tools, including linters, type checkers, CodeQL queries, and even large language models, can flag certain categories of issues, such as OS-dependent APIs or unsafe path handling. However, many portability issues only manifest at runtime, for example due to environment assumptions, platform-specific encodings, or dependency incompatibilities. To complement static checks, we employ a dynamic strategy—our ``rerun'' approach—that executes tests across multiple operating systems to reveal failures that static analysis cannot anticipate. By comparing the coverage of static and dynamic techniques, we can assess their effectiveness and identify opportunities for improving tool support in cross-platform Python development. 
 
-\textbf{Methodology.} \Fix{Describe here the methodology to answer RQ3}
+% \textbf{Methodology.} \Fix{Describe here the methodology to answer RQ3}
 
 
 \noindent\textit{\RQFour{}}
@@ -236,7 +236,7 @@ We aim to answer the following key research questions:
 
 \noindent\textit{\RQFourTwo{}}
 
-\textbf{Methodology.} \Fix{Describe here the methodology to answer RQ4}
+% \textbf{Methodology.} \Fix{Describe here the methodology to answer RQ4}
 
 
 
@@ -249,7 +249,7 @@ We aim to answer the following key research questions:
 
 This section provides answering to the posed research questions.
 
-\subsection{Answering \RQOne{}}
+\subsection{\textbf{Answering} \RQOne{}}
 \label{rq1}
 
 % add here: statistics, tables, and plots showing the frequency and distribution of portability issues
@@ -265,9 +265,9 @@ This section provides answering to the posed research questions.
     \toprule
     Total number of projects mined & \NumProjects{} \\
     Total number of projects selected & \NumProjectsAnalyzed{} \\
-    \hspace{2ex}Total number of projects with OS differences & \Fix{95??} \\    
-    Total number of tests executed & 440,728 \\
-    \hspace{2ex}Total number of test runs with OS differences & 9,508 \\
+    \hspace{2ex}Total number of projects with OS differences & \NumProjectsWithOSDiffInTests{} \\    
+    Total number of tests executed & \NumTestsExecuted{} \\
+    \hspace{2ex}Total number of test runs with OS differences & \NumTestRunsWithOSDiff{} \\
     %Total number of differences analyzed & 2,421 \\
     \bottomrule
     \end{tabular}
@@ -278,9 +278,10 @@ This section provides answering to the posed research questions.
     \caption{\label{tab:dataset-b}Detected problems with manual inspection.}
     \begin{tabular}{lc}
       \toprule
-      Total number of issues mined & 2,617 \\
-      Total number of issues analyzed & 240 \\
-      Total number of issues related & 102\\
+      Total number of issues mined & \NumIssuesMined{} \\
+      Total number of issues analyzed & \NumIssuesAnalyzed{} \\
+      Total number of issues related & \NumIssuesRelated{}\\
+      \hspace{2ex}Total number of projects with OS differences & \NumProjectsWithOSDiffInIssues{} \\
       \bottomrule
     \end{tabular}
   \end{subtable}
@@ -296,37 +297,62 @@ nearly 25\% of them, \ie{}, \NumProjectsAnalyzed{} projects. Recalll
 from Section~\ref{sec:setup} that each test suite is executed on three
 different virtual machines and the outcomes of each test cases is
 compared for discrepancy. The \NumProjectsAnalyzed{} projects whose
-test suites were executed included a total of 440,728 test cases. Of
+test suites were executed included a total of \NumTestsExecuted{} test cases. Of
 those, we found discrepant outcomes (\ie{}, there was no agreement
-across all three OSes that we considered) in 9,508 cases, which
-corresponds to 2.16\%\Mar{please, add macros!}. It is worth noting
+across all three OSes that we considered) in \NumTestRunsWithOSDiff{} cases, which
+corresponds to \PercentDiscrepantTests{}. It is worth noting
 that test execution method is precise, \ie{}, we found no cases of
 false positives. All discrepancies we find indicate with this method
 indicate real portability issues. In contrast to the test re-execution
 method, the issue mining method is imprecise due to the inherent
 innacuracy of text mining. As such, we require to manually analyze the
 discussion threads of the issues to understand if they indicate real
-portability issues. Table~\ref{tab:dataset-b}\Fix{...}\Mar{@Ali, please,
-explain your table as we do above.}
+portability issues. Table~\ref{tab:dataset-b} shows the results from 
+mining and analyzing \github{} issues. We mined a total of 
+\NumIssuesMined{} candidate issues using our keyword-based search 
+strategy described in Section~\ref{sec:methodology}. From this set, we 
+randomly sampled \NumIssuesAnalyzed{} of the most recent issues for 
+manual inspection. Through careful analysis of issue titles, descriptions, 
+discussion threads, and the associated code, we confirmed that \NumIssuesRelated{} of these 
+were genuine portability issues, representing a confirmation rate of 
+42.5\%. While this method is less precise than test re-execution and 
+requires significant manual effort, it provides complementary insights 
+that test-based detection cannot capture. Specifically, issue mining 
+reveals how developers discuss, diagnose, and prioritize portability 
+problems in practice, exposes historical patterns across different project 
+contexts, and surfaces issues in projects or code paths that may lack 
+comprehensive test coverage. Importantly, the \NumIssuesRelated{} 
+confirmed issues come from projects with no overlap with those analyzed 
+in Table~\ref{tab:dataset-a}, demonstrating that portability problems 
+extend beyond our test execution sample and affect a broader range of 
+the Python ecosystem.
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
 \textbf{RQ\textsubscript{1} (prevalence)}: We find that portability
-issues are relatively prevalent. For example, of the \Fix{500}
-projects whose tests we re-executed in different OSes we find
-that \Fix{4.7\%} of them have tests with portability problems.
+issues are relatively prevalent. Of the \NumProjectsAnalyzed{}
+projects whose tests we re-executed in different OSes, 
+\PercentProjectsWithPortabilityReExecution{} have tests with portability problems.
+Additionally, our issue mining approach confirmed \NumIssuesRelated{} genuine 
+portability issues from a separate set of projects, demonstrating that these 
+problems affect a broad range of the Python ecosystem.
 \end{tcolorbox}
 
-\subsection{Answering \RQTwo}
+\subsection{\textbf{Answering} \RQTwo{}}
 
 This section elaborates the characteristics of portability problems:
 root causes, symptoms, and fixes.
 
-\subsubsection{RQ2.1 — Root Causes}
-\label{rq2-1}
-\RQTwoOne{}
- 
+\subsubsection{\textbf{Answering \RQTwoOne{}}}
+\label{rq2-1} 
 
-\textbf{Findings.} Table~\ref{tab:categories} reports root-cause categories with sub-categories (bulleted). Numbers are aggregated per category (tests, issues, and totals).  
+\noindent Table~\ref{tab:categories} presents our taxonomy of portability issues 
+organized by root-cause categories. Each row groups related sub-categories
+under a main category. The columns show: (i) the root-cause category name and acronym,
+(ii) specific sub-categories within that category,
+(iii) a brief description of each sub-category,
+(iv) the number of distinct projects where the issue appeared in test execution,
+(v) the number of distinct projects where the issue appeared in mined \github{} issues, and 
+(vi) the total count across both sources. 
 
 % ========================= CATEGORIES TABLE =========================
 \begin{table*}[t]
@@ -349,78 +375,69 @@ root causes, symptoms, and fixes.
     \midrule
     
     \multirow[t]{6}{*}{File and Directories (FILE)} 
-    & Path separators & Forward vs. backslash differences & 27 & 7 & \multirow{6}{*}{59} \\
-    & Line endings & CRLF vs. LF mismatch & 4  & 1 &                      \\
-    & Case sensitivity & Filename case handling varies & 1  & 1 &                      \\
-    & File locking & Windows locks open files & 4 & 5 &                      \\
-    & Encoding & UTF-8 not default everywhere & 7 & 2 &                      \\
-    & Filesystem block size & Block size assumptions differ & 1 & 0 &                      \\
+    & Path separators & Forward vs. backslash differences & 7 & 27 & \multirow{6}{*}{60} \\
+    & Line endings & CRLF vs. LF mismatch & 1  & 5 &                      \\
+    & Case sensitivity & Filename case handling varies & 1  & 0 &                      \\
+    & File locking & Windows locks open files & 5 & 4 &                      \\
+    & Encoding & UTF-8 not default everywhere & 2 & 7 &                      \\
+    & Filesystem block size & Block size assumptions differ & 0 & 1 &                      \\
     \midrule
     
     \multirow[t]{3}{*}{Process and Signals (PROC)}
-    & Shell command execution & Shell behavior differs across OS & 14 & 5 & \multirow{3}{*}{25} \\
-    & Missing signals & Signals unavailable on Windows & 2  & 3 &                      \\
-    & Address already in use & Port binding conflicts vary & 0  & 1 &                      \\
+    & Shell command execution & Shell behavior differs across OS & 5 & 14 & \multirow{3}{*}{25} \\
+    & Missing signals & Signals unavailable on Windows & 3 & 2 &                      \\
+    & Address already in use & Port binding conflicts vary & 1 & 0 &                      \\
     \midrule
     
     \multirow[t]{4}{*}{Library Dependencies (LIB)}
-    & Platform-specific libraries (e.g. fcntl) & Unix-only libraries missing elsewhere & 1  & 2 & \multirow{4}{*}{24} \\
-    & Missing libraries & Dependencies not universally available & 11 & 2 &                      \\
-    & Dynamic library loading & DLL vs. SO file issues & 5  & 0 &                      \\
-    & Binary wheel mismatch & Architecture-specific wheel incompatibilities & 3 & 0 &                      \\
+    & Platform-specific libraries (e.g. fcntl) & Unix-only libraries missing elsewhere & 2  & 1 & \multirow{4}{*}{24} \\
+    & Missing libraries & Dependencies not universally available & 2 & 11 &                      \\
+    & Dynamic library loading & DLL vs. SO file issues & 0 & 5 &                      \\
+    & Binary wheel mismatch & Architecture-specific wheel incompatibilities & 0 & 3 &                      \\
     \midrule
     
     \multirow[t]{4}{*}{Environment and Display (ENV)}
-    & No display in github CI (linux) & Headless CI lacks display server & 2 & 3 & \multirow{4}{*}{14} \\
-    & GUI differences & Window manager behavior varies & 4 & 0 &                      \\
-    & Missing curses & Curses unavailable on Windows & 0 & 1 &                      \\
+    & No display in github CI (linux) & Headless CI lacks display server & 3 & 2 & \multirow{4}{*}{14} \\
+    & GUI differences & Window manager behavior varies & 0 & 4 &                      \\
+    & Missing curses & Curses unavailable on Windows & 1 & 0 &                      \\
     & Terminal capabilities & Terminal features differ across systems & 2 & 2 &                      \\
     \midrule
     
     \multirow[t]{2}{*}{API Availability (API)}
-    & Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() & OS methods missing on Windows & 2 & 4 & \multirow{2}{*}{8} \\
-    & Modules: readline, resource & Optional modules not everywhere & 2 & 0 &                      \\
+    & Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() & OS methods missing on Windows & 4 & 2 & \multirow{2}{*}{8} \\
+    & Modules: readline, resource & Optional modules not everywhere & 0 & 2 &                      \\
     \midrule
     
     \multirow[t]{3}{*}{Permissions and Limits (PERM)}
-    & Permission & Permission models differ by OS & 1 & 3 & \multirow{3}{*}{7} \\
-    & File descriptor limits & Resource limits vary across systems & 1 & 0 &                     \\
+    & Permission & Permission models differ by OS & 3 & 1 & \multirow{3}{*}{7} \\
+    & File descriptor limits & Resource limits vary across systems & 0 & 1 &                     \\
     & Symlink privileges & Windows requires admin for symlinks & 1 & 1 &                     \\
     \midrule
     
     \multirow[t]{2}{*}{System Information (SYS)}
-    & /proc filesystem & /proc missing on macOS/Windows & 0 & 1 & \multirow{2}{*}{2} \\
-    & Timezone database & Timezone data not always installed & 0 & 1 &                      \\
+    & /proc filesystem & /proc missing on macOS/Windows & 1 & 0 & \multirow{2}{*}{2} \\
+    & Timezone database & Timezone data not always installed & 1 & 0 &                      \\
     \midrule
-    \textbf{Total} & - & - & \textbf{95} & \textbf{45} & \textbf{140} \\
+    \textbf{Total} & - & - & \textbf{\NumProjectsWithOSDiffInTests{}} & \textbf{\NumProjectsWithOSDiffInIssues{}} & \textbf{140} \\
     \bottomrule
     \end{tabularx}
 \end{table*}
 
-% ====================================================================
+We identify seven main root-cause categories that explain why portability problems occur:
 
-\noindent\textbf{File and Directories (FILE).}
-The most prevalent category involves file handling differences across operating systems. Issues include path separator mismatches (forward vs. backslash), line ending inconsistencies (CRLF vs. LF), case sensitivity variations in filesystems, file locking behavior (especially on Windows), text encoding problems, and filesystem block size assumptions.
+\noindent\textbf{File and Directories (FILE):} The most prevalent category (60 projects) stems from OS differences in file operations. Key issues include path separator differences (backslash vs. forward slash), line ending mismatches (CRLF vs. LF), file locking semantics, and text encoding defaults.
 
-\noindent\textbf{Process and Signals (PROC).}
-Cross-platform discrepancies in process execution manifest through shell command execution differences, missing signal handlers (e.g., SIGKILL, SIGHUP unavailable on Windows), and port binding conflicts that produce different error codes across systems.
+\noindent\textbf{Process and Signals (PROC):} This category (25 projects) captures failures from OS-level process management differences. Shell execution varies across platforms (cmd.exe vs. bash), Windows lacks many Unix signals (SIGHUP, SIGKILL), and port binding produces different error codes.
 
-\noindent\textbf{Library Dependencies (LIB).}
-Platform-specific library availability causes failures when code relies on libraries like fcntl (Unix-only), encounters missing dependencies, faces dynamic library loading issues (DLL vs. SO files), or experiences binary wheel architecture mismatches.
+\noindent\textbf{Library Dependencies (LIB):} These failures (24 projects) occur when code assumes platform-specific libraries. Issues include Unix-only modules (e.g., fcntl), missing dependencies, different dynamic library extensions (.dll vs .so vs .dylib), and architecture-specific binary wheels.
 
-\noindent\textbf{Environment and Display (ENV).}
-Runtime environment differences emerge when tests require displays in headless CI environments, depend on GUI window managers, attempt to use curses on Windows, or rely on specific terminal capabilities not universally available.
+\noindent\textbf{Environment and Display (ENV):} These problems (14 projects) arise from runtime environment differences. Headless CI lacks display servers for GUI testing, window managers behave differently, terminal capabilities vary, and curses may be unavailable (especially on Windows).
 
-\noindent\textbf{API Availability (API).}
-Platform-specific APIs in Python's standard library cause portability issues, particularly missing methods (os.uname(), os.geteuid(), os.getuid(), os.getpgid()) and modules (readline, resource) unavailable on certain platforms.
+\noindent\textbf{API Availability (API):} This category (8 projects) covers Python APIs not universally available. Many os module methods are Unix-specific (os.uname(), os.geteuid(), os.getpgid()) and fail on Windows, while optional modules like readline and resource may be missing.
 
-\noindent\textbf{Permissions and Limits (PERM).}
-System permission and resource limit differences include permission errors with varying behavior, file descriptor limits that differ by OS, and symlink privilege restrictions (requiring administrator rights on Windows).
+\noindent\textbf{Permissions and Limits (PERM):} These issues (7 projects) reflect OS differences in access control. Permission models differ (Unix chmod vs. Windows ACLs), file descriptor limits vary, and symbolic link creation requires admin privileges on Windows.
 
-\noindent\textbf{System Information (SYS).}
-Platform-specific system information sources cause failures when code assumes /proc filesystem availability (absent on macOS/Windows) or relies on timezone databases not installed by default on all systems.
-
-\textbf{Quick Answer.} Portability issues cluster around 7 main categories: file handling, process execution, library dependencies, environment mismatches, API availability, permissions, and system information sources.
+\noindent\textbf{System Information (SYS):} This category (2 projects) includes failures from platform-specific system information mechanisms. The /proc filesystem exists only on Linux, and timezone databases may not be installed by default.
 
 \begin{figure}[!ht]
 \centering
@@ -468,7 +485,9 @@ def test_special_case():
 \end{figure}
 
 
-\begin{table*}[t]
+\subsubsection{\textbf{Answering \RQTwoTwo{}}}
+
+\noindent\begin{table*}[t]
     \centering
     \caption{Diagnostic symptom signatures and general fix patterns for portability sub-categories.}
     \label{tab:symptoms}
@@ -526,40 +545,19 @@ def test_special_case():
     \end{tabularx}
     \end{table*}   
 
-\subsubsection{RQ2.2 — Symptoms}
-\label{rq2-2}
-\RQTwoTwo{}
+\noindent Table~\ref{tab:symptoms} presents diagnostic symptom signatures mapped to portability sub-categories. Each row represents a specific sub-category within a broader root-cause category (FILE, PROC, LIB, ENV, API, PERM, SYS). The columns show: (i) the root-cause category, (ii) the specific sub-category, (iii) verbatim error messages or symptoms when available, and (iv) the recommended general fix pattern. Not every sub-category produces a unique diagnostic signature; where concrete error messages exist, they reliably identify the underlying cause in test/CI logs (e.g., \texttt{AttributeError: module 'os' has no attribute 'uname'}, \texttt{UnicodeDecodeError}). These signatures enable rapid triage and help developers quickly recognize portability issues in practice.
 
-\textbf{Symptom signatures} 
+\subsubsection{\textbf{Answering \RQTwoThree{}}}
 
-For subcategories with concrete signals, we list verbatim exceptions or OS-specific error texts that reliably identify the underlying cause in test/CI logs. Not every subcategory has a unique signature; we include only those with specific, reproducible messages (e.g., \texttt{AttributeError: module 'os' has no attribute 'uname'}, \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x..}). These signatures are meant to speed triage and help developers and tools quickly recognize portability issues; they are not exhaustive of all possible manifestations (see Table~\ref{tab:symptoms}).  
+\noindent Figure~\ref{fig:patterns} illustrates representative examples of fix patterns for portability issues, drawn from real-world projects. Each subfigure demonstrates a different repair strategy applied to actual code. The figure shows before (lines prefixed with \texttt{-}) and after (lines prefixed with \texttt{+}) versions of code snippets. The four patterns demonstrated are: (a) defensive checks using try/except for optional imports, (b) portable APIs replacing OS-specific constructs with cross-platform abstractions, (c) normalization using path separators correctly, and (d) environment handling using platform-aware test skipping.
 
-\textbf{Quick Answer.} Most portability issues produce distinctive error signatures that enable quick diagnosis and categorization.
+Across projects, portability issues are resolved through four recurring strategies: \textbf{(i) Defensive checks} add guards, fallbacks, \texttt{try/except}, or conditional imports to handle missing APIs or modules gracefully (Listing~\ref{lst:defensive}); \textbf{(ii) Portable APIs} replace OS-specific constructs with cross-platform abstractions like \texttt{pathlib}, \texttt{platform}, or \texttt{psutil} (Listing~\ref{lst:portable}); \textbf{(iii) Normalization} standardizes encodings, line endings, paths, or filenames to prevent spurious differences (Listing~\ref{lst:normalization}); and \textbf{(iv) Environment handling} adapts code and tests to runtime conditions, such as skipping GUI tests in headless CI or managing platform-specific permissions (Listing~\ref{lst:environment}). 
 
-\subsubsection{RQ2.3 — Fix Patterns}
-\label{rq2-3}
-\RQTwoThree{} 
-% \textbf{Rationale.} Identifying reusable solutions helps developers apply proven strategies to resolve portability problems. By analyzing fixes across projects, we can distill common patterns that effectively address cross-platform issues without requiring extensive platform-specific code.
+Table~\ref{tab:symptoms} (in RQ2.2) maps each root-cause sub-category to its recommended fix pattern, showing how these four general strategies apply across the taxonomy. This mapping provides developers with actionable guidance: given a specific symptom or error message, the table indicates which fix pattern to apply.
 
-\textbf{Concrete example (PR fix).} \Fix{We will insert a specific PR and code diff illustrating the applied fix.}
-
-Across projects, we find that portability issues are often resolved through a small set of recurring strategies. Figure~\ref{fig:patterns} illustrates representative examples of these fixes, drawn from real-world projects.
-
-Specifically, we observe four general patterns. (i)  \textbf{Defensive checks}, which add guards, fallbacks, \texttt{try/except}, or conditional imports to avoid crashes when APIs or modules are missing (see Listing~\ref{lst:defensive}); 
-(ii) \textbf{Portable APIs}, which replace OS-specific constructs with cross-platform abstractions (e.g., \texttt{pathlib}, \texttt{platform}, \texttt{psutil}) and safer subprocess usage (Listing~\ref{lst:portable});
-(iii) \textbf{Normalization} which standardizes encodings, line endings, paths, or filenames before comparison to prevent spurious differences (Listing~\ref{lst:normalization}); 
-and \textbf{Environment handling}, which adapts code and tests to runtime conditions (e.g., skipping tests in restricted environments, handling permissions/dependencies, or using containers/virtual environments) is illustrated in Listing~\ref{lst:environment}. These patterns are simple, teachable, and cover the majority of fixes we observed.
-
-Table~\ref{tab:symptoms} maps each root-cause category to its recommended fix patterns, providing a practical guide for addressing specific portability issues:
-
-\begin{itemize}
-  \item \textbf{Defensive checks:} add guards, fallbacks, \texttt{try/except}, or conditional imports to avoid crashes when APIs or modules are missing.
-  \item \textbf{Portable APIs:} prefer cross-platform abstractions such as \texttt{pathlib}, \texttt{platform}, or \texttt{psutil}, and use safer subprocess calls with explicit arguments.
-  \item \textbf{Normalization:} standardize encodings, line endings, paths, or filenames before comparison to prevent spurious differences.
-  \item \textbf{Environment handling:} adapt code and tests to runtime conditions (e.g., skip GUI in headless CI, manage permissions/dependencies, or use containers/virtual environments).
-\end{itemize}
-
-\textbf{Quick Answer.} Four fix patterns (defensive checks, portable APIs, normalization, environment handling) address the majority of portability issues we observed.
+\begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
+\textbf{RQ\textsubscript{2} (characteristics)}: Portability issues cluster around 7 root-cause categories, with File and Directories (FILE) being the most prevalent (60 projects). Most issues produce distinctive error signatures that enable quick diagnosis. Four general fix patterns—defensive checks, portable APIs, normalization, and environment handling—address the majority of observed portability problems. These patterns are simple, teachable, and applicable across different categories.
+\end{tcolorbox}
 
 \subsection{RQ3 — Tool Effectiveness}
 \label{rq3}
