@@ -565,9 +565,8 @@ Table~\ref{tab:symptoms} (in RQ2.2) maps each root-cause sub-category to its rec
 \textbf{RQ\textsubscript{2} (characteristics)}: Portability issues cluster around 7 root-cause categories, with File and Directories (FILE) being the most prevalent (60 projects). Most issues produce distinctive error signatures that enable quick diagnosis. Four general fix patterns—defensive checks, portable APIs, normalization, and environment handling—address the majority of observed portability problems. These patterns are simple, teachable, and applicable across different categories.
 \end{tcolorbox}
 
-\subsection{RQ3 — Tool Effectiveness}
+\subsection{\textbf{Answering} \RQThree{}}
 \label{rq3}
-\RQThree{}
 
 
 \textbf{Analysis of Static Tools.} To evaluate the effectiveness of static analysis tools in detecting Python portability issues, we systematically examined the rules and capabilities of several widely used linters and type checkers. Specifically, we considered Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright}.
@@ -686,11 +685,10 @@ From a broader research standpoint, the results highlight both promise and limit
 % Add here: quantitative comparison (coverage, precision, recall)
 % For example: Figure 3 (Venn diagram of issues detected by static vs dynamic approaches)
 
-\subsection{RQ4. \RQFour{}}
+\subsection{\textbf{Answering} \RQFour{}}
 \label{sec:pr-discussion}
-\subsubsection{RQ4.1 — Applied Fixes}
+\subsubsection{\textbf{Answering} \RQFourOne{}}
 \label{rq4-1}
-\textbf{Research Question.} \RQFourOne{}
  
 
 % Add here: commit/PR analysis, with representative examples of code changes
@@ -699,9 +697,8 @@ From a broader research standpoint, the results highlight both promise and limit
 
 \textbf{Quick Answer.} Fixes often involve replacing OS-specific APIs, adding conditional checks, or adopting cross-platform libraries.  
 
-\subsubsection{RQ4.2 — Community Reaction}
+\subsubsection{\textbf{Answering} \RQFourTwo{}}
 \label{rq4-2}
-\textbf{Research Question.} \RQFourTwo{}
 
 
 % Add here: time-to-fix statistics, issue/PR comment analysis
