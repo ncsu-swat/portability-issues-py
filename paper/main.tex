@@ -587,6 +587,9 @@ Table~\ref{tab:symptoms} (in RQ2.2) maps each root-cause sub-category to its rec
 
 Our analysis revealed that, among these tools, only Ruff provides a rule that directly addresses potential portability concerns, namely the \texttt{unspecified-encoding} check~\cite{encruff} that maps to the ``Encoding'' subcategory within the ``File and Directories'' category. This rule helps identify cases where files are opened without explicitly specifying an encoding, which may lead to cross-platform inconsistencies. The remaining tools focus primarily on style, type correctness, security, and general code quality, without offering rules specifically designed to detect operating-system-dependent behaviors or other portability issues.
 
+\Den{@Marcelo, everything below is new and needs to be revised!}
+
+
 \textbf{Motivation for LLM Evaluation.}
 
 Given the limited support for portability checks in existing static tools, we extended our evaluation to large language models (LLMs). We designed an experiment in which LLMs were presented with real Python code snippets exhibiting three distinct behaviors: (i)~non-portable code containing OS-specific constructs, (ii)~portable code that had been corrected to work across platforms, and (iii)~code unrelated to portability.
@@ -658,7 +661,7 @@ Model & Precision & Recall & F1-Score & Accuracy \\
 
 \begin{table*}[h!]
 \centering
-\caption{\label{tab:confusion_matrices_combined}Confusion matrices for all models}
+\caption{\label{tab:confusion_matrices_combined}Confusion matrices showing classification performance of three LLMs on the portability detection task. Rows represent actual labels, columns represent predicted labels, and diagonal entries indicate correct classifications.}
 \begin{tabular}{lccc|ccc|ccc}
 \toprule
 & \multicolumn{3}{c|}{\texttt{llama-3.3}} & \multicolumn{3}{c|}{\texttt{grok-4-fast}} & \multicolumn{3}{c}{\texttt{gpt-4o-mini}} \\
@@ -670,6 +673,7 @@ Model & Precision & Recall & F1-Score & Accuracy \\
 \end{tabular}
 \end{table*}
 
+Table~\ref{tab:confusion_matrices_combined} presents the confusion matrices for all three models evaluated. The matrices reveal distinct classification patterns across models. \texttt{Grok-4-Fast} demonstrates the most balanced performance, correctly identifying 53 out of 60 portable cases and 18 out of 30 non-portable cases, yielding an overall accuracy of 79\%. In contrast, \texttt{llama-3.3} exhibits a strong bias toward the non-portable class, misclassifying 50 of the 60 portable samples, resulting in only 40\% accuracy. \texttt{GPT-4o-Mini} shows an opposite tendency: while it achieves near-perfect specificity (29 out of 30 non-portable cases correctly identified), it misses the majority of portable cases (39 out of 60), achieving 56\% accuracy. These patterns suggest fundamentally different decision boundaries and risk tolerance levels across the three models, which we analyze in detail below.
 
 The extended evaluation provides new insight into how different LLMs reason about software portability under a more diverse and balanced dataset. The inclusion of ``unrelated'' yet valid Python code introduces a subtle but important challenge: distinguishing the absence of portability issues from the presence of clear portability signals. This distinction is conceptually close to the notion of false alarms in static analysis and serves as a more realistic proxy for practical development scenarios.
 
@@ -760,7 +764,7 @@ Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total 
 
 From this number of PRs, we observe that the fix was applied in \TotalPRInTestsCode{} cases to the test code only, in \TotalPRInProgramCode{} cases to the program code only, and in \TotalPRInBothCode{} cases to both the test and program code. This distribution suggests that while some portability issues can be resolved by adjusting tests to be more environment-aware, many require changes to the application logic itself to ensure consistent behavior across platforms.
 
-\begin{table*}[h!]
+\begin{table}[h!]
     \centering
     \footnotesize
     \setlength{\tabcolsep}{2pt}
@@ -781,7 +785,7 @@ From this number of PRs, we observe that the fix was applied in \TotalPRInTestsC
         \textbf{Total} & \textbf{\TotalPROpened} & \textbf{\TotalPRAccepted} & \textbf{\TotalPRRejected} \\
         \bottomrule
     \end{tabular}
-\end{table*}
+\end{table}
 
 \textbf{Quick Answer.} Developers typically acknowledge portability problems but often give them lower priority than functional bugs, resulting in varied resolution times.  
 
