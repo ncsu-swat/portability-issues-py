@@ -164,9 +164,13 @@ a handful of commits to large, long-lived, and widely adopted projects.
 
 
 
-\subsection{Methods}\textbf{Cross-OS re-execution.} For each project we run the test suite on multiple operating systems and record divergent outcomes. We then triage failures via logs and small code inspections, mapping each instance to a concrete category.\Fix{Explain what is a category.}  
+\subsection{Methods}
 
-\textbf{Mining portability-related issues.} To complement test-based findings, we also mine \github{} issues and pull requests. We built a “candidate finder” combining multiple keyword axes:  
+We use two complementary methods to identify portability issues:
+
+\textbf{Cross-OS re-execution.} For each project we run the test suite on multiple operating systems and record divergent outcomes. We then triage failures via logs and small code inspections, mapping each instance to a concrete category.\Fix{Explain what is a category.}  
+
+\textbf{Issues Mining.} To complement test-based findings, we also mine \github{} issues and pull requests. We built a “candidate finder” combining multiple keyword axes:  
 (a) OS/platform indicators (e.g., Windows, Linux, macOS, specific distros/architectures),  
 (b) failure/fix language (e.g., fails, error, bug, fix, workaround),  
 (c) testing/CI context (pytest, CI, \github{} Actions), and  
@@ -291,12 +295,16 @@ Table~\ref{tab:dataset} reports on the prevalence of portability
 problems in \github{} Python projects. Table~\ref{tab:dataset-a}
 details the results we obtain when re-executing test cases whereas
 Table~\ref{tab:dataset-b} details the results we obtain when
-inspecting issues from projects. Table~\ref{tab:dataset-a} shows that
+inspecting issues from projects. 
+
+Table~\ref{tab:dataset-a} shows that
 we mined a total of \NumProjects{} but re-executed test suites of
 nearly 25\% of them, \ie{}, \NumProjectsAnalyzed{} projects. Recall
 from Section~\ref{sec:setup} that each test suite is executed on three
 different virtual machines and the outcomes of each test cases is
-compared for discrepancy. The \NumProjectsAnalyzed{} projects whose
+compared for discrepancy. 
+
+The \NumProjectsAnalyzed{} projects whose
 test suites were executed included a total of \NumTestsExecuted{} test cases. Of
 those, we found discrepant outcomes (\ie{}, there was no agreement
 across all three OSes that we considered) in \NumTestRunsWithOSDiff{} cases, which
@@ -307,12 +315,16 @@ indicate real portability issues. In contrast to the test re-execution
 method, the issue mining method is imprecise due to the inherent
 innacuracy of text mining. As such, we require to manually analyze the
 discussion threads of the issues to understand if they indicate real
-portability issues. Table~\ref{tab:dataset-b} shows the results from 
+portability issues. 
+
+Table~\ref{tab:dataset-b} shows the results from 
 mining and analyzing \github{} issues. We mined a total of 
 \NumIssuesMined{} candidate issues using our keyword-based search 
 strategy described in Section~\ref{sec:methodology}. From this set, we 
 randomly sampled \NumIssuesAnalyzed{} of the most recent issues for 
-manual inspection. Through careful analysis of issue titles, descriptions, 
+manual inspection. 
+
+Through careful analysis of issue titles, descriptions, 
 discussion threads, and the associated code, we confirmed that \NumIssuesRelated{} of these 
 were genuine portability issues, representing a confirmation rate of 
 42.5\%. While this method is less precise than test re-execution and 
@@ -321,7 +333,9 @@ that test-based detection cannot capture. Specifically, issue mining
 reveals how developers discuss, diagnose, and prioritize portability 
 problems in practice, exposes historical patterns across different project 
 contexts, and surfaces issues in projects or code paths that may lack 
-comprehensive test coverage. Importantly, the \NumIssuesRelated{} 
+comprehensive test coverage. 
+
+Importantly, the \NumIssuesRelated{} 
 confirmed issues come from projects with no overlap with those analyzed 
 in Table~\ref{tab:dataset-a}, demonstrating that portability problems 
 extend beyond our test execution sample and affect a broader range of 
@@ -350,7 +364,7 @@ root causes, symptoms, and fixes.
 ~
 
 \noindent Table~\ref{tab:categories} presents our taxonomy of portability issues 
-organized by root-cause categories. Each row groups related sub-categories
+organized by root causes. Each row groups related sub-categories
 under a main category. The columns show: (i) the root-cause category name and acronym,
 (ii) specific sub-categories within that category,
 (iii) a brief description of each sub-category,
@@ -429,15 +443,15 @@ under a main category. The columns show: (i) the root-cause category name and ac
 
 We identify seven main root-cause categories that explain why portability problems occur:
 
-\noindent\textbf{File and Directories (FILE):} The most prevalent category (60 projects) stems from OS differences in file operations. Key issues include path separator differences (backslash vs. forward slash), line ending mismatches (CRLF vs. LF), file locking semantics, and text encoding defaults.
+\noindent\textbf{File and Directories (FILE):} The most prevalent category (60 projects) stems from OS differences in file operations. Key issues include path separator differences (backslash vs. forward slash), line ending mismatches (\CodeIn{CRLF} vs. \CodeIn{LF}), file locking semantics, and text encoding defaults.
 
-\noindent\textbf{Process and Signals (PROC):} This category (25 projects) captures failures from OS-level process management differences. Shell execution varies across platforms (cmd.exe vs. bash), Windows lacks many Unix signals (SIGHUP, SIGKILL), and port binding produces different error codes.
+\noindent\textbf{Process and Signals (PROC):} This category (25 projects) captures failures due to OS process management differences. For example, shell execution varies across platforms (\CodeIn{cmd.exe} vs. \CodeIn{bash}), Windows lacks many Unix signals (\CodeIn{SIGHUP}, \CodeIn{SIGKILL}), and port binding produces different error codes.
 
-\noindent\textbf{Library Dependencies (LIB):} These failures (24 projects) occur when code assumes platform-specific libraries. Issues include Unix-only modules (e.g., fcntl), missing dependencies, different dynamic library extensions (.dll vs .so vs .dylib), and architecture-specific binary wheels.
+\noindent\textbf{Library Dependencies (LIB):} These failures (24 projects) occur when code assumes platform-specific libraries. Issues include Unix-only modules (e.g., fcntl), missing dependencies, different dynamic library extensions (\CodeIn{.dll} vs \CodeIn{.so} vs \CodeIn{.dylib}), and architecture-specific binary wheels.
 
 \noindent\textbf{Environment and Display (ENV):} These problems (14 projects) arise from runtime environment differences. Headless CI lacks display servers for GUI testing, window managers behave differently, terminal capabilities vary, and curses may be unavailable (especially on Windows).
 
-\noindent\textbf{API Availability (API):} This category (8 projects) covers Python APIs not universally available. Many os module methods are Unix-specific (os.uname(), os.geteuid(), os.getpgid()) and fail on Windows, while optional modules like readline and resource may be missing.
+\noindent\textbf{API Availability (API):} This category (8 projects) covers Python APIs not universally available. Many OS module methods are Unix-specific (\CodeIn{os.uname()}, \CodeIn{os.geteuid()}, \CodeIn{os.getpgid()}) and fail on Windows, while optional modules like readline and resource may be missing.
 
 \noindent\textbf{Permissions and Limits (PERM):} These issues (7 projects) reflect OS differences in access control. Permission models differ (Unix chmod vs. Windows ACLs), file descriptor limits vary, and symbolic link creation requires admin privileges on Windows.
 
@@ -521,7 +535,7 @@ def test_special_case():
     & Address already in use & \texttt{OSError: [Errno 98] Address already in use} (Linux) \; / \; \texttt{OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted} (Windows) & Defensive checks + Environment handling — catch OS-specific errors, use port 0 \\
     \midrule
     \textbf{LIB} &
-    Platform-specific libraries (e.g. fcntl) & \texttt{ModuleNotFoundError: No module named 'fcntl'} & Defensive checks — conditional import provide fallback \\
+    Platform-specific libraries (e.g. \CodeIn{fcntl}) & \texttt{ModuleNotFoundError: No module named 'fcntl'} & Defensive checks — conditional import provide fallback \\
     & Missing libraries & \texttt{ModuleNotFoundError: No module named '...'} & Defensive checks — optional import with fallback \\
     & Dynamic library loading & \texttt{OSError: [WinError 126] The specified module could not be found} & Defensive checks — guard loading prefer pure-Python \\
     & Binary wheel mismatch & No specific signature & Environment handling — install platform-appropriate wheel \\
@@ -549,7 +563,7 @@ def test_special_case():
     \end{tabularx}
     \end{table*}   
 
-\noindent Table~\ref{tab:symptoms} presents diagnostic symptom signatures mapped to portability sub-categories. Each row represents a specific sub-category within a broader root-cause category (FILE, PROC, LIB, ENV, API, PERM, SYS). The columns show: (i) the root-cause category, (ii) the specific sub-category, (iii) verbatim error messages or symptoms when available, and (iv) the recommended general fix pattern. Not every sub-category produces a unique diagnostic signature; where concrete error messages exist, they reliably identify the underlying cause in test/CI logs (e.g., \texttt{AttributeError: module 'os' has no attribute 'uname'}, \texttt{UnicodeDecodeError}). These signatures enable rapid triage and help developers quickly recognize portability issues in practice.
+\noindent Table~\ref{tab:symptoms} presents diagnostic symptom signatures mapped to portability sub-categories. Each row represents a specific sub-category within a broader root-cause category (\eg FILE). The columns show: (i) the root-cause category, (ii) the specific sub-category, (iii) verbatim error messages or symptoms when available, and (iv) the recommended general fix pattern. We find that not every sub-category produces a unique diagnostic signature; where concrete error messages exist, they reliably identify the underlying cause in test/CI logs (e.g., \texttt{AttributeError: module ``os'' has no attribute ``uname''}, \texttt{UnicodeDecodeError}). These signatures enable rapid triage and help developers quickly recognize portability issues in practice.
 
 \subsubsection{\textbf{Answering \RQTwoThree{}}}
 
@@ -750,7 +764,7 @@ From this number of PRs, we observe that the fix was applied in \TotalPRInTestsC
     \centering
     \footnotesize
     \setlength{\tabcolsep}{2pt}
-    \caption{Summary of Pull Requests (PRs) by issue type, showing opened, accepted, and rejected. The last row shows totals.}
+    \caption{\Fix{Ali, please update this table with the latest results.} Summary of Pull Requests (PRs) by issue type, showing opened, accepted, and rejected. The last row shows totals.}
     \label{tab:prs}
     % Creating a compact tabular environment
     \begin{tabular}{lccc}
