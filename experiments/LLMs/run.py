@@ -5,7 +5,7 @@ import json
 import time
 
 # Configuração
-API_KEY = ""
+API_KEY = "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"
 MODELS = ["meta-llama/llama-3.3-70b-instruct", "x-ai/grok-4-fast", "openai/gpt-4o-mini", "deepseek/deepseek-chat-v3.1:free"]  # seus 4 modelos
 BASE_DIR = "code"
 OUTPUT_FULL_CSV = "results_full.csv"

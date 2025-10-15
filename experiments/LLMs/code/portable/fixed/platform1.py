@@ -1,7 +1,7 @@
 import platform
 import pytest
 
-class TestPlatformInfo:
+class TestInfo:
 
     def test_system_is_string(self):
         system = platform.system()
