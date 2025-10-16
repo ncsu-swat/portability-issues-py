@@ -417,7 +417,7 @@ open coding, we identified recurring patterns and grouped issues with similar
 underlying causes. This process was conducted by the authors, with 
 regular discussions to resolve ambiguities and refine category definitions. The 
 resulting taxonomy consists of 7 high-level root-cause categories (e.g., FILE, 
-PROC, LIB) with 24 distinct subcategories. For each issue, we also documented 
+PROC, LIB) with 24 distinct sub-categories. For each issue, we also documented 
 observable symptoms (error messages, behaviors) and examined corresponding fixes 
 in merged pull requests or commits to identify common repair patterns.
 
@@ -441,7 +441,7 @@ under a main category. The columns show: (i) the root-cause category name and ac
 % ========================= CATEGORIES TABLE =========================
 \begin{table*}[t]
     \centering
-    \caption{Taxonomy of portability issues showing root-cause categories, subcategories, brief descriptions, and number of distinct projects observed in test execution and mined \github{} issues.}
+    \caption{Taxonomy of portability issues showing root-cause categories, sub-categories, brief descriptions, and number of distinct projects observed in test execution and mined \github{} issues.}
     \label{tab:categories}
     \scriptsize
     \setlength{\tabcolsep}{3pt}
@@ -684,7 +684,25 @@ Across projects, portability issues are resolved through four recurring strategi
       code and tests to runtime conditions, such as skipping GUI tests in headless CI or
        managing platform-specific permissions (Listing~\ref{lst:environment}). 
 
-Table~\ref{tab:symptoms} (in RQ2.2) maps each root-cause sub-category to its recommended fix pattern, showing how these four general strategies apply across the taxonomy. This mapping provides developers with actionable guidance: given a specific symptom or error message, the table indicates which fix pattern to apply.
+Table~\ref{tab:symptoms} (in RQ2.2) maps each root-cause sub-category to its recommended fix pattern, showing how these four general strategies apply across the taxonomy. Figure~\ref{fig:fix_pattern_distribution} shows the distribution of these patterns, revealing that Defensive checks and Environment handling are the most common strategies (together accounting for $\sim$67\% of fixes), while Portable APIs is used less frequently but targets specific, well-defined issues. This mapping provides developers with actionable guidance: given a specific symptom or error message, the table indicates which fix pattern to apply.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\pie[
+    text=legend,
+    radius=2.2,
+    color={DefensiveColor!80,EnvColor!80,NormColor!80,PortableColor!80}
+]{
+    33.3/Defensive checks (9),
+    33.3/Environment handling (9),
+    22.2/Normalization (6),
+    11.1/Portable APIs (3)
+}
+\end{tikzpicture}
+\caption{Distribution of fix patterns across 24 portability sub-categories.}
+\label{fig:fix_pattern_distribution}
+\end{figure}
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
 \textbf{RQ\textsubscript{2} (characteristics)}: Portability issues cluster around 7 root-cause categories, with File and Directories (FILE) being the most prevalent (60 projects). Most issues produce distinctive error signatures that enable quick diagnosis. Four general fix patterns—defensive checks, portable APIs, normalization, and environment handling—address the majority of observed portability problems. These patterns are simple, teachable, and applicable across different categories.
@@ -698,7 +716,7 @@ This section evaluates performance of LLMs for detecting
 (\textsection~\ref{sec:llm-fixing}) portability issues.
 
 \begin{table}[t!]
-  \centering
+\centering
   \caption{~\label{tab:llm_detection_results} LLMs for detection: metrics.}
   \vspace{-2ex}  
   \setlength{\tabcolsep}{1.5pt} % Sets the horizontal space before and after each column to 10pt
@@ -747,7 +765,7 @@ MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright}.
 We find that only Ruff provides a rule that directly addresses
 potential portability concerns, namely the
 \texttt{unspecified-encoding} check~\cite{encruff} that maps to the
-``Encoding'' subcategory within the ``File and Directories''
+``Encoding'' sub-category within the ``File and Directories''
 category. The remaining tools focus primarily on style, type
 correctness, security, and general code quality. For that reason, we
 focus on LLMs. We consider three LLMs of moderate model size, namely
