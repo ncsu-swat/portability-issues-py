@@ -168,28 +168,44 @@ a handful of commits to large, long-lived, and widely adopted projects.
 
 We use two complementary methods to identify portability issues:
 
-\textbf{Cross-OS re-execution.} For each project we run the test suite on multiple operating systems and record divergent outcomes. We then triage failures via logs and small code inspections, mapping each instance to a concrete category.\Fix{Explain what is a category.}  
+\textbf{Cross-OS re-execution.} For each project we run the test suite
+on multiple operating systems and record divergent outcomes. We then
+triage failures via logs and small code inspections, mapping each
+instance to a concrete category.\Mar{Is this the first time the term
+  ``category'' appears? If so, explain!!.} We execute tests on
+ephemeral virtual machines provided by GitHub-hosted
+runners~\cite{github_actions_runners}. Each virtual machine is
+automatically provisioned with 4~CPUs and 16~GB of RAM. We implemented
+a single GitHub Actions workflow (YAML) that uses a matrix strategy to
+run the test-suite on Ubuntu 24.04 LTS, macOS 15, and Windows Server
+2025 (each job runs in a fresh VM image). Each job installs
+dependencies, runs the Python tests with
+\texttt{pytest}~\cite{pytest_tool} and the \texttt{pytest-json-report}
+plugin~\cite{pytest_json_report} to create JSON reports, and finally
+uploads the JSON files as workflow artifacts for later analysis. This
+approach ensures reproducible, parallel cross-platform testing while
+GitHub manages VM provisioning and maintenance.
 
-\textbf{Issues Mining.} To complement test-based findings, we also mine \github{} issues and pull requests. We built a “candidate finder” combining multiple keyword axes:  
+\textbf{Issues Mining.} To complement test-based findings, we mine
+\github{} issues and pull requests. We wrote a “candidate finder”
+combining multiple \emph{types} of keyword:  
 (a) OS/platform indicators (e.g., Windows, Linux, macOS, specific distros/architectures),  
 (b) failure/fix language (e.g., fails, error, bug, fix, workaround),  
 (c) testing/CI context (pytest, CI, \github{} Actions), and  
 (d) common portability causes (e.g., path separators, chmod/permissions, encodings/UTF-8, dynamic libraries like \texttt{.dll}/\texttt{.so}).  
-
-We applied AND across axes and OR within each axis, so matches typically required an OS reference plus a failure/fix cue, optionally reinforced by test or cause terms. We searched titles, bodies, and comments, with extra weight to title and close-proximity matches. Light triage (brief summaries and negative filters for off-topic mentions) kept the set precise. Candidate issues were normalized into consistent records (project, link, date, summary, compact tags like OS=, FIX=, TEST=, CAUSE=), duplicates removed, and full text (title, description, comments) archived for analysis.  
-
-\subsection{Setup}
-\label{sec:setup}
+%
+We combine these keywords with ``OR'' within each type and ``AND''
+across types. We searched titles, bodies, and comments, with extra
+weight to title and close-proximity matches. We employ a lightweight
+triage (brief summaries and negative filters for off-topic mentions)
+to filter spurious results. Candidate issues were normalized into
+consistent records (project, link, date, summary, compact tags like
+OS=, FIX=, TEST=, CAUSE=), duplicates removed, and full text (title,
+description, comments) archived for analysis.
 
 % \Mar{HEY, this is not what you are doing. You need to explain how you
 % used \github{} Actions/Cloud to create VMs for different OSes.}
-
-\Den{Updated: Please check/revise!}
-
-
-All experiments were executed on ephemeral virtual machines provided by GitHub-hosted runners~\cite{github_actions_runners}. Each virtual machine is automatically provisioned with 4~CPUs and 16~GB of RAM. We implemented a single GitHub Actions workflow (YAML) that uses a matrix strategy to run the test-suite on Ubuntu 24.04 LTS, macOS 15, and Windows Server 2025 (each job runs in a fresh VM image). Each job installs dependencies, runs the Python tests with \texttt{pytest}~\cite{pytest_tool} and the \texttt{pytest-json-report} plugin~\cite{pytest_json_report} to create JSON reports, and finally uploads the JSON files as workflow artifacts for later analysis. This approach ensures reproducible, parallel cross-platform testing while GitHub manages VM provisioning and maintenance.
-
-
+%\Den{Updated: Please check/revise!}
 
 % \Den{I don't know if it's necessary and I also don't know if the text is clear enough. Please check/revise!}
 % All experiments were conducted across three operating systems to ensure compatibility. The Linux setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Ubuntu 24.04 LTS.
@@ -201,45 +217,72 @@ All experiments were executed on ephemeral virtual machines provided by GitHub-h
 
 We aim to answer the following key research questions:
 
-\noindent\textit{\RQOne{}}
-
-\textbf{Rationale.} With this question, we aim to measure how often portability problems actually occur in practice. Although Python is advertised as a cross-platform language, our preliminary results suggest that many tests fail when run on different operating systems. By quantifying the frequency of such issues across a representative set of projects and applying statistical tests, we can provide stronger evidence on whether portability is a widespread concern in the Python ecosystem or only affects a small subset of projects.  
+\sloppy \MyPara{\RQOne{}}~This question aims to assess how frequently
+portability problems occur in practice. If such issues are very rare,
+or if developers generally disregard them, the study’s practical value
+would be limited. To address this question, we analyze issue reports
+and execute tests in the wild across multiple virtual machines.
+%% Although
+%% Python is advertised as a cross-platform language, our preliminary
+%% results suggest that many tests fail when run on different operating
+%% systems. By quantifying the frequency of such issues across a
+%% representative set of projects and applying statistical tests, we can
+%% provide stronger evidence on whether portability is a widespread
+%% concern in the Python ecosystem or only affects a small subset of
+%% projects.
 
 
 % \textbf{Methodology.} \Fix{Describe here the methodology to answer RQ1.}
-\par
 
-\textit{\RQTwo{}}
+\MyPara{\RQTwo{}}~\textbf{Rationale.}~Assuming that identifying and
+resolving portability issues is an important problem, it is also
+essential to understand how these issues manifest (i.e., their
+symptoms), what their root causes are, and how they are typically
+repaired. For instance, automated solutions become more feasible when
+a small number of recurring fix patterns can be observe
 
-\textbf{Rationale.} This question is important to justify further investigation on portability problems in Python software. If we find that these problems are rare or have no consistent causes or manifestations, then further investigation is meaningless. To understand how and why portability issues occur in Python programs, and how they can be effectively addressed, we aim to answer three sub-questions:
-
-
-
-\noindent\textit{\RQTwoOne{}}
+%% Assuming problem of finding and
+%% fixing portability issues is important, it is also important to
+%% understand manifestations (\ie{}, symptoms), the root-causes of
+%% portability issues, and also how they are typically repaired. For
+%% example, automated solutions are more viable when a small set of fix
+%% patterns exists.
 % \textbf{Rationale.} This question seeks to identify and categorize the underlying reasons why portability issues arise. Our observations indicate that differences in modules such as os, file system conventions, path handling, and environment-specific assumptions may contribute to failures. In addition, some dependencies work properly on one operating system but not on another, further aggravating the problem. Understanding these root-causes is essential not only to characterize the problem but also to guide the development of best practices and tools to prevent such issues in the future.  
-
 % \textbf{Rationale.} Recognizing diagnostic signatures helps developers quickly triage failures and identify the underlying portability issue from test logs or CI output. While not all issues produce unique error messages, many exhibit specific, reproducible patterns that enable rapid diagnosis.
-
-\noindent\textit{\RQTwoTwo{}}
-\noindent\textit{\RQTwoThree{}}
-
+%% \noindent\textit{\RQTwoOne{}}
+%% \noindent\textit{\RQTwoTwo{}}
+%% \noindent\textit{\RQTwoThree{}}
 % \textbf{Methodology.} \Fix{Describe here the methodology to answer RQ2}
 
-\noindent\textit{\RQThree{}}
+\MyPara{\RQThree{}}~This question examines the extent to which
+existing tools (e.g., static analyzers and LLMs) can detect and fix
+portability problems. Re-executing test suites across different OSes
+(e.g., through virtual machines) can reliably identify portability
+issues, but it is limited by the ability of the existing tests to
+exercise the affected code locations.
 
-\textbf{Rationale.} This question investigates to what extent existing tools help identify portability problems. Static tools, including linters, type checkers, CodeQL queries, and even large language models, can flag certain categories of issues, such as OS-dependent APIs or unsafe path handling. However, many portability issues only manifest at runtime, for example due to environment assumptions, platform-specific encodings, or dependency incompatibilities. To complement static checks, we employ a dynamic strategy—our ``rerun'' approach—that executes tests across multiple operating systems to reveal failures that static analysis cannot anticipate. By comparing the coverage of static and dynamic techniques, we can assess their effectiveness and identify opportunities for improving tool support in cross-platform Python development. 
-
+%% Static tools, including
+%% linters, type checkers, CodeQL queries, and even large language
+%% models, can flag certain categories of issues, such as OS-dependent
+%% APIs or unsafe path handling. However, many portability issues only
+%% manifest at runtime, for example due to environment assumptions,
+%% platform-specific encodings, or dependency incompatibilities. To
+%% complement static checks, we employ a dynamic strategy—our ``rerun''
+%% approach—that executes tests across multiple operating systems to
+%% reveal failures that static analysis cannot anticipate. By comparing
+%% the coverage of static and dynamic techniques, we can assess their
+%% effectiveness and identify opportunities for improving tool support in
+%% cross-platform Python development.
 % \textbf{Methodology.} \Fix{Describe here the methodology to answer RQ3}
 
 
-\noindent\textit{\RQFour{}}
+\MyPara{\RQFour{}}~This question aims to further understand technical
+and social dimensions of portability issues, namely what are the
+common fixes developers employ and how developers react to pull
+request we submit to fix portability issues in their projects.
 
-\textbf{Rationale.} This question is important to justify further investigation on how developers handle portability issues in real projects. If developers rarely fix such problems or do not discuss them actively, further investigation is meaningless. To understand both the technical and social dimensions of how portability issues are addressed, we aim to answer two questions: 
-
-\noindent\textit{\RQFourOne{}}
-
-\noindent\textit{\RQFourTwo{}}
-
+%% \noindent\textit{\RQFourOne{}}
+%% \noindent\textit{\RQFourTwo{}}
 % \textbf{Methodology.} \Fix{Describe here the methodology to answer RQ4}
 
 
