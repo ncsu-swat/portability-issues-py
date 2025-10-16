@@ -123,7 +123,7 @@ This paper contributes an empirical study that (i) re-executes tests across oper
 \label{sec:sources}
 We define an \emph{OS portability issue} as a difference in test outcome across operating systems attributable to platform-specific APIs, environment/terminal capabilities, filesystem semantics, encodings, or native libraries. 
 
-\section{Methods and Objects of analysis}
+\section{Projects, Method, and Questions}
 \label{sec:methodology}
 
 This section describes the projects we used (\ref{sec:projects}), the
@@ -165,10 +165,11 @@ a handful of commits to large, long-lived, and widely adopted projects.
 
 
 \subsection{Methods}
+\label{sec:methods}
 
 We use two complementary methods to identify portability issues:
 
-\textbf{Cross-OS re-execution.} For each project we run the test suite
+\textbf{Cross-OS test re-execution.} For each project we run the test suite
 on multiple operating systems and record divergent outcomes. We then
 triage failures via logs and small code inspections, mapping each
 instance to a concrete category.\Mar{Is this the first time the term
@@ -310,7 +311,7 @@ This section provides answering to the posed research questions.
     \caption{\label{tab:dataset-a}Detected problems with test re-execution.}
     \begin{tabular}{lr}
     \toprule
-    Total number of projects mined & \NumProjects{} \\
+%    Total number of projects mined & \NumProjects{} \\
     Total number of projects selected & \NumProjectsAnalyzed{} \\
     \hspace{2ex}Total number of projects with OS differences & \NumProjectsWithOSDiffInTests{} \\    
     Total number of tests executed & \NumTestsExecuted{} \\
@@ -323,7 +324,7 @@ This section provides answering to the posed research questions.
   \begin{subtable}[t]{\linewidth}
     \centering
     \caption{\label{tab:dataset-b}Detected problems with manual inspection.}
-    \begin{tabular}{lc}
+    \begin{tabular}{lr}
       \toprule
       Total number of issues mined & \NumIssuesMined{} \\
       Total number of issues analyzed & \NumIssuesAnalyzed{} \\
@@ -335,7 +336,17 @@ This section provides answering to the posed research questions.
 \end{table}
 
 
-\Ali{Please review updates: (smaller paragraphs, remove the 100 percentage accuracy of re-execution method, add example of issue mining findings, ...)}
+%% \Ali{Please review updates: (smaller paragraphs, remove the 100
+%%   percentage accuracy of re-execution method, add example of issue
+%%   mining findings, ...)}
+
+This question assesses the prevalence of portability problems in
+Python projects through cross-OS test re-execution and issue mining
+(Section~\ref{sec:methods}). Recall that the first method is precise
+but incomplete as tests can fail to reach code locations with
+portability problems. The issue mining method complements the test
+re-execution method but it is costly; it requires the authors to
+inspect the issues.
 
 Table~\ref{tab:dataset} reports on the prevalence of portability
 problems in \github{} Python projects. Table~\ref{tab:dataset-a}
@@ -343,56 +354,71 @@ details the results we obtain when re-executing test cases whereas
 Table~\ref{tab:dataset-b} details the results we obtain when
 inspecting issues from projects. 
 
-Table~\ref{tab:dataset-a} shows that
-we mined a total of \NumProjects{} projects but re-executed test suites of
-nearly 25\% of them, \ie{}, \NumProjectsAnalyzed{} projects, due to the 
-resource-intensive nature of cross-platform test execution across three operating systems. Recall
-from Section~\ref{sec:setup} that each test suite is executed on three
-different virtual machines and the outcomes of each test cases is
-compared for discrepancy. 
+Table~\ref{tab:dataset-a} shows that we re-executed test suites (see
+Section~\ref{sec:methods}) from a sample of \NumProjectsAnalyzed{}
+projects mined from \github. Of these, we found discrepant behavior in
+45 projects, \ie{}, projects where test suites had at least one test
+manifesting OS differences. The \NumProjectsAnalyzed{} projects whose
+test suites were executed included a total of \NumTestsExecuted{} test
+cases. Of those, we found discrepant outcomes in
+\NumTestRunsWithOSDiff{} cases, which corresponds to
+\PercentDiscrepantTests{}.  
 
-The \NumProjectsAnalyzed{} projects whose
-test suites were executed included a total of \NumTestsExecuted{} test cases. Of
-those, we found discrepant outcomes (\ie{}, there was no agreement
-across all three OSes that we considered) in \NumTestRunsWithOSDiff{} cases, which
-corresponds to \PercentDiscrepantTests{}. The test re-execution
-method provides a systematic and reliable approach to detecting
-portability issues by directly observing behavioral differences across
-platforms.
+%% , due to the 
+%% resource-intensive nature of cross-platform test execution across
+%% three operating systems.
+%% Recall from Section~\ref{sec:methods} that each test suite is executed
+%% on three different virtual machines and the outcomes of each test
+%% cases is compared for discrepancy.
 
-In contrast, the issue mining method relies on text analysis
-of developer discussions and issue reports. Due to the inherent
-variability of natural language and the need to interpret context, we
-manually analyze the discussion threads of the issues to confirm
-whether they indicate real portability issues. 
+%% The test re-execution method
+%% provides a systematic and reliable approach to detecting portability
+%% issues by directly observing behavioral differences across
+%% platforms.
+%% . Due to the inherent variability of natural
+%% language and the need to interpret context, we manually analyze the
+%% discussion threads of the issues to confirm whether they indicate real
+%% portability issues.
 
-Table~\ref{tab:dataset-b} shows the results from 
-mining and analyzing \github{} issues. We mined a total of 
-\NumIssuesMined{} candidate issues using our keyword-based search 
-strategy described in Section~\ref{sec:methodology}. From this set, we 
-randomly sampled \NumIssuesAnalyzed{} of the most recent issues for 
-manual inspection. 
+Table~\ref{tab:dataset-b} shows the results from mining and analyzing
+\github{} issues. We mined a total of \NumIssuesMined{} candidate
+issues using keyword search (see Section~\ref{sec:methods}). From this
+set, we randomly sampled \NumIssuesAnalyzed{} of the most recent
+issues for manual inspection. Importantly, the \NumIssuesRelated{}
+confirmed issues come from projects with no overlap with those
+analyzed in Table~\ref{tab:dataset-a}.\Mar{where is the 95 number on
+  Table 2(b) is coming from? Either remove from the table or discuss
+  it here.}
 
-Through careful analysis of issue titles, descriptions, 
-discussion threads, and the associated code, we confirmed that \NumIssuesRelated{} of these 
-were genuine portability issues, representing a confirmation rate of 
-42.5\%. While this method requires significant manual effort to validate
-candidates, it provides complementary insights 
-that test-based detection cannot capture. Specifically, issue mining 
-reveals how developers discuss, diagnose, and prioritize portability 
-problems in practice, exposes historical patterns across different project 
-contexts, and surfaces issues in projects or code paths that may lack 
-comprehensive test coverage. For instance, we found an issue where a 
-project's tutorial failed on Windows due to a platform-incompatible 
-dependency, prompting maintainer discussions about whether to make 
-dependencies optional or create platform-specific variants—decision-making 
-processes and untested code paths that test re-execution alone cannot capture~\cite{pyearthtools-issue82}. 
+\Mar{I like this discussion, but it does not belong here. The question
+is about prevalence and this text is about analysis of root causes,
+symptoms, etc. It seems to belong to the next RQs. That said, I notice
+you do not mention if the (sub)category of root cause, symptom, and
+fix originate from test re-execution or issue mining. A table showing
+(1) only re-execution, (2) only mining, (3) both with rows for the
+three cases (causes, symptom, fixes) would be ``good enough''.}
+Through careful analysis of issue titles, descriptions, discussion
+threads, and the associated code, we confirmed that
+\NumIssuesRelated{} of these were genuine portability issues,
+representing a confirmation rate of 42.5\%. While this method requires
+significant manual effort to validate candidates, it provides
+complementary insights that test-based detection cannot
+capture. Specifically, issue mining reveals how developers discuss,
+diagnose, and prioritize portability problems in practice, exposes
+historical patterns across different project contexts, and surfaces
+issues in projects or code paths that may lack comprehensive test
+coverage. For instance, we found an issue where a project's tutorial
+failed on Windows due to a platform-incompatible dependency, prompting
+maintainer discussions about whether to make dependencies optional or
+create platform-specific variants—decision-making processes and
+untested code paths that test re-execution alone cannot
+capture~\cite{pyearthtools-issue82}.
 
-Importantly, the \NumIssuesRelated{} 
-confirmed issues come from projects with no overlap with those analyzed 
-in Table~\ref{tab:dataset-a}, demonstrating that portability problems 
-extend beyond our test execution sample and affect a broader range of 
-the Python ecosystem. 
+
+
+%% demonstrating that portability problems 
+%% extend beyond our test execution sample and affect a broader range of 
+%% the Python ecosystem. 
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
 \textbf{RQ\textsubscript{1} (prevalence)}: We find that portability
