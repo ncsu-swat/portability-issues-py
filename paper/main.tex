@@ -679,9 +679,9 @@ These metrics provide an objective measure of how effectively LLMs can detect or
 \toprule
 Model & Precision & Recall & F1-Score & Accuracy \\
 \midrule
-\texttt{llama-3.3} & 0.714 & 0.167 & 0.270 & 0.400 \\
-\texttt{grok-4-fast} & 0.815 & 0.883 & 0.848 & 0.789 \\
-\texttt{gpt-4o-mini} & 0.955 & 0.350 & 0.512 & 0.556 \\
+\texttt{llama-3.3} & 0.34 & 0.87 & 0.49 & 0.40 \\
+\texttt{grok-4-fast} & 0.72 & 0.60 & 0.65 & 0.79 \\
+\texttt{gpt-4o-mini} & 0.43 & 0.97 & 0.59 & 0.56 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -745,23 +745,31 @@ Table~\ref{tab:confusion_matrices_combined} presents the confusion matrices for 
 
 The extended evaluation provides new insight into how different LLMs reason about software portability under a more diverse and balanced dataset. The inclusion of ``unrelated'' yet valid Python code introduces a subtle but important challenge: distinguishing the absence of portability issues from the presence of clear portability signals. This distinction is conceptually close to the notion of false alarms in static analysis and serves as a more realistic proxy for practical development scenarios.
 
-The \texttt{llama-3.3} model achieved the lowest recall (0.167) and F1-score (0.270), despite maintaining moderate precision (0.714). This means that while Llama was occasionally correct when flagging code as non-portable, it failed to detect the majority of true portability-related cases. Its confusion matrix (Table~\ref{tab:confusion_matrices_combined}) reveals a clear conservative bias: most portability-related code—whether portable or not—was classified as non-portable. This under-detection behavior suggests that Llama relies heavily on surface-level heuristics, such as the appearance of system or file I/O APIs, rather than a deeper understanding of their context or cross-platform semantics. Such an approach limits its usefulness for nuanced code auditing, as it tends to overestimate risk and overlook safe but platform-agnostic constructs.
+% talking about the precision, recall, f1-score, accuracy now:
 
-In contrast, \texttt{Grok-4-Fast} exhibited the most balanced and effective performance, achieving the highest recall (0.883), F1-score (0.848), and accuracy (0.789). Its confusion matrix (Table~\ref{tab:confusion_matrices_combined}) shows that Grok correctly classified the vast majority of both portable and non-portable samples, suggesting a strong generalization ability across different code types. However, its precision (0.815) indicates a mild tendency to over-classify snippets as portable, occasionally mislabeling risky constructs. This reflects an inclusive reasoning pattern—Grok tends to assume code is portable unless clear OS-specific cues are present. Such behavior may result from broader contextual generalization learned during instruction tuning, leading the model to associate “ordinary Python” with portability unless explicit evidence of platform dependence is detected.
+The \texttt{llama-3.3} model achieved the lowest precision 34\% and accuracy 40\%, while maintaining the highest recall 87\%. This means that Llama correctly identified most non-portable cases but did so with a substantial number of false alarms—frequently flagging portable code as non-portable. Its confusion matrix (Table~\ref{tab:confusion_matrices_combined}) confirms this pattern: the model displays a highly cautious bias, tending to classify almost any code snippet as potentially non-portable.
+% 
+This behavior reflects a risk-sensitive but shallow reasoning strategy, where the model overestimates portability issues without truly distinguishing between harmless platform-specific constructs and genuine cross-platform incompatibilities. As a result, Llama achieves strong coverage at the expense of reliability, limiting its effectiveness for precise portability assessment.
 
-The \texttt{GPT-4o-Mini} model achieved the highest precision (0.955), showing that its positive classifications were almost always correct. Nevertheless, its recall (0.350) and F1-score (0.512) reveal that it missed a large portion of portability-related cases. GPT-4o (confusion matrix \ref{tab:confusion_matrices_combined}) thus demonstrates an opposite inferential style to Grok: it classifies conservatively, only asserting portability when the evidence is unambiguous. This behavior mirrors risk-averse reasoning, where the model avoids false positives even at the cost of missing true positives.
+In contrast, \texttt{Grok-4-Fast} exhibited the most balanced and effective performance, with a precision of 72\%, recall of 60\%, F1-score of 65\%, and the highest accuracy (79\%). Its confusion matrix (Table~\ref{tab:confusion_matrices_combined}) shows that Grok successfully differentiates between portable and non-portable code in most cases, striking a reasonable balance between sensitivity and specificity.
+%
+The model demonstrates contextual generalization, capturing both syntactic and semantic cues related to platform-dependent constructs. However, its moderate recall suggests a cautious tendency to miss some non-portable samples, favoring correctness over exhaustive detection.
 
-In practical contexts, such cautious bias could be advantageous in high-stakes environments—e.g., when automated fixes or portability warnings must be highly reliable—but less useful for exploratory detection tasks aimed at coverage.
+The \texttt{GPT-4o-Mini} model achieved the highest recall (97\%), outperforming the others in its ability to detect nearly all non-portable cases. Nevertheless, its low precision (43\%) and moderate accuracy (56\%) indicate a strong over-detection bias—GPT-4o tends to classify many portable codes as problematic.
 
-Overall, the three models exhibit distinct reasoning paradigms:
+This pattern reveals a highly inclusive reasoning style: the model is eager to label code as non-portable, prioritizing coverage rather than precision. Such behavior, while useful for exploratory or preventive analysis, may produce excessive false positives in practical settings where diagnostic accuracy is essential.
+
+In practical terms, these results suggest complementary reasoning profiles across models:
 \begin{enumerate}
-  \item \texttt{llama-3.3}: Conservative and shallow reasoning: prioritizes safety but lacks sensitivity, leading to under-detection.
-  \item \texttt{Grok-4-Fast}: Inclusive and generalizing reasoning: prioritizes coverage and context recognition, achieving the best balance.
-  \item \texttt{GPT-4o-Mini}: Selective and risk-averse reasoning: prioritizes correctness at the expense of recall.
+  \item \texttt{llama-3.3}: Highly cautious and overgeneralizing reasoning—maximizes detection coverage but produces many false positives.
+  \item \texttt{Grok-4-Fast}: Balanced reasoning—achieves the best trade-off between recall, precision, and overall accuracy.
+  \item \texttt{GPT-4o-Mini}: Over-sensitive reasoning—detects almost all non-portable cases but lacks discrimination power.
 \end{enumerate}
 
+From a broader research standpoint, the findings indicate that all three models possess a functional grasp of portability-related cues—such as system-dependent paths, OS-specific APIs, and encoding assumptions—but none exhibit fine-grained semantic discrimination. 
+% 
+Their performance highlights a key limitation of current LLMs in software reasoning: a tendency to rely on surface-level heuristics rather than deep contextual understanding of cross-platform behavior. Addressing this limitation will require more explicit exposure to platform-diverse examples during instruction tuning and evaluation.
 
-From a broader research standpoint, the results highlight both promise and limitation. On one hand, all models demonstrate a capacity for recognizing key portability indicators, confirming that they capture meaningful cross-platform cues such as file I/O encodings, path separators, and system-dependent API calls. On the other hand, none exhibit consistent sensitivity to more subtle forms of non-portability—like locale-dependent behavior, subprocess invocation nuances, or reliance on external command availability. These gaps reflect the probabilistic and context-limited nature of LLM reasoning in software domains.
 
 \textbf{Answer.} \Fix{turn this into a box anwser:}Static tools (linters, CodeQL, LLM prompts) can detect some issues but miss runtime failures. Dynamic re-execution across OSes (our approach) provides broader coverage.
 
@@ -769,7 +777,7 @@ From a broader research standpoint, the results highlight both promise and limit
 
 Following the classification experiment, we conducted a complementary evaluation focused on the corrective capabilities of LLMs. In this setting, we used the 30 non-portable Python snippets identified earlier and prompted each model with a generic instruction explicitly stating that the code exhibited portability issues and requesting a corrected version. The goal was to assess whether the models could not only recognize but also repair cross-platform defects by producing functionally portable code. We then manually verified whether the generated fixes effectively resolved the underlying portability problem without altering the intended semantics of the original program.
 
-Each model thus attempted to repair 30 faulty code samples, yielding a total of 90 attempted fixes across all LLMs. Table~\ref{tab:llm_fix_results} summarizes the quantitative results. Overall, out of the 90 non-portable snippets, only 38 were correctly repaired, corresponding to an overall success rate of 42.22\%. This moderate performance highlights the challenge of producing accurate cross-platform corrections even when the model is explicitly informed that the input code is non-portable.
+Each model thus attempted to repair 30 faulty code samples, yielding a total of 90 attempted fixes across all LLMs. Table~\ref{tab:llm_fix_results} summarizes the quantitative results. Overall, out of the 90 non-portable snippets, only 38 were correctly repaired, corresponding to an overall success rate of 42\%. This moderate performance highlights the challenge of producing accurate cross-platform corrections even when the model is explicitly informed that the input code is non-portable.
 
 \begin{table}[h!]
 \centering
