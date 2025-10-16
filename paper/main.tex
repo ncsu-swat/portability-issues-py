@@ -695,6 +695,7 @@ Model & Precision & Recall & F1-Score & Accuracy \\
 \end{table}
 
 \subsubsection{LLMs for detection}\sloppy
+\label{sec:llm-detection}
 \textbf{Alternative static analysis tools.} We examine the
 capabilities of various popular linters for Python, namely
 Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint},
@@ -721,10 +722,10 @@ and \texttt{GPT-4o-Mini}~\cite{gpt4o}
 %% Given the limited support for portability checks in existing static
 %% tools, we extended our evaluation to large language models (LLMs).
 
-\noindent\textbf{Setup.}~We sampled a total of 90\Mar{macro} code
-snippets to evaluate performance of LLM: (i)~30~non-portable snippets
-containing OS-specific constructs, (ii)~30~portable snippets that had
-been fixed by developers (mined from issues), and (iii)~30~code we
+\noindent\textbf{Setup.}~We sampled a total of \NumCodeUsedLLM{} code
+snippets to evaluate performance of LLM: (i)~\NumCodeNonPortableByLLM{} non-portable snippets
+containing OS-specific constructs, (ii)~\NumCodePortableIssue{} portable snippets that had
+been fixed by developers (mined from issues), and (iii)~\NumCodePortableManual{} code we
 manually categorized as portable. This distribution attempts to
 reflect a more realistic division of code seen in the wild, where
 portability violations are less frequent. We used the openrouter.ai
@@ -742,7 +743,7 @@ to measure performance of binary classifiers (e.g., precision, recall,
 accuracy, etc.). Table~\ref{tab:llm_detection_results} shows
 results. Table~\ref{tab:confusion_matrices_combined} shows the
 confusion matrices associated with each LLM, illustrating the
-classification of the 90\Mar{macro!} samples and
+classification of the \NumCodeUsedLLM{} samples and
 Table\ref{tab:llm_performance} shows the metrics.
 
 %% By comparing the models' predictions against the known classification
@@ -803,8 +804,9 @@ positives.
 %% provides broader coverage.
 
 
-\subsubsection{LLMs for fixing.}\Mar{@Denini, can you follow a similar
-approach to above and revise this text???}
+\subsubsection{LLMs for fixing.}
+\Mar{@Denini, can you follow a similar approach to above and revise this text???}
+\label{sec:llm-fixing}
 Following the classification experiment, we conducted a complementary evaluation focused on the corrective capabilities of LLMs. In this setting, we used the 30 non-portable Python snippets identified earlier and prompted each model with a generic instruction explicitly stating that the code exhibited portability issues and requesting a corrected version. The goal was to assess whether the models could not only recognize but also repair cross-platform defects by producing functionally portable code. We then manually verified whether the generated fixes effectively resolved the underlying portability problem without altering the intended semantics of the original program.
 
 Each model thus attempted to repair 30 faulty code samples, yielding a total of 90 attempted fixes across all LLMs. We evaluated the correctness of each fix based on two criteria: (i) the modified code should run without errors on all target platforms (Linux, macOS, Windows), and (ii) it should preserve the original functionality as closely as possible. Fixes that met both criteria were classified as correct; otherwise, they were deemed incorrect.
@@ -850,10 +852,6 @@ Nevertheless, the observed partial success confirms that LLMs possess a meaningf
 
 \textbf{Pattern-guided prompts for portability repair.}
 % part 3
-
-To assess whether providing structured guidance could enhance the models' repair capabilities, we conducted a second round of experiments using pattern-guided prompts. In this setup, each non-portable snippet was accompanied by a description of the specific portability issue it exhibited, along with the corresponding General Fix Pattern from Table~\ref{tab:symptoms}. This additional context aimed to focus the models' attention on relevant aspects of the problem and suggest appropriate repair strategies.
-
-\textbf{Pattern-guided prompts for portability repair.}
 
 To assess whether providing structured guidance could enhance the models' repair capabilities, we conducted a second round of experiments using pattern-guided prompts. In this setup, each non-portable snippet was accompanied by a description of the specific portability issue it exhibited, along with the corresponding General Fix Pattern from Table~\ref{tab:symptoms}. This additional context aimed to focus the models' attention on relevant aspects of the problem and suggest appropriate repair strategies.
 
