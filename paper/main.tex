@@ -848,60 +848,34 @@ positives.
 
 
 \subsubsection{LLMs for fixing.}
-\Mar{@Denini, can you follow a similar approach to above and revise this text???}
 \label{sec:llm-fixing}
-Following the classification experiment, we conducted a complementary evaluation focused on the corrective capabilities of LLMs. In this setting, we used the 30 non-portable Python snippets identified earlier and prompted each model with a generic instruction explicitly stating that the code exhibited portability issues and requesting a corrected version. The goal was to assess whether the models could not only recognize but also repair cross-platform defects by producing functionally portable code. We then manually verified whether the generated fixes effectively resolved the underlying portability problem without altering the intended semantics of the original program.
+Following the classification experiment, we conducted a complementary evaluation focused on the corrective capabilities of LLMs. In this setting, we used the \NumCodeNonPortableByLLM{} non-portable Python snippets identified earlier and prompted each model with a generic instruction explicitly stating that the code exhibited portability issues and requesting a corrected version. The goal was to assess whether the models could not only recognize but also repair cross-platform defects by producing functionally portable code. We then manually verified whether the generated fixes effectively resolved the underlying portability problem without altering the intended semantics of the original program.
 
-Each model thus attempted to repair 30 faulty code samples, yielding a total of 90 attempted fixes across all LLMs. We evaluated the correctness of each fix based on two criteria: (i) the modified code should run without errors on all target platforms (Linux, macOS, Windows), and (ii) it should preserve the original functionality as closely as possible. Fixes that met both criteria were classified as correct; otherwise, they were deemed incorrect.
-
-
-We divided this experiment into two complementary settings. In the first, we used a generic prompt, simply informing the model that the code contained a portability issue and requesting a fix, without providing any specific guidance. In the second, we augmented the prompt by explicitly describing the type of portability problem observed and including the corresponding General Fix Pattern from Table~\ref{tab:symptoms}. This second setup aimed to evaluate whether giving the models contextual hints and structured repair patterns would improve their ability to generate correct and portable fixes.
-
-
-\textbf{Generic prompts for portability repair.}
-% part 2
-
-Table~\ref{tab:llm_fix_results} summarizes the quantitative results. Overall, out of the 90 non-portable snippets, only 38 were correctly repaired, corresponding to an overall success rate of 42\%. This moderate performance highlights the challenge of producing accurate cross-platform corrections even when the model is explicitly informed that the input code is non-portable.
-
-\begin{table}[h!]
-\centering
-\caption{Performance of LLMs in generating correct portability fixes when prompted with non-portable Python snippets (30 samples per model).}
-\label{tab:llm_fix_results}
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Model} & \textbf{Correct} & \textbf{Incorrect} & \textbf{Accuracy} \\
-\midrule
-\texttt{grok-4-fast} & 13 & 17 & 0.43 \\
-\texttt{gpt-4o-mini} & 12 & 18 & 0.40 \\
-\texttt{llama-3.3} & 10 & 20 & 0.33 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Among the evaluated models, \texttt{grok-4-fast} achieved the highest accuracy at 43.33\%, successfully repairing 13 of the 30 faulty snippets. Its results indicate that the model can often identify the source of non-portability and propose plausible corrections, such as replacing hard-coded path separators or adjusting file-opening modes for cross-platform compatibility. However, several fixes were only partially correct—resolving one issue while inadvertently introducing another—revealing that Grok's repair strategies remain heuristic rather than systematic.
-
-\texttt{gpt-4o-mini} followed closely with an accuracy of 40.00\%. Its fixes tended to be more conservative, often preserving the structure of the original code while addressing specific portability issues. In some cases, GPT-4o correctly identified the problematic API usage but failed to modify it comprehensively, producing fixes that improved portability without fully resolving the problem. This pattern suggests a reasoning style that prioritizes minimal and precise edits, consistent with its high precision observed in the previous classification experiment.
-
-The \texttt{llama-3.3} model obtained the lowest accuracy, correctly repairing 33.33\% of the snippets. In many instances, it produced code that appeared plausible but did not execute correctly on all platforms. The errors often involved overlooking subtle environment-dependent aspects, such as socket reuse semantics or filesystem path normalization. This indicates that while Llama demonstrates surface-level understanding of cross-platform issues, its capacity to generate effective end-to-end corrections is limited.
-
-Overall, the results reveal that current LLMs can sometimes generate valid portability fixes but struggle to do so consistently. The best-performing model achieved success in fewer than half of the cases, underscoring that awareness of the issue (as expressed in the prompt) does not guarantee successful code repair. 
-% 
-The models appear to rely on pattern-based generalizations rather than reasoning through the operational implications of their modifications. These findings emphasize the need for prompt calibration, repair-specific fine-tuning, or hybrid approaches combining LLM reasoning with static verification tools to achieve reliable automated portability correction.
-
-From a broader perspective, this experiment complements the earlier classification results by demonstrating that identifying portability problems and repairing them are distinct capabilities. 
-% 
-While classification relies on recognition of problematic patterns, effective repair requires the synthesis of correct, executable, and platform-agnostic alternatives—a substantially more demanding cognitive task for current LLMs. 
-Nevertheless, the observed partial success confirms that LLMs possess a meaningful, if incomplete, grasp of cross-platform reasoning, marking an important step toward their integration into automated software maintenance workflows.
-
-\textbf{Pattern-guided prompts for portability repair.}
-% part 3
+Each model thus attempted to repair \NumCodeNonPortableByLLM{} faulty code samples, yielding a total of 90 attempted fixes across all LLMs. We evaluated the correctness of each fix based on two criteria: (i) the modified code should run without errors on all target platforms (Linux, macOS, Windows), and (ii) it should preserve the original functionality as closely as possible. Fixes that met both criteria were classified as correct; otherwise, they were deemed incorrect.
 
 To assess whether providing structured guidance could enhance the models' repair capabilities, we conducted a second round of experiments using pattern-guided prompts. In this setup, each non-portable snippet was accompanied by a description of the specific portability issue it exhibited, along with the corresponding General Fix Pattern from Table~\ref{tab:symptoms}. This additional context aimed to focus the models' attention on relevant aspects of the problem and suggest appropriate repair strategies.
 
 \begin{table}[h!]
 \centering
-\caption{Performance of LLMs in generating correct portability fixes with pattern-guided prompts (30 samples per model).}
-\label{tab:llm_fix_results_pattern_guided}
+\caption{Performance of LLMs in generating correct portability fixes across both prompt configurations (\NumCodeNonPortableByLLM{} samples per model).}
+\label{tab:llm_fix_results_combined}
+\begin{subtable}[t]{0.47\textwidth}
+\centering
+\caption{Generic prompt.}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Model} & \textbf{Correct} & \textbf{Incorrect} & \textbf{Accuracy} \\
+\midrule
+\texttt{grok-4-fast} & 13 & 17 & 0.43 \\
+\texttt{gpt-4o-mini} & 10 & 20 & 0.33 \\
+\texttt{llama-3.3} & 8 & 22 & 0.27 \\
+\bottomrule
+\end{tabular}
+\end{subtable}
+\hfill
+\begin{subtable}[t]{0.47\textwidth}
+\centering
+\caption{Pattern-guided prompt.}
 \begin{tabular}{lrrr}
 \toprule
 \textbf{Model} & \textbf{Correct} & \textbf{Incorrect} & \textbf{Accuracy} \\
@@ -911,16 +885,14 @@ To assess whether providing structured guidance could enhance the models' repair
 \texttt{llama-3.3} & 15 & 15 & 0.50 \\
 \bottomrule
 \end{tabular}
+\end{subtable}
 \end{table}
 
-The inclusion of pattern-guided information improved repair accuracy across all evaluated models. As shown in Table~\ref{tab:llm_fix_results_pattern_guided}, the overall success rate increased markedly compared to the generic prompt setting. The \texttt{grok-4-fast} model achieved the highest accuracy at 76.67\%, successfully correcting 23 out of 30 faulty snippets. This improvement of more than 30 percentage points relative to the previous experiment indicates that the model can effectively leverage structured repair cues to guide its reasoning and produce more consistent, portable fixes.
+The inclusion of pattern-guided information significantly improved repair accuracy across all evaluated models. As shown in Table~\ref{tab:llm_fix_results_combined}, the overall success rate increased markedly compared to the generic prompt setting. The \texttt{grok-4-fast} model achieved the highest accuracy at 76.67\%, successfully correcting 23 out of \NumCodeNonPortableByLLM{} faulty snippets. This improvement of more than \NumCodeNonPortableByLLM{} percentage points relative to the previous experiment indicates that the model can effectively leverage structured repair cues to guide its reasoning and produce more consistent, portable fixes.
 
-The \texttt{gpt-4o-mini} model also benefited substantially from the pattern-guided prompts, reaching an accuracy of 70\%. Its fixes were generally more complete and aligned with the provided repair strategies, demonstrating a clearer understanding of portability concepts when supplied with contextual examples. However, some remaining errors suggest occasional overfitting to the pattern description—where the model followed the suggested fix mechanically without fully adapting it to the specific snippet structure.
+The \texttt{gpt-4o-mini} model also benefited substantially from the pattern-guided prompts, reaching an accuracy of 70.00\%. Its fixes were generally more complete and aligned with the provided repair strategies, demonstrating a clearer understanding of portability concepts when supplied with contextual examples. However, some remaining errors suggest occasional overfitting to the pattern description—where the model followed the suggested fix mechanically without fully adapting it to the specific snippet structure.
 
-The \texttt{llama-3.3} model showed moderate improvement, achieving an accuracy of 50\%. While still the weakest performer, it displayed greater consistency compared to the generic prompt scenario. The model was able to apply straightforward fix patterns, such as replacing hard-coded paths or handling platform-dependent APIs, but often failed to integrate the repair logic correctly within more complex code contexts. 
-
-Overall, these results demonstrate that incorporating explicit repair patterns can substantially enhance the effectiveness of LLM-based portability fixes, although the extent of improvement varies across models.
-
+The \texttt{llama-3.3} model showed moderate improvement, achieving an accuracy of 50.00\%. While still the weakest performer, it displayed greater consistency compared to the generic prompt scenario. The model was able to apply straightforward fix patterns, such as replacing hard-coded paths or handling platform-dependent APIs, but often failed to integrate the repair logic correctly within more complex code contexts. Overall, these results demonstrate that incorporating explicit repair patterns can substantially enhance the effectiveness of LLM-based portability fixes, although the extent of improvement varies across models.
 
 % Add here: quantitative comparison (coverage, precision, recall)
 % For example: Figure 3 (Venn diagram of issues detected by static vs dynamic approaches)
