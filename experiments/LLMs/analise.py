@@ -1,15 +1,15 @@
 import pandas as pd
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score, confusion_matrix
 
 # Ler o CSV
-df = pd.read_csv('results_summary.csv')
+df = pd.read_csv('3results_summary.csv')
 
 # Modelos a analisar
 MODELS = [
     "meta-llama/llama-3.3-70b-instruct", 
     "x-ai/grok-4-fast", 
     "openai/gpt-4o-mini", 
-    "deepseek/deepseek-chat-v3.1:free"
+    # "deepseek/deepseek-chat-v3.1:free"
 ]
 
 # Calcular métricas para cada modelo
@@ -27,10 +27,12 @@ for model in MODELS:
     y_true = model_data['class'].values
     y_pred = model_data['predicted'].values
     
-    # Calcular métricas
-    precision = precision_score(y_true, y_pred, pos_label='portable', zero_division=0)
-    recall = recall_score(y_true, y_pred, pos_label='portable', zero_division=0)
-    f1 = f1_score(y_true, y_pred, pos_label='portable', zero_division=0)
+    # Agora "nonportable" é o caso positivo (TP)
+    pos_label = 'nonportable'
+    
+    precision = precision_score(y_true, y_pred, pos_label=pos_label, zero_division=0)
+    recall = recall_score(y_true, y_pred, pos_label=pos_label, zero_division=0)
+    f1 = f1_score(y_true, y_pred, pos_label=pos_label, zero_division=0)
     accuracy = accuracy_score(y_true, y_pred)
     
     # Armazenar resultados
@@ -48,7 +50,7 @@ results_df = pd.DataFrame(results)
 
 # Exibir tabela formatada para o paper
 print("\n" + "="*80)
-print("MÉTRICAS DE DESEMPENHO POR MODELO")
+print("MÉTRICAS DE DESEMPENHO POR MODELO (NonPort = Positivo)")
 print("="*80 + "\n")
 
 # Tabela em formato LaTeX
@@ -79,12 +81,10 @@ print(f"Melhor F1-Score: {results_df.loc[results_df['F1-Score'].idxmax(), 'Model
 print(f"Melhor Accuracy: {results_df.loc[results_df['Accuracy'].idxmax(), 'Model']} "
       f"({results_df['Accuracy'].max():.3f})")
 
-# Matriz de confusão para cada modelo
+# Matrizes de confusão para cada modelo
 print("\n" + "="*80)
-print("MATRIZES DE CONFUSÃO")
+print("MATRIZES DE CONFUSÃO (NonPort = Positivo)")
 print("="*80)
-
-from sklearn.metrics import confusion_matrix
 
 for model in MODELS:
     model_data = df[df['model'] == model]

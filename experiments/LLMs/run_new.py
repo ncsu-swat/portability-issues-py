@@ -7,10 +7,10 @@ import time
 # Configuração
 API_KEY = "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"
 MODELS = [
-    "meta-llama/llama-3.3-70b-instruct",
-    "x-ai/grok-4-fast",
-    "openai/gpt-4o-mini",
-    "deepseek/deepseek-chat-v3.1:free"
+    "deepseek/deepseek-chat-v3.1:free",
+    # "meta-llama/llama-3.3-70b-instruct",
+    # "x-ai/grok-4-fast",
+    # "openai/gpt-4o-mini",
 ]
 BASE_DIR = "code"
 OUTPUT_FULL_CSV = "results_full.csv"
@@ -49,7 +49,7 @@ def call_llm(model, code):
             except (KeyError, IndexError):
                 return "ERROR: no content"
         else:
-            print(f"⚠️  {model} returned status {response.status_code}, retrying ({attempt + 1}/2)...")
+            print(f"⚠️  {model} returned status {response.status_code}, retrying ({attempt + 1}/2)..., {response.text if hasattr(response, 'text') else ''}")
             time.sleep(3)  # espera antes de tentar novamente
 
     return f"ERROR: status {response.status_code}"
@@ -126,7 +126,7 @@ def main():
                     else:
                         print(f"🧠 Processing {rel_path} with {model}...")
                         output = call_llm(model, code)
-                        time.sleep(1)
+                        time.sleep(0.5)
 
                     classified = classify_response(output)
 
