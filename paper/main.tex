@@ -867,11 +867,16 @@ positives.
 
 \subsubsection{LLMs for fixing.}
 \label{sec:llm-fixing}
-Following the classification experiment, we conducted a complementary evaluation focused on the corrective capabilities of LLMs. In this setting, we used the \NumCodeNonPortableByLLM{} non-portable Python snippets identified earlier and prompted each model with a generic instruction explicitly stating that the code exhibited portability issues and requesting a corrected version. The goal was to assess whether the models could not only recognize but also repair cross-platform defects by producing functionally portable code. We then manually verified whether the generated fixes effectively resolved the underlying portability problem without altering the intended semantics of the original program.
+\noindent\textbf{Setup.}~ Following the classification experiment, we designed a complementary evaluation focused on the corrective capabilities of LLMs. In this phase, we used the \NumCodeNonPortableByLLM{} non-portable Python snippets identified earlier and prompted each model with two distinct repair configurations.  
+In the first configuration (\textit{generic prompt}), each model received a general instruction stating that the code exhibited portability issues and was asked to produce a corrected version.  
+In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}.  
+This design aimed to evaluate whether structured repair guidance could improve the models' ability to generate functionally portable code. Each model attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in 90 repair attempts per configuration.
 
-Each model thus attempted to repair \NumCodeNonPortableByLLM{} faulty code samples, yielding a total of 90 attempted fixes across all LLMs. We evaluated the correctness of each fix based on two criteria: (i) the modified code should run without errors on all target platforms (Linux, macOS, Windows), and (ii) it should preserve the original functionality as closely as possible. Fixes that met both criteria were classified as correct; otherwise, they were deemed incorrect.
-
-To assess whether providing structured guidance could enhance the models' repair capabilities, we conducted a second round of experiments using pattern-guided prompts. In this setup, each non-portable snippet was accompanied by a description of the specific portability issue it exhibited, along with the corresponding General Fix Pattern from Table~\ref{tab:symptoms}. This additional context aimed to focus the models' attention on relevant aspects of the problem and suggest appropriate repair strategies.
+\noindent\textbf{Metrics.} ~We evaluated the correctness of each generated fix using two criteria:  
+(i) the modified code must execute successfully without errors across all target platforms (Linux, macOS, Windows), and  
+(ii) the fix must preserve the intended functionality of the original program.  
+Fixes that met both criteria were considered \textit{correct}; otherwise, they were labeled as \textit{incorrect}.  
+Accuracy was computed as the ratio of correct fixes to the total number of attempted repairs per model.
 
 \begin{table}[h!]
 \centering
@@ -906,14 +911,23 @@ To assess whether providing structured guidance could enhance the models' repair
 \end{subtable}
 \end{table}
 
-The inclusion of pattern-guided information significantly improved repair accuracy across all evaluated models. As shown in Table~\ref{tab:llm_fix_results_combined}, the overall success rate increased markedly compared to the generic prompt setting. The \texttt{grok-4-fast} model achieved the highest accuracy at 76.67\%, successfully correcting 23 out of \NumCodeNonPortableByLLM{} faulty snippets. This improvement of more than \NumCodeNonPortableByLLM{} percentage points relative to the previous experiment indicates that the model can effectively leverage structured repair cues to guide its reasoning and produce more consistent, portable fixes.
+\noindent\textbf{Analysis of results.}~ The results in Table~\ref{tab:llm_fix_results_combined} show that all models exhibited limited success under the generic prompt setting, with accuracies ranging from 27\% to 43\%.  
+This indicates that, when provided with only minimal context, most LLMs struggle to infer the exact nature of portability issues and to produce appropriate cross-platform corrections.  
+While the \texttt{grok-4-fast} model outperformed the others, its success rate remained below 50\%, suggesting that general-purpose reasoning alone is insufficient for precise code repair in this domain.
 
-The \texttt{gpt-4o-mini} model also benefited substantially from the pattern-guided prompts, reaching an accuracy of 70.00\%. Its fixes were generally more complete and aligned with the provided repair strategies, demonstrating a clearer understanding of portability concepts when supplied with contextual examples. However, some remaining errors suggest occasional overfitting to the pattern description—where the model followed the suggested fix mechanically without fully adapting it to the specific snippet structure.
+In contrast, the pattern-guided configuration substantially improved repair performance across all models.  
+The inclusion of explicit problem descriptions and generalized fix patterns increased accuracy by more than 30 percentage points on average.  
+The \texttt{grok-4-fast} model achieved the highest accuracy (76.67\%), demonstrating a clear ability to integrate structured repair hints into its reasoning process.  
+Similarly, \texttt{gpt-4o-mini} reached 70\%, producing fixes that were more consistent with the intended patterns while preserving functional correctness.  
+The \texttt{llama-3.3} model also showed moderate improvement (50\%), particularly in cases involving straightforward path and API adjustments, though it still struggled with more complex logic integration.
 
-The \texttt{llama-3.3} model showed moderate improvement, achieving an accuracy of 50.00\%. While still the weakest performer, it displayed greater consistency compared to the generic prompt scenario. The model was able to apply straightforward fix patterns, such as replacing hard-coded paths or handling platform-dependent APIs, but often failed to integrate the repair logic correctly within more complex code contexts. Overall, these results demonstrate that incorporating explicit repair patterns can substantially enhance the effectiveness of LLM-based portability fixes, although the extent of improvement varies across models.
+Overall, these findings highlight the strong impact of guided contextualization on LLM-based repair.  
+When supplied with explicit repair patterns, the models produced significantly more reliable and semantically consistent fixes, confirming that structured guidance can substantially enhance cross-platform reasoning capabilities in code generation tasks.
 
-% Add here: quantitative comparison (coverage, precision, recall)
-% For example: Figure 3 (Venn diagram of issues detected by static vs dynamic approaches)
+\begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
+\textbf{RQ\textsubscript{3} (detection and repair)}: Traditional static analysis tools do not offer support for portability detection—only Ruff provides a specific rule addressing encoding issue. LLMs show stronger potential: in the detection task, they achieved solid recall and precision, with the best model reaching around 70\%. However, their ability to fix portability issues remains limited. When asked to repair 30 faulty snippets, success rates ranged from 33-43\% with generic prompts, and improved to 50-77\% only when guided by explicit issue descriptions and fix patterns. Overall, LLMs can recognize and sometimes repair portability problems, but reliable automated correction still demands structured guidance or integration with static verification tools.
+\end{tcolorbox}
+
 
 \subsection{\textbf{Answering} \RQFour{}}
 \label{sec:pr-discussion}
@@ -925,7 +939,7 @@ The \texttt{llama-3.3} model showed moderate improvement, achieving an accuracy 
 % For example: Table 4 (Common fix patterns with frequency and examples)
 
 
-\textbf{Quick Answer.} Fixes often involve replacing OS-specific APIs, adding conditional checks, or adopting cross-platform libraries.  
+\textbf{Quick Answer.} \Fix{add in a box} Fixes often involve replacing OS-specific APIs, adding conditional checks, or adopting cross-platform libraries.  
 
 \subsubsection{\textbf{Answering} \RQFourTwo{}}
 \label{rq4-2}
