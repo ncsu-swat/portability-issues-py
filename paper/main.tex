@@ -980,7 +980,7 @@ positives.
 \label{sec:llm-fixing}
 \noindent\textbf{Setup.}~ Following the classification experiment, we designed a complementary evaluation focused on the corrective capabilities of LLMs. In this phase, we used the \NumCodeNonPortableByLLM{} non-portable Python snippets identified earlier and prompted each model with two distinct repair configurations.  
 In the first configuration (\textit{generic prompt}), each model received a general instruction stating that the code exhibited portability issues and was asked to produce a corrected version.  
-In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}.  
+In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue (derived from our taxonomy in RQ2) and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}.  
 This design aimed to evaluate whether structured repair guidance could improve the models' ability to generate functionally portable code. Each model attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in 90 repair attempts per configuration.
 
 \noindent\textbf{Metrics.} ~We evaluated the correctness of each generated fix using two criteria:  
@@ -991,8 +991,9 @@ Accuracy was computed as the ratio of correct fixes to the total number of attem
 
 \begin{table}[h!]
 \centering
-\caption{Performance of LLMs in generating correct portability fixes across both prompt configurations (\NumCodeNonPortableByLLM{} samples per model).}
+\caption{Performance of LLMs in generating portability fixes across both prompt configurations (\NumCodeNonPortableByLLM{} samples per model).}
 \label{tab:llm_fix_results_combined}
+
 \begin{subtable}[t]{0.47\textwidth}
 \centering
 \caption{Generic prompt.}
@@ -1036,11 +1037,18 @@ Overall, these findings highlight the strong impact of guided contextualization 
 When supplied with explicit repair patterns, the models produced significantly more reliable and semantically consistent fixes, confirming that structured guidance can substantially enhance cross-platform reasoning capabilities in code generation tasks.
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
-\textbf{RQ\textsubscript{3} (detection and repair)}: Traditional static analysis tools do not offer support for portability detection—only Ruff provides a specific rule addressing encoding issue. LLMs show stronger potential: in the detection task, they achieved solid recall and precision, with the best model reaching around 70\%. However, their ability to fix portability issues remains limited. When asked to repair 30 faulty snippets, success rates ranged from 33-43\% with generic prompts, and improved to 50-77\% only when guided by explicit issue descriptions and fix patterns. Overall, LLMs can recognize and sometimes repair portability problems, but reliable automated correction still demands structured guidance or integration with static verification tools.
+\textbf{RQ\textsubscript{3}:} Traditional static analysis tools provide very limited support for portability issues—only Ruff includes a specific rule related to encoding. 
+
+\textbf{For detection}, LLMs show potential over traditional tools. They achieved strong recall and precision, with the best model reaching approximately 70\%, suggesting that they can reliably identify portability-related problems in source code. 
+
+\textbf{For repair}, however, their performance remains less limited. When prompted to fix 30 faulty snippets, success rates ranged from 33--43\% with generic prompts, increasing to 50--77\% only when explicit issue descriptions and repair patterns were provided. Overall, results indicate that while LLMs can recognize and occasionally correct portability issues, achieving reliable automated repairs still requires structured guidance or integration with static verification tools.
+
+
 \end{tcolorbox}
 
 
 \subsection{\textbf{Answering} \RQFour{}}
+This section discusses the analysis of pull requests (PRs) submitted to open-source projects to address portability issues identified in our study.
 \label{sec:pr-discussion}
 \subsubsection{\textbf{Answering} \RQFourOne{}}
 \label{rq4-1}
@@ -1161,9 +1169,6 @@ immediately recognized as critical by the community.
 % - Studies on testing across operating systems
 % - Tool support for detecting environment-specific issues
 % - Positioning of this work relative to literature
-
-
-\section{Related Work}
 
 Several lines of research have explored the detection, characterization, and mitigation of portability and reliability issues in software systems.
 
