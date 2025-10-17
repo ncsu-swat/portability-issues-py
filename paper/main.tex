@@ -51,31 +51,60 @@ Python is broadly used across operating systems, but our cross-OS test re-execut
 
 \section{Introduction}
 \label{sec:intro}
-Python is widely regarded as cross-platform, powering applications
-from diverse domains (e.g., data science pipelines, web applications,
-etc.) and consistently ranks among the most popular programming
-languages of
-today~\cite{stackoverflow2025,githuboctoverse2024,pypl2025}. Yet,
-platform portability is not a guarantee. For example, Mince \etal{}
-found that 40\% of ML library functionality does not perform
-consistently across different hardware (\eg{}, CPU and
-TPU)~\cite{mince2023}. Similar problem exists at the OS level.
+\label{sec:sources}
+
+
+A \emph{portability issue} refers to an observable difference in a
+program’s behavior that arises from variations in the underlying
+platform—for example, inconsistencies in API implementations or
+platform-specific functionality. Python is widely regarded as a
+cross-platform language, powering applications across diverse domains
+such as data science, web development, and automation. It consistently
+ranks among the most popular programming languages
+today~\cite{stackoverflow2025,githuboctoverse2024,pypl2025}. However,
+platform portability is not guaranteed. Mince et al.~\cite{mince2023},
+for instance, reported that roughly 40\% of the functionality in
+popular machine learning libraries (\eg{}, JAX, PyTorch, TensorFlow)
+behaves inconsistently across hardware platforms such as CPUs and
+TPUs. Similar challenges occur at the operating-system level; for
+example, the function \CodeIn{os.geteuid()} is unavailable in Windows
+distributions of Python.
+
+Non-portable code is a significant problem: it leads to failed
+deployments and reduces developer
+productivity~\cite{mince2023,kiuwancodeportability,peng2024,job2024}. Although
+container technologies such as Docker and Singularity/Apptainer can
+mitigate these issues, most open-source Python projects are not
+containerized. In our analysis of \NumProjects\ \github\ repositories,
+only 19.9\% included Dockerfile or Docker compose configuration.
+
+%% A \emph{portability issue} is an observable difference in the
+%% execution of a project caused by the underlying platform, \eg{},
+%% differences in API implementations that are API specific. Python is
+%% widely regarded as cross-platform, powering applications from diverse
+%% domains (e.g., data science pipelines, web applications, etc.) and
+%% consistently ranks among the most popular programming languages of
+%% today~\cite{stackoverflow2025,githuboctoverse2024,pypl2025}. Yet,
+%% platform portability is not a guarantee. For example, Mince
+%% \etal{}~\cite{mince2023} found that 40\% of the functionality from ML
+%% Python libraries (\eg{}, \jax, \torch, and \tf) does not perform
+%% consistently across different hardware (\eg{}, CPU and TPU). Similar
+%% problem exists at the OS level.  For example, the Python function
+%% \texttt{os.geteuid()} is unavailable on Python distributions for
+%% Windows. Non-portable code is an important problem; it results in
+%% failed deployments and disrupts develpment
+%% productivity. Container
+%% technology (e.g., Docker and Singularity/Apptainer) can mitigate this
+%% problem but we find that most open source projects are not
+%% containerized, i.e., they lack Dockerfiles or Singularity recipes to
+%% create images. Only 19.9\% of \NumProjects{} \github projects in
+%% Python we analyze contain Dockerfile or Docker compose configurations.
+
 %% While
 %% Python's design philosophy emphasizes portability through standardized
 %% interfaces in modules like \texttt{os}~\cite{pymotwos,geeksos2025},
 %% real-world codebases routinely contain platform-specific assumptions
 %% that render them fragile across operating systems.
-For example, the Python function \texttt{os.geteuid()} is unavailable
-on Python distributions for Windows. Overall, non-portable code
-results in failed deployments and disrupts develpment
-productivity~\cite{mince2023,kiuwancodeportability,peng2024,job2024}. Container
-technology (e.g., Docker and Singularity) can mitigate this problem
-but we find that most open source projects are not containerized,
-i.e., they lack Dockerfile or Singularity recipe to create
-images. Only 19.9\% of \NumProjects{} \github projects in Python we
-analyze contain Dockerfile or Docker compose
-configurations.\Mar{Ali/Denini, please check/revise!}
-
 %% (e.g., broken
 %% continuous integration, increased maintenance overhead, and broader
 %% implications like 
@@ -101,27 +130,37 @@ configurations.\Mar{Ali/Denini, please check/revise!}
 %% problems: delayed releases, increased maintenance burden, and
 %% reduced software accessibility.
 
-This paper reports on a study about portability issues in Python
-tests\Mar{is it tests or code? considering the text above...why
-tests?}. More precisely, we analyze prevalence, root-causes of
-failures, their fixes, and the reaction of developers toward the pull
-requests we opened to fix portability issues in their code. We
-conclude with a set of lessons we learn, including \Mar{try to
-integrate with next paragraph...}
 
-Our analysis reveals that these portability failures, while widespread, are not chaotic or unpredictable. Instead, they cluster around a small set of well-defined categories—path handling, character encoding, platform-specific APIs, and environment assumptions. This systematic nature suggests that targeted solutions are possible, transforming what appears to be an intractable problem into a manageable engineering challenge.
+This paper presents a study of portability issues in Python
+projects. Specifically, we analyze the prevalence of such issues,
+their characteristics (e.g., symptoms, root causes, and fixes), the
+effectiveness of existing tools (e.g., static analyzers and large
+language models) in detecting and repairing them, and developers’
+reactions to the pull requests we submitted to address portability
+issues in their code. We conclude with a set of lessons we learn.
+\Mar{Revise this!  $\rightarrow$} Our analysis reveals that these
+portability failures, while widespread, are not chaotic or
+unpredictable. Instead, they cluster around a small set of
+well-defined categories—path handling, character encoding,
+platform-specific APIs, and environment assumptions. Results indicate
+that a combination of test re-execution and LLMs can complementary
+detect issues and that LLMs can further precisely repair the issues.
 
-This paper contributes an empirical study that (i) re-executes tests across operating systems for a large set of open-source projects, (ii) categorizes the root-causes behind cross-OS differences, and (iii) derives concrete repair patterns.
-
-\paragraph{Contributions.}
-\begin{itemize}
-  \item Cross-OS re-execution of Python tests across a large sample (\NumProjects{} repositories, with results reported so far from \NumProjectsAnalyzed{}).
-  \item A taxonomy of 7 actionable root-cause categories (Table~\ref{tab:categories}) with ready-to-apply repair patterns.
-\end{itemize}
-
-
-\label{sec:sources}
-We define an \emph{OS portability issue} as a difference in test outcome across operating systems attributable to platform-specific APIs, environment/terminal capabilities, filesystem semantics, encodings, or native libraries. 
+This paper makes the following contributions:
+\begin{packed_itemize}
+  \item[\Contrib] A study about the prevalence of portability issues that use
+    two complementary methods to identify issues: test re-execution
+    and mining of issues with subsequent manual analysis;
+  \item[\Contrib] A detailed categorization of symptoms, root causes, and fix
+    patterns of portability issues;
+  \item[\Contrib] An evaluation of the ability of existing tools to detect and
+    repair portability issues;
+  \item[\Contrib] An evaluation about the reaction of developers about the pull
+    requests we open to fix portability issues in their
+    \github\ projects;
+  \item[\Contrib] A dataset of \Fix{xxx} portability issues across \Fix{yyy}
+    Python projects.
+\end{packed_itemize}
 
 \section{Projects, Method, and Questions}
 \label{sec:methodology}
@@ -156,8 +195,15 @@ Sum & 1,169,056 & 85,019,457 & - & - & - \\
 \end{table}
 
 
-Table~\ref{tab:project-stats} summarizes key characteristics of the \NumProjects{} evaluated projects. 
-On average, each project comprises approximately 584 tests and 42K lines of Python code (SLOC), with a median of 72 tests and 7.5K SLOC, indicating a distribution skewed by a few very large systems. Regarding repository activity, projects have on average 2.9K commits, a median of 427, and span a mean lifetime of 6.2 years. The number of \github{} stars varies widely, with an average of 6.1K, a median of only 84, and a maximum exceeding 366K, reflecting the presence of both niche and highly popular projects. 
+Table~\ref{tab:project-stats} summarizes key characteristics of the
+\NumProjects{} evaluated projects.  On average, each project comprises
+approximately 584 tests and 42K lines of Python code (SLOC), with a
+median of 72 tests and 7.5K SLOC, indicating a distribution skewed by
+a few very large systems. Regarding repository activity, projects have
+on average 2.9K commits, a median of 427, and span a mean lifetime of
+6.2 years. The number of \github{} stars varies widely, with an
+average of 6.1K, a median of only 84, and a maximum exceeding 366K,
+reflecting the presence of both niche and highly popular projects.
 
 Overall, the dataset covers a diverse range of software systems, from small-scale repositories with only 
 a handful of commits to large, long-lived, and widely adopted projects.
