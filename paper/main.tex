@@ -126,9 +126,10 @@ We define an \emph{OS portability issue} as a difference in test outcome across 
 \section{Projects, Method, and Questions}
 \label{sec:methodology}
 
-This section describes the projects we used (\ref{sec:projects}), the
-setup of our experiments (\ref{sec:setup}), and the research questions
-we posed (\ref{sec:questions}).
+\Fix{Please review this paragraph}
+This section describes the projects we used (\ref{sec:projects}), 
+the setup and methodology of our experiments (\ref{sec:methods}), 
+and the research questions we posed (\ref{sec:questions}).
 
 \subsection{Projects}
 \label{sec:projects}
@@ -1102,6 +1103,23 @@ immediately recognized as critical by the community.
 % - Studies on testing across operating systems
 % - Tool support for detecting environment-specific issues
 % - Positioning of this work relative to literature
+
+
+\section{Related Work}
+
+Several lines of research have explored the detection, characterization, and mitigation of portability and reliability issues in software systems.
+
+Pysa~\cite{pysa2021}, developed by Meta, is a static analysis framework for Python that performs data-flow tracking to identify potential security vulnerabilities. By tracing information from sources to sensitive sinks, Pysa enables early detection of flaws in large-scale codebases, reducing security risks without executing the code. Its design illustrates how static analysis can be leveraged to uncover subtle issues in dynamic languages such as Python.
+
+Vahabzadeh \etal{}~\cite{vahabzadeh2015empirical} conducted a comprehensive empirical study on defects in test code, revealing that such bugs are both pervasive and detrimental to software quality. They report that approximately 18\% of these issues stem from environmental factors, particularly differences between Windows and Unix platforms. This finding underscores the role of environment-related faults as a major source of unreliability in testing infrastructures.
+
+Rasley \etal{}~\cite{rasley2015detecting} introduced \CodeIn{CheckAPI}, a runtime framework for detecting latent cross-platform API violations by contrasting execution traces against platform-specific interface specifications. Their approach identifies compatibility problems that remain undetected during standard testing yet may trigger failures when software is deployed on different operating systems. This work emphasizes the importance of uncovering non-manifest portability bugs that traditional test suites often overlook.
+
+Complementing these efforts, Ghandorh \etal{}~\cite{ghandorh2020systematic} performed a systematic literature review of metrics and methodologies for assessing software portability. Their findings highlight the fragmented nature of current research in this domain and the absence of a standardized framework for quantifying portability across systems and environments.
+
+Finally, Sun \etal{}~\cite{sun2016bear} proposed \textit{Bear}, a framework that statistically measures application sensitivity to operating system (OS) variability. By analyzing how nondeterministic OS behaviors affect reliability and performance, they demonstrate that assumptions about OS predictability can lead to unforeseen failures. This perspective complements application-level analyses by reinforcing the need to account for environmental uncertainty in ensuring robust and portable soft
+
+
 
 \Fix{Talk about} \cite{vahabzadeh2015empirical} here. Others: \cite{rasley2015detecting, ghandorh2020systematic}
 
