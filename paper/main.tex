@@ -154,7 +154,8 @@ This paper makes the following contributions:
   \item[\Contrib] A detailed categorization of symptoms, root causes, and fix
     patterns of portability issues;
   \item[\Contrib] An evaluation of the ability of existing tools to detect and
-    repair portability issues;
+    repair portabi
+    lity issues;
   \item[\Contrib] An evaluation about the reaction of developers about the pull
     requests we open to fix portability issues in their
     \github\ projects;
@@ -162,7 +163,7 @@ This paper makes the following contributions:
     Python projects.
 \end{packed_itemize}
 
-\section{Projects, Method, and Questions}
+\section{Projects and Questions}
 \label{sec:methodology}
 
 \Fix{Please review this paragraph}
@@ -205,60 +206,10 @@ on average 2.9K commits, a median of 427, and span a mean lifetime of
 average of 6.1K, a median of only 84, and a maximum exceeding 366K,
 reflecting the presence of both niche and highly popular projects.
 
-Overall, the dataset covers a diverse range of software systems, from small-scale repositories with only 
-a handful of commits to large, long-lived, and widely adopted projects.
+Overall, the dataset covers a diverse range of software systems, from
+small-scale repositories with only a handful of commits to large,
+long-lived, and widely adopted projects.
 
-
-
-
-\subsection{Methods}
-\label{sec:methods}
-
-We use two complementary methods to identify portability issues:
-
-\textbf{Cross-OS test re-execution.} For each project we run the test suite
-on multiple operating systems and record divergent outcomes. We then
-triage failures via logs and small code inspections, mapping each
-instance to a concrete category.\Mar{Is this the first time the term
-  ``category'' appears? If so, explain!!.} We execute tests on
-ephemeral virtual machines provided by GitHub-hosted
-runners~\cite{github_actions_runners}. Each virtual machine is
-automatically provisioned with 4~CPUs and 16~GB of RAM. We implemented
-a single GitHub Actions workflow (YAML) that uses a matrix strategy to
-run the test-suite on Ubuntu 24.04 LTS, macOS 15, and Windows Server
-2025 (each job runs in a fresh VM image). Each job installs
-dependencies, runs the Python tests with
-\texttt{pytest}~\cite{pytest_tool} and the \texttt{pytest-json-report}
-plugin~\cite{pytest_json_report} to create JSON reports, and finally
-uploads the JSON files as workflow artifacts for later analysis. This
-approach ensures reproducible, parallel cross-platform testing while
-GitHub manages VM provisioning and maintenance.
-
-\textbf{Issues Mining.} To complement test-based findings, we mine
-\github{} issues and pull requests. We wrote a “candidate finder”
-combining multiple \emph{types} of keyword:  
-(a) OS/platform indicators (e.g., Windows, Linux, macOS, specific distros/architectures),  
-(b) failure/fix language (e.g., fails, error, bug, fix, workaround),  
-(c) testing/CI context (pytest, CI, \github{} Actions), and  
-(d) common portability causes (e.g., path separators, chmod/permissions, encodings/UTF-8, dynamic libraries like \texttt{.dll}/\texttt{.so}).  
-%
-We combine these keywords with ``OR'' within each type and ``AND''
-across types. We searched titles, bodies, and comments, with extra
-weight to title and close-proximity matches. We employ a lightweight
-triage (brief summaries and negative filters for off-topic mentions)
-to filter spurious results. Candidate issues were normalized into
-consistent records (project, link, date, summary, compact tags like
-OS=, FIX=, TEST=, CAUSE=), duplicates removed, and full text (title,
-description, comments) archived for analysis.
-
-% \Mar{HEY, this is not what you are doing. You need to explain how you
-% used \github{} Actions/Cloud to create VMs for different OSes.}
-%\Den{Updated: Please check/revise!}
-
-% \Den{I don't know if it's necessary and I also don't know if the text is clear enough. Please check/revise!}
-% All experiments were conducted across three operating systems to ensure compatibility. The Linux setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Ubuntu 24.04 LTS.
-
-% The macOS setup ran on an Apple M2 Pro chip (Arm64) with 5 CPU cores, 8 GPU cores, 16 GB RAM, and macOS 15. The Windows setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Windows Server 2025.
 
 \subsection{Research Questions and Methodology}
 \label{sec:questions}
@@ -387,13 +338,72 @@ This section provides answering to the posed research questions.
 %%   percentage accuracy of re-execution method, add example of issue
 %%   mining findings, ...)}
 
+\subsubsection{Methods}
+\label{sec:methods}
+
+We use two complementary methods to identify portability issues: (1)
+test re-execution systematically reveals behavioral differences across
+platforms but it is inherently incomplete as tests may not cover
+important code paths; (2) issue mining includes developer's
+perspectives with discussion. We discuss them in detail.
+
+\textbf{Cross-OS test re-execution.} For each project we run the test suite
+on multiple operating systems and record divergent outcomes. We then
+triage failures via logs and small code inspections, mapping each
+instance to a concrete category.\Mar{Is this the first time the term
+  ``category'' appears? If so, explain!!.} We execute tests on
+ephemeral virtual machines provided by GitHub-hosted
+runners~\cite{github_actions_runners}. Each virtual machine is
+automatically provisioned with 4~CPUs and 16~GB of RAM. We implemented
+a single GitHub Actions workflow (YAML) that uses a matrix strategy to
+run the test-suite on Ubuntu 24.04 LTS, macOS 15, and Windows Server
+2025 (each job runs in a fresh VM image). Each job installs
+dependencies, runs the Python tests with
+\texttt{pytest}~\cite{pytest_tool} and the \texttt{pytest-json-report}
+plugin~\cite{pytest_json_report} to create JSON reports, and finally
+uploads the JSON files as workflow artifacts for later analysis. This
+approach ensures reproducible, parallel cross-platform testing while
+GitHub manages VM provisioning and maintenance.
+
+\textbf{Issues Mining.} To complement test-based findings, we mine
+\github{} issues and pull requests. We wrote a “candidate finder”
+combining multiple \emph{types} of keyword:  
+(a) OS/platform indicators (e.g., Windows, Linux, macOS, specific distros/architectures),  
+(b) failure/fix language (e.g., fails, error, bug, fix, workaround),  
+(c) testing/CI context (pytest, CI, \github{} Actions), and  
+(d) common portability causes (e.g., path separators, chmod/permissions, encodings/UTF-8, dynamic libraries like \texttt{.dll}/\texttt{.so}).  
+%
+We combine these keywords with ``OR'' within each type and ``AND''
+across types. We searched titles, bodies, and comments, with extra
+weight to title and close-proximity matches. We employ a lightweight
+triage (brief summaries and negative filters for off-topic mentions)
+to filter spurious results. Candidate issues were normalized into
+consistent records (project, link, date, summary, compact tags like
+OS=, FIX=, TEST=, CAUSE=), duplicates removed, and full text (title,
+description, comments) archived for analysis.
+
+% \Mar{HEY, this is not what you are doing. You need to explain how you
+% used \github{} Actions/Cloud to create VMs for different OSes.}
+%\Den{Updated: Please check/revise!}
+
+% \Den{I don't know if it's necessary and I also don't know if the text is clear enough. Please check/revise!}
+% All experiments were conducted across three operating systems to ensure compatibility. The Linux setup used an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and Ubuntu 24.04 LTS.
+
+% The macOS setup ran on an Apple M2 Pro chip (Arm64) with 5 CPU
+% cores, 8 GPU cores, 16 GB RAM, and macOS 15. The Windows setup used
+% an AMD EPYC 7763 64-Core Processor with 4 CPUs, 16 GB RAM, and
+% Windows Server 2025.
+
+\subsubsection{Results}
+
 This question assesses the prevalence of portability problems in
 Python projects through cross-OS test re-execution and issue mining
 (Section~\ref{sec:methods}). Recall that the first method is precise
 but incomplete as tests can fail to reach code locations with
 portability problems. The issue mining method complements the test
-re-execution method but it is costly; it requires the authors to
-inspect the issues.
+re-execution method but it is costly; it requires authors to
+read discussion threads associated with issues to rule out spurious
+cases.
 
 Table~\ref{tab:dataset} reports on the prevalence of portability
 problems in \github{} Python projects. Table~\ref{tab:dataset-a}
@@ -404,13 +414,12 @@ inspecting issues from projects.
 Table~\ref{tab:dataset-a} shows that we re-executed test suites (see
 Section~\ref{sec:methods}) from a sample of \NumProjectsAnalyzed{}
 projects mined from \github. Of these, we found discrepant behavior in
-45 projects, \ie{}, projects where test suites had at least one test
+9\% of the projects, \ie{}, projects where test suites had at least one test
 manifesting OS differences. The \NumProjectsAnalyzed{} projects whose
 test suites were executed included a total of \NumTestsExecuted{} test
 cases. Of those, we found discrepant outcomes in
 \NumTestRunsWithOSDiff{} cases, which corresponds to
-\PercentDiscrepantTests{}.  
-
+\PercentDiscrepantTests{}. 
 %% , due to the 
 %% resource-intensive nature of cross-platform test execution across
 %% three operating systems.
@@ -435,11 +444,11 @@ issues for manual inspection. Through careful manual analysis, we
 confirmed that \NumIssuesRelated{} of these were genuine portability
 issues, spanning \NumProjectsWithOSDiffInIssues{} distinct
 projects. Importantly, these projects have no overlap with those
-analyzed in Table~\ref{tab:dataset-a}.
+analyzed in Table~\ref{tab:dataset-a}. So, we found 140 Python projects with
+portability issues.
 
-\Ali{Explained where 95 distinct projects comes from.}
-
-\Ali{Moved methodology discussion to RQ2 and added Table 4 showing data sources for taxonomy components.}
+%% \Ali{Explained where 95 distinct projects comes from.}
+%% \Ali{Moved methodology discussion to RQ2 and added Table 4 showing data sources for taxonomy components.}
 
 %\Mar{I like this discussion, but it does not belong here. The question
 %is about prevalence and this text is about analysis of root causes,
@@ -452,60 +461,59 @@ analyzed in Table~\ref{tab:dataset-a}.
 
 %% demonstrating that portability problems 
 %% extend beyond our test execution sample and affect a broader range of 
-%% the Python ecosystem. 
+%% the Python ecosystem.
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
 \textbf{RQ\textsubscript{1} (prevalence)}: We find that portability
-issues are relatively prevalent. Of the \NumProjectsAnalyzed{}
-projects whose tests we re-executed in different OSes, 
-\PercentProjectsWithPortabilityReExecution{} have tests with portability problems.
-Additionally, our issue mining approach confirmed \NumIssuesRelated{} genuine 
-portability issues from a separate set of projects, demonstrating that these 
-problems affect a broad range of the Python ecosystem.
+issues are relatively prevalent. For example,
+\PercentProjectsWithPortabilityReExecution{} of the
+\NumProjectsAnalyzed{} projects we analyzed with cross-OS test
+re-execution have portability problems.  Additionally, our issue
+mining approach shows that \NumProjectsWithOSDiffInIssues{} of the
+projects we analyzed have genuine portability issues.
 \end{tcolorbox}
 
 \subsection{\textbf{Answering} \RQTwo{}}
 
-\Ali{Please review updates: (methodology explained at the beginning of the section,color-coded fix patterns, ...)}
+%% : test re-execution
+%% (\NumTestRunsWithOSDiff{} test differences) and issue mining
+%% (\NumIssuesRelated{} confirmed issues with a 42.5\% confirmation
+%% rate). 
+%% For instance, through issue mining we found cases\Mar{more
+%%   than one?} where a project's tutorial failed on Windows due to
+%% platform-incompatible dependencies, prompting maintainer discussions
+%% about whether to make dependencies optional or create
+%% platform-specific variants—decision-making processes and untested code
+%% paths that test re-execution alone cannot
+%% capture~\cite{pyearthtools-issue82}.\Mar{Can you show an excerpt of
+%%   this in a listing/figure to make it more tangible?}
 
-To answer RQ2, we performed qualitative analysis on portability issues
-identified through two methods: test re-execution
-(\NumTestRunsWithOSDiff{} test differences) and issue mining
-(\NumIssuesRelated{} confirmed issues with a 42.5\% confirmation
-rate). These methods provide different but complementary perspectives:
-test re-execution systematically reveals behavioral differences across
-platforms, while issue mining captures how developers discuss,
-diagnose, and prioritize portability problems in practice, including
-issues in code paths that may lack comprehensive test coverage. For
-instance, through issue mining we found cases where a project's
-tutorial failed on Windows due to platform-incompatible dependencies,
-prompting maintainer discussions about whether to make dependencies
-optional or create platform-specific variants—decision-making processes
-and untested code paths that test re-execution alone cannot
-capture~\cite{pyearthtools-issue82}.
+\subsubsection{Method}~To answer this question, we perform a
+qualitative analysis about symptoms, causes, and fixes of issues.
 
 For test re-execution, we manually inspected error messages, stack
 traces, and failing test code to understand the root causes of
 behavioral differences across platforms. For issue mining, we analyzed
 issue titles, descriptions, developer discussions, and comments to
 identify portability-related problems and their resolutions. Through
-iterative open coding across both data sources, we identified recurring
-patterns and grouped instances with similar underlying causes. This
-process was conducted by the authors, with regular discussions to
-resolve ambiguities and refine category definitions. The resulting
-taxonomy consists of 7 high-level root-cause categories (e.g., FILE,
-PROC, LIB) with 24 distinct sub-categories. For each instance, we also
-documented observable symptoms (error messages, behaviors) and examined
-corresponding fixes in merged pull requests or commits to identify
-common repair patterns.
-
-Table~\ref{tab:data_sources} summarizes the primary data sources used to
-identify each component of our taxonomy. Root-cause categories were derived
-from patterns observed across both test failures and issue discussions.
-Symptom signatures were primarily extracted from test re-execution, where
-concrete error messages and stack traces provide direct evidence of
-portability problems. Fix patterns were identified by examining code changes
-and discussions in both test-related commits and issue-related pull requests.
+iterative open coding~\cite{strauss1990basics} across both data
+sources, we identified recurring patterns and grouped instances with
+similar underlying causes. This process was conducted by the authors,
+with regular discussions to resolve ambiguities and refine category
+definitions. The resulting taxonomy consists of \textbf{7} high-level
+root-cause categories (e.g., FILE, PROC, LIB) with \textbf{24} distinct
+sub-categories. For each instance, we documented observable symptoms
+(error messages, behaviors) and examined corresponding fixes in merged
+pull requests or commits to identify common repair
+patterns. Table~\ref{tab:data_sources} summarizes the primary data
+sources used to identify each component of our taxonomy. Root-cause
+categories were derived from patterns observed across both test
+failures and issue discussions.  Symptom signatures were primarily
+extracted from test re-execution, where concrete error messages and
+stack traces provide direct evidence of portability problems. Fix
+patterns were identified by examining code changes and discussions in
+both test-related commits and issue-related pull requests.\Mar{Can you
+give summary numbers for symptoms and fixes too?}
 
 \begin{table}[h]
 \centering
@@ -515,9 +523,9 @@ and discussions in both test-related commits and issue-related pull requests.
 \toprule
 \textbf{Component} & \textbf{Test Re-execution} & \textbf{Issue Mining} \\
 \midrule
-Root-cause categories & \checkmark & \checkmark \\
-Symptoms & \checkmark & -- \\
-Fix patterns & \checkmark & \checkmark \\
+Root-cause categories & \cmark & \cmark \\
+Symptoms & \cmark & \xmark \\
+Fix patterns & \cmark & \cmark \\
 \bottomrule
 \end{tabular}
 \end{table}
