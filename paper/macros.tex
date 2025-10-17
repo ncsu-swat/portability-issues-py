@@ -267,7 +267,7 @@ and fixing portability issues?}
 % ========================================
 \newcommand{\NumProjects}{2,042}
 \newcommand{\NumProjectsAnalyzed}{500}
-\newcommand{\NumProjectsWithOSDiffInTests}{45}
+\newcommand{\NumProjectsWithOSDiffInTests}{56}
 \newcommand{\NumTestsExecuted}{440,728}
 \newcommand{\NumTestRunsWithOSDiff}{9,508}
 \newcommand{\PercentDiscrepantTests}{2.16\%}
@@ -281,7 +281,7 @@ and fixing portability issues?}
 % Calculated percentage: projects with portability issues from test re-execution
 \usepackage{xfp}
 \newcommand{\PercentProjectsWithPortabilityReExecution}{%
-  \fpeval{round(45/500*100, 1)}\%}
+  \fpeval{round(56/500*100, 1)}\%}
 
 % ========================================
 % Issue Mining Approach (RQ1 - Table b)
@@ -291,13 +291,16 @@ and fixing portability issues?}
 \newcommand{\NumIssuesAnalyzed}{240}
 \newcommand{\NumIssuesRelated}{102}
 
+% Total projects with portability issues (from both test re-execution and issue mining)
+\newcommand{\TotalProjectsWithPortabilityIssues}{151}
+
 % ========================================
 % Pull Request Statistics (RQ4)
 % ========================================
-\newcommand{\TotalPROpened}{36}
-\newcommand{\TotalPRAccepted}{12}
+\newcommand{\TotalPROpened}{33}
+\newcommand{\TotalPRAccepted}{16}
 \newcommand{\TotalPRRejected}{0}
-\newcommand{\TotalPRInTestsCode}{20}
+\newcommand{\TotalPRInTestsCode}{17}
 \newcommand{\TotalPRInProgramCode}{10}
 \newcommand{\TotalPRInBothCode}{6}
 

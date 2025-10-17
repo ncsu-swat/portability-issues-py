@@ -414,7 +414,7 @@ inspecting issues from projects.
 Table~\ref{tab:dataset-a} shows that we re-executed test suites (see
 Section~\ref{sec:methods}) from a sample of \NumProjectsAnalyzed{}
 projects mined from \github. Of these, we found discrepant behavior in
-9\% of the projects, \ie{}, projects where test suites had at least one test
+\PercentProjectsWithPortabilityReExecution{} of the projects, \ie{}, projects where test suites had at least one test
 manifesting OS differences. The \NumProjectsAnalyzed{} projects whose
 test suites were executed included a total of \NumTestsExecuted{} test
 cases. Of those, we found discrepant outcomes in
@@ -444,7 +444,7 @@ issues for manual inspection. Through careful manual analysis, we
 confirmed that \NumIssuesRelated{} of these were genuine portability
 issues, spanning \NumProjectsWithOSDiffInIssues{} distinct
 projects. Importantly, these projects have no overlap with those
-analyzed in Table~\ref{tab:dataset-a}. So, we found 140 Python projects with
+analyzed in Table~\ref{tab:dataset-a}. So, we found \TotalProjectsWithPortabilityIssues{} Python projects with
 portability issues.
 
 %% \Ali{Explained where 95 distinct projects comes from.}
@@ -568,10 +568,10 @@ under a main category. The columns show: (i) the root-cause category name and ac
     \midrule
     
     \multirow[t]{6}{*}{File and Directories (FILE)} 
-    & Path separators & Forward vs. backslash differences & 7 & 27 & \multirow{6}{*}{60} \\
+    & Path separators & Forward vs. backslash differences & 7 & 27 & \multirow{6}{*}{62} \\
     & Line endings & CRLF vs. LF mismatch & 1  & 5 &                      \\
     & Case sensitivity & Filename case handling varies & 1  & 0 &                      \\
-    & File locking & Windows locks open files & 5 & 4 &                      \\
+    & File locking & Windows locks open files & 7 & 4 &                      \\
     & Encoding & UTF-8 not default everywhere & 2 & 7 &                      \\
     & Filesystem block size & Block size assumptions differ & 0 & 1 &                      \\
     \midrule
@@ -589,16 +589,16 @@ under a main category. The columns show: (i) the root-cause category name and ac
     & Binary wheel mismatch & Architecture-specific wheel incompatibilities & 0 & 3 &                      \\
     \midrule
     
+    \multirow[t]{2}{*}{API Availability (API)}
+    & Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() & OS methods missing on Windows & 13 & 2 & \multirow{2}{*}{17} \\
+    & Modules: readline, resource & Optional modules not everywhere & 0 & 2 &                      \\
+    \midrule
+    
     \multirow[t]{4}{*}{Environment and Display (ENV)}
     & No display in github CI (linux) & Headless CI lacks display server & 3 & 2 & \multirow{4}{*}{14} \\
     & GUI differences & Window manager behavior varies & 0 & 4 &                      \\
     & Missing curses & Curses unavailable on Windows & 1 & 0 &                      \\
     & Terminal capabilities & Terminal features differ across systems & 2 & 2 &                      \\
-    \midrule
-    
-    \multirow[t]{2}{*}{API Availability (API)}
-    & Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() & OS methods missing on Windows & 4 & 2 & \multirow{2}{*}{8} \\
-    & Modules: readline, resource & Optional modules not everywhere & 0 & 2 &                      \\
     \midrule
     
     \multirow[t]{3}{*}{Permissions and Limits (PERM)}
@@ -611,45 +611,47 @@ under a main category. The columns show: (i) the root-cause category name and ac
     & /proc filesystem & /proc missing on macOS/Windows & 1 & 0 & \multirow{2}{*}{2} \\
     & Timezone database & Timezone data not always installed & 1 & 0 &                      \\
     \midrule
-    \textbf{Total} & - & - & \textbf{\NumProjectsWithOSDiffInTests{}} & \textbf{\NumProjectsWithOSDiffInIssues{}} & \textbf{140} \\
+    \textbf{Total} & - & - & \textbf{\NumProjectsWithOSDiffInTests{}} & \textbf{\NumProjectsWithOSDiffInIssues{}} & \textbf{\TotalProjectsWithPortabilityIssues{}} \\
     \bottomrule
     \end{tabularx}
 \end{table*}
 
 We identify seven main root-cause categories that explain why portability problems occur:
 
-\noindent\textbf{File and Directories (FILE):} The most prevalent category (60 projects) stems
+\begin{packed_enumerate}
+\item \textbf{File and Directories (FILE):} The most prevalent category (62 projects) stems
  from OS differences in file operations. Key issues include path separator differences
   (backslash vs. forward slash), line ending mismatches (\CodeIn{CRLF} vs. \CodeIn{LF}),
    file locking semantics, and text encoding defaults.
 
-\noindent\textbf{Process and Signals (PROC):} This category (25 projects) captures failures
+\item \textbf{Process and Signals (PROC):} This category (25 projects) captures failures
  due to OS process management differences. For example, shell execution varies across platforms
   (\CodeIn{cmd.exe} vs. \CodeIn{bash}), Windows lacks many Unix signals
    (\CodeIn{SIGHUP}, \CodeIn{SIGKILL}), and port binding produces different error codes.
 
-\noindent\textbf{Library Dependencies (LIB):} These failures (24 projects) occur when code
+\item \textbf{Library Dependencies (LIB):} These failures (24 projects) occur when code
  assumes platform-specific libraries. Issues include Unix-only modules (e.g., \CodeIn{fcntl}),
   missing dependencies, different dynamic library extensions (\CodeIn{.dll} vs \CodeIn{.so} vs
    \CodeIn{.dylib}), and architecture-specific binary wheels.
 
-\noindent\textbf{Environment and Display (ENV):} These problems (14 projects) 
-arise from runtime environment differences. Headless CI lacks display servers 
-for GUI testing, window managers behave differently, terminal capabilities vary, 
-and the curses module is unavailable on Windows (not included in standard Python distributions).
-
-\noindent\textbf{API Availability (API):} This category (8 projects) covers Python APIs
+\item \textbf{API Availability (API):} This category (17 projects) covers Python APIs
  not universally available. Many OS module methods are Unix-specific (\CodeIn{os.uname()},
   \CodeIn{os.geteuid()}, \CodeIn{os.getpgid()}) and fail on Windows, while optional modules
    like readline and resource may be missing.
 
-\noindent\textbf{Permissions and Limits (PERM):} These issues (7 projects) reflect OS
+\item \textbf{Environment and Display (ENV):} These problems (14 projects) 
+arise from runtime environment differences. Headless CI lacks display servers 
+for GUI testing, window managers behave differently, terminal capabilities vary, 
+and the curses module is unavailable on Windows (not included in standard Python distributions).
+
+\item \textbf{Permissions and Limits (PERM):} These issues (7 projects) reflect OS
  differences in access control. Permission models differ (Unix chmod vs. Windows ACLs),
   file descriptor limits vary, and symbolic link creation requires admin privileges on Windows.
 
-\noindent\textbf{System Information (SYS):} This category (2 projects) includes failures
+\item \textbf{System Information (SYS):} This category (2 projects) includes failures
  from platform-specific system information mechanisms. The /proc filesystem exists only on
   Linux, and timezone databases may not be installed by default.
+\end{packed_enumerate}
 
 \begin{figure}[!ht]
 \centering
@@ -736,16 +738,16 @@ def test_special_case():
     & Dynamic library loading & \texttt{OSError: [WinError 126] The specified module could not be found} & \DefensivePattern{} — guard loading prefer pure-Python \\
     & Binary wheel mismatch & No specific signature & \EnvPattern{} — install platform-appropriate wheel \\
     \midrule
+    \textbf{API} &
+    Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() &
+    \texttt{AttributeError: module 'os' has no attribute 'uname'} (example) & \PortablePattern{} + \DefensivePattern{} — use platform.uname, hasattr guards \\
+    & Modules: readline, resource & \texttt{ModuleNotFoundError: No module named 'readline'} (example) & \DefensivePattern{} — guard import use alternatives \\
+    \midrule
     \textbf{ENV} &
     No display in github CI (linux) & \texttt{TclError: no display name and no \$DISPLAY environment variable} & \EnvPattern{} — skip GUI tests in CI \\
     & GUI differences & No specific signature & \EnvPattern{} — skip or mock GUI features \\
     & Missing curses & \texttt{ModuleNotFoundError: No module named '\_curses'} & \DefensivePattern{} — conditional import with stub fallback \\
     & Terminal capabilities & No specific signature & \EnvPattern{} — detect capabilities degrade gracefully \\
-    \midrule
-    \textbf{API} &
-    Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() &
-    \texttt{AttributeError: module 'os' has no attribute 'uname'} (example) & \PortablePattern{} + \DefensivePattern{} — use platform.uname, hasattr guards \\
-    & Modules: readline, resource & \texttt{ModuleNotFoundError: No module named 'readline'} (example) & \DefensivePattern{} — guard import use alternatives \\
     \midrule
     \textbf{PERM} &
     Permission & \texttt{PermissionError: [Errno 13] Permission denied: '...'} & \DefensivePattern{} + \EnvPattern{} — check permissions, skip restricted tests \\
@@ -814,7 +816,7 @@ Table~\ref{tab:symptoms} (in RQ2.2) maps each root-cause sub-category to its rec
 \end{figure}
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
-\textbf{RQ\textsubscript{2} (characteristics)}: Portability issues cluster around 7 root-cause categories, with File and Directories (FILE) being the most prevalent (60 projects). Most issues produce distinctive error signatures that enable quick diagnosis. Four general fix patterns—defensive checks, portable APIs, normalization, and environment handling—address the majority of observed portability problems. These patterns are simple, teachable, and applicable across different categories.
+\textbf{RQ\textsubscript{2} (characteristics)}: Portability issues cluster around 7 root-cause categories, with File and Directories (FILE) being the most prevalent (62 projects). Most issues produce distinctive error signatures that enable quick diagnosis. Four general fix patterns—defensive checks, portable APIs, normalization, and environment handling—address the majority of observed portability problems. These patterns are simple, teachable, and applicable across different categories.
 \end{tcolorbox}
 
 \subsection{\textbf{Answering} \RQThree{}}
@@ -1068,7 +1070,9 @@ From this number of PRs, we observe that the fix was applied in \TotalPRInTestsC
     \centering
     \footnotesize
     \setlength{\tabcolsep}{2pt}
-    \caption{\Fix{Ali, please update this table with the latest results.} Summary of Pull Requests (PRs) by issue type, showing opened, accepted, and rejected. The last row shows totals.}
+    \caption{
+      % \Fix{Ali, please update this table with the latest results.} 
+      Summary of Pull Requests (PRs) by issue type, showing opened, accepted, and rejected. The last row shows totals.}
     \label{tab:prs}
     % Creating a compact tabular environment
     \begin{tabular}{lccc}
