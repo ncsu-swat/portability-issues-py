@@ -384,36 +384,23 @@ Table~\ref{tab:dataset-b} shows the results from mining and analyzing
 \github{} issues. We mined a total of \NumIssuesMined{} candidate
 issues using keyword search (see Section~\ref{sec:methods}). From this
 set, we randomly sampled \NumIssuesAnalyzed{} of the most recent
-issues for manual inspection. Importantly, the \NumIssuesRelated{}
-confirmed issues come from projects with no overlap with those
-analyzed in Table~\ref{tab:dataset-a}.\Mar{where is the 95 number on
-  Table 2(b) is coming from? Either remove from the table or discuss
-  it here.}
+issues for manual inspection. Through careful manual analysis, we
+confirmed that \NumIssuesRelated{} of these were genuine portability
+issues, spanning \NumProjectsWithOSDiffInIssues{} distinct
+projects. Importantly, these projects have no overlap with those
+analyzed in Table~\ref{tab:dataset-a}.
 
-\Mar{I like this discussion, but it does not belong here. The question
-is about prevalence and this text is about analysis of root causes,
-symptoms, etc. It seems to belong to the next RQs. That said, I notice
-you do not mention if the (sub)category of root cause, symptom, and
-fix originate from test re-execution or issue mining. A table showing
-(1) only re-execution, (2) only mining, (3) both with rows for the
-three cases (causes, symptom, fixes) would be ``good enough''.}
-Through careful analysis of issue titles, descriptions, discussion
-threads, and the associated code, we confirmed that
-\NumIssuesRelated{} of these were genuine portability issues,
-representing a confirmation rate of 42.5\%. While this method requires
-significant manual effort to validate candidates, it provides
-complementary insights that test-based detection cannot
-capture. Specifically, issue mining reveals how developers discuss,
-diagnose, and prioritize portability problems in practice, exposes
-historical patterns across different project contexts, and surfaces
-issues in projects or code paths that may lack comprehensive test
-coverage. For instance, we found an issue where a project's tutorial
-failed on Windows due to a platform-incompatible dependency, prompting
-maintainer discussions about whether to make dependencies optional or
-create platform-specific variants—decision-making processes and
-untested code paths that test re-execution alone cannot
-capture~\cite{pyearthtools-issue82}.
+\Ali{Explained where 95 distinct projects comes from.}
 
+\Ali{Moved methodology discussion to RQ2 and added Table 4 showing data sources for taxonomy components.}
+
+%\Mar{I like this discussion, but it does not belong here. The question
+%is about prevalence and this text is about analysis of root causes,
+%symptoms, etc. It seems to belong to the next RQs. That said, I notice
+%you do not mention if the (sub)category of root cause, symptom, and
+%fix originate from test re-execution or issue mining. A table showing
+%(1) only re-execution, (2) only mining, (3) both with rows for the
+%three cases (causes, symptom, fixes) would be ``good enough''.}
 
 
 %% demonstrating that portability problems 
@@ -434,21 +421,62 @@ problems affect a broad range of the Python ecosystem.
 
 \Ali{Please review updates: (methodology explained at the beginning of the section,color-coded fix patterns, ...)}
 
-To answer RQ2, we performed qualitative analysis on the 
-portability issues identified through test re-execution (\NumTestRunsWithOSDiff{} 
-test differences) and issue mining (\NumIssuesRelated{} confirmed issues). For 
-each instance, we manually inspected error messages, stack traces, failing test 
-code, and—in the case of \github{} issues—developer discussions. Through iterative 
-open coding, we identified recurring patterns and grouped issues with similar 
-underlying causes. This process was conducted by the authors, with 
-regular discussions to resolve ambiguities and refine category definitions. The 
-resulting taxonomy consists of 7 high-level root-cause categories (e.g., FILE, 
-PROC, LIB) with 24 distinct sub-categories. For each issue, we also documented 
-observable symptoms (error messages, behaviors) and examined corresponding fixes 
-in merged pull requests or commits to identify common repair patterns.
+To answer RQ2, we performed qualitative analysis on portability issues
+identified through two methods: test re-execution
+(\NumTestRunsWithOSDiff{} test differences) and issue mining
+(\NumIssuesRelated{} confirmed issues with a 42.5\% confirmation
+rate). These methods provide different but complementary perspectives:
+test re-execution systematically reveals behavioral differences across
+platforms, while issue mining captures how developers discuss,
+diagnose, and prioritize portability problems in practice, including
+issues in code paths that may lack comprehensive test coverage. For
+instance, through issue mining we found cases where a project's
+tutorial failed on Windows due to platform-incompatible dependencies,
+prompting maintainer discussions about whether to make dependencies
+optional or create platform-specific variants—decision-making processes
+and untested code paths that test re-execution alone cannot
+capture~\cite{pyearthtools-issue82}.
 
-This section elaborates the characteristics of portability problems:
-root-causes, symptoms, and fixes.
+For test re-execution, we manually inspected error messages, stack
+traces, and failing test code to understand the root causes of
+behavioral differences across platforms. For issue mining, we analyzed
+issue titles, descriptions, developer discussions, and comments to
+identify portability-related problems and their resolutions. Through
+iterative open coding across both data sources, we identified recurring
+patterns and grouped instances with similar underlying causes. This
+process was conducted by the authors, with regular discussions to
+resolve ambiguities and refine category definitions. The resulting
+taxonomy consists of 7 high-level root-cause categories (e.g., FILE,
+PROC, LIB) with 24 distinct sub-categories. For each instance, we also
+documented observable symptoms (error messages, behaviors) and examined
+corresponding fixes in merged pull requests or commits to identify
+common repair patterns.
+
+Table~\ref{tab:data_sources} summarizes the primary data sources used to
+identify each component of our taxonomy. Root-cause categories were derived
+from patterns observed across both test failures and issue discussions.
+Symptom signatures were primarily extracted from test re-execution, where
+concrete error messages and stack traces provide direct evidence of
+portability problems. Fix patterns were identified by examining code changes
+and discussions in both test-related commits and issue-related pull requests.
+
+\begin{table}[h]
+\centering
+\caption{Data sources for portability taxonomy components.}
+\label{tab:data_sources}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Component} & \textbf{Test Re-execution} & \textbf{Issue Mining} \\
+\midrule
+Root-cause categories & \checkmark & \checkmark \\
+Symptoms & \checkmark & -- \\
+Fix patterns & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In the following subsections, we elaborate on the characteristics of
+ portability problems: root-causes, symptoms, and fixes.
 
 \subsubsection{\textbf{Answering \RQTwoOne{}}}
 \label{rq2-1}
