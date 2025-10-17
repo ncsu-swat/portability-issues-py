@@ -46,8 +46,6 @@ Python is broadly used across operating systems, but our cross-OS test re-execut
 
 \maketitle
 
-\section{Introduction}
-\label{sec:intro}
 
 \section{Introduction}
 \label{sec:intro}
@@ -980,7 +978,7 @@ positives.
 \label{sec:llm-fixing}
 \noindent\textbf{Setup.}~ Following the classification experiment, we designed a complementary evaluation focused on the corrective capabilities of LLMs. In this phase, we used the \NumCodeNonPortableByLLM{} non-portable Python snippets identified earlier and prompted each model with two distinct repair configurations.  
 In the first configuration (\textit{generic prompt}), each model received a general instruction stating that the code exhibited portability issues and was asked to produce a corrected version.  
-In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue (derived from our taxonomy in RQ2) and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}.  
+In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue (derived from our taxonomy in \ref{rq2-1}) and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}.  
 This design aimed to evaluate whether structured repair guidance could improve the models' ability to generate functionally portable code. Each model attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in 90 repair attempts per configuration.
 
 \noindent\textbf{Metrics.} ~We evaluated the correctness of each generated fix using two criteria:  
@@ -1050,23 +1048,13 @@ When supplied with explicit repair patterns, the models produced significantly m
 \subsection{\textbf{Answering} \RQFour{}}
 This section discusses the analysis of pull requests (PRs) submitted to open-source projects to address portability issues identified in our study.
 \label{sec:pr-discussion}
-\subsubsection{\textbf{Answering} \RQFourOne{}}
-\label{rq4-1}
- 
 
-% Add here: commit/PR analysis, with representative examples of code changes
-% For example: Table 4 (Common fix patterns with frequency and examples)
-
-
-\textbf{Quick Answer.} \Fix{add in a box} Fixes often involve replacing OS-specific APIs, adding conditional checks, or adopting cross-platform libraries.  
-
-\subsubsection{\textbf{Answering} \RQFourTwo{}}
-\label{rq4-2}
-
+%
 
 % Add here: time-to-fix statistics, issue/PR comment analysis
 % For example: Figure 4 (Distribution of time-to-fix), Table 5 (Engagement metrics per project)
 
+\subsubsection{Methodology}
 To validate our findings and contribute back to the open-source ecosystem, we submitted pull requests addressing the portability issues uncovered in our study. Our contributions focused on libraries where our analysis revealed systematic portability challenges, proposing fixes to improve cross-platform compatibility and robustness.
 
 Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total of \TotalPROpened{} pull requests (PRs) spanning 6 categories of portability issues, of which \TotalPRAccepted{} had been accepted at the time of writing. The overall acceptance rate of 33\%, along with a zero rejection rate, indicates that the issues we identified correspond to genuine portability problems recognized by library maintainers. Notably, ``File and Directories'' issues were the most frequent (18 PRs), reflecting the prevalence of path, encoding, and file handling inconsistencies across platforms. Conversely, ``Process and Signals'' issues exhibited the highest acceptance rate (100\%), likely due to their critical impact on application functionality.
