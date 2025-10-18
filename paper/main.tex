@@ -164,16 +164,22 @@ This paper makes the following contributions:
 \section{Projects and Questions}
 \label{sec:methodology}
 
-\Fix{Please review this paragraph}
-This section describes the projects we used (\ref{sec:projects}), 
-the setup and methodology of our experiments (\ref{sec:methods}), 
-and the research questions we posed (\ref{sec:questions}).
+This section describes the projects we used (\ref{sec:projects}) the
+research questions we posed (\ref{sec:questions}).
 
 \subsection{Projects}
 \label{sec:projects}
 
-\textbf{Dataset.} We sampled \NumProjects{} Python repositories; the analyses reported here reflect the first \NumProjectsAnalyzed{} analyzed.  
-\textbf{Selection criteria.} We selected projects using \github{}'s REST API, focusing on repositories primarily implemented in Python that show evidence of testing activity (e.g., use of pytest or unittest), have at least one star, and contain at least one test case that can be executed successfully. This filtering ensures that the analyzed projects are active, testable, and representative of real-world Python software.
+\textbf{Dataset.} We sampled \NumProjects{} Python repositories from
+\github. We selected projects using \github{}'s REST API, focusing on
+repositories primarily implemented in Python that show evidence of
+testing activity (e.g., use of pytest or unittest), have at least one
+star, and contain at least one test case that can be executed
+successfully. This filtering ensures that the analyzed projects are
+active, testable, and representative of real-world Python software.
+%; the analyses reported here reflect the first \NumProjectsAnalyzed{} analyzed.  
+%\textbf{Selection criteria.}
+
 % i) \textbf{Language:} Python as primary language; ii) \textbf{Activity:} at least 100 commits and 10 contributors; iii) \textbf{Testing:} presence of an automated test suite (e.g., pytest, unittest); iv) \textbf{Popularity:} at least 50 stars on \github{}; v) \textbf{Diversity:} a mix of application domains (web, data science, utilities, etc.); vi) \textbf{Non-containerized:} absence of Dockerfile or Singularity recipe to create images.
 
 \begin{table}[H]
@@ -301,31 +307,34 @@ This section provides answering to the posed research questions.
 
 \begin{table}[t!]
   \centering
-  \caption{\label{tab:dataset}Prevalence of portability problems.}  
+  \caption{\label{tab:dataset}Prevalence of portability
+    problems.\Mar{Complete and check if this is consistent with text.}}
+  \vspace{-1ex}
   \begin{subtable}[t]{\linewidth}
     \centering
-    \caption{\label{tab:dataset-a}Detected problems with test re-execution.}
+    \caption{\label{tab:dataset-a}Problems detected with test re-execution.}
     \begin{tabular}{lr}
     \toprule
-%    Total number of projects mined & \NumProjects{} \\
-    Total number of projects selected & \NumProjectsAnalyzed{} \\
-    \hspace{2ex}Total number of projects with OS differences & \NumProjectsWithOSDiffInTests{} \\    
-    Total number of tests executed & \NumTestsExecuted{} \\
-    \hspace{2ex}Total number of test runs with OS differences & \NumTestRunsWithOSDiff{} \\
-    %Total number of differences analyzed & 2,421 \\
+%     Number of projects mined & \NumProjects{} \\
+     Number of projects selected & \NumProjectsAnalyzed{} \\
+    \hspace{2ex} Number of projects with OS differences & \NumProjectsWithOSDiffInTests{} \\    
+     Number of tests executed & \NumTestsExecuted{} \\
+    \hspace{2ex} Number of test runs with OS differences & \NumTestRunsWithOSDiff{} \\
+    % Number of differences analyzed & 2,421 \\
     \bottomrule
     \end{tabular}
+  \vspace{1ex} % space between subtables    
   \end{subtable}
-  \vspace{1ex} % space between subtables
   \begin{subtable}[t]{\linewidth}
     \centering
-    \caption{\label{tab:dataset-b}Detected problems with manual inspection.}
+    \caption{\label{tab:dataset-b}Problems detected in issues with manual inspection.}
     \begin{tabular}{lr}
       \toprule
-      Total number of issues mined & \NumIssuesMined{} \\
-      Total number of issues analyzed & \NumIssuesAnalyzed{} \\
-      Total number of issues related & \NumIssuesRelated{}\\
-      \hspace{2ex}Total number of projects with OS differences & \NumProjectsWithOSDiffInIssues{} \\
+       Number of projects selected & \Fix{???} \\
+      \hspace{2ex} Number of projects with OS differences & \NumProjectsWithOSDiffInIssues{} \\      
+       Number of issues mined & \NumIssuesMined{} \\
+      \hspace{2ex} Number of issues analyzed & \NumIssuesAnalyzed{} \\
+      \hspace{4ex} Number of issues documenting OS differences & \NumIssuesRelated{}\\
       \bottomrule
     \end{tabular}
   \end{subtable}
@@ -486,23 +495,31 @@ projects we analyzed have genuine portability issues.
 %% capture~\cite{pyearthtools-issue82}.\Mar{Can you show an excerpt of
 %%   this in a listing/figure to make it more tangible?}
 
-\subsubsection{Method}~To answer this question, we perform a
-qualitative analysis about symptoms, causes, and fixes of issues.
+\subsubsection{Method}~We conducted a qualitative study to categorize
+the root causes, symptoms, and the fixes of portability problems.
 
-For test re-execution, we manually inspected error messages, stack
-traces, and failing test code to understand the root causes of
-behavioral differences across platforms. For issue mining, we analyzed
-issue titles, descriptions, developer discussions, and comments to
-identify portability-related problems and their resolutions. Through
-iterative open coding~\cite{strauss1990basics} across both data
-sources, we identified recurring patterns and grouped instances with
-similar underlying causes. This process was conducted by the authors,
-with regular discussions to resolve ambiguities and refine category
-definitions. The resulting taxonomy consists of \textbf{7} high-level
-root-cause categories (e.g., FILE, PROC, LIB) with \textbf{24} distinct
-sub-categories. For each instance, we documented observable symptoms
-(error messages, behaviors) and examined corresponding fixes in merged
-pull requests or commits to identify common repair
+%% We
+%% used two different methods reflecting the methods used to identify the
+%% portability problems~(Section~\ref{sec:methods}).
+
+We used cross-OS test re-execution and the analysis of issues to find
+root causes and symptoms. For fixes, we needed to rely on the
+discussion in the issue and the corresponding fix commits. In cross-OS
+test re-execution, we analyzed error messages, stack traces, and the
+failing test code to understand the root causes and symptoms. For
+issue mining, we analyzed issue titles, descriptions, developer
+discussions, and comments to understand the root causes and symptoms.
+Through iterative open coding~\cite{strauss1990basics} across both
+data sources, we identified recurring patterns and grouped instances
+with similar underlying causes. This process was conducted by the
+authors, with regular discussions to resolve ambiguities and refine
+category definitions.
+
+The resulting taxonomy of root causes consists of \textbf{7}
+high-level categories (e.g., FILE, PROC, LIB) with \textbf{24}
+distinct sub-categories. For each instance, we documented observable
+symptoms (error messages, behaviors) and examined corresponding fixes
+in merged pull requests or commits to identify common repair
 patterns. Table~\ref{tab:data_sources} summarizes the primary data
 sources used to identify each component of our taxonomy. Root-cause
 categories were derived from patterns observed across both test
@@ -511,7 +528,7 @@ extracted from test re-execution, where concrete error messages and
 stack traces provide direct evidence of portability problems. Fix
 patterns were identified by examining code changes and discussions in
 both test-related commits and issue-related pull requests.\Mar{Can you
-give summary numbers for symptoms and fixes too?}
+  give summary numbers for symptoms and fixes too?}
 
 \begin{table}[h]
 \centering
@@ -820,7 +837,7 @@ Table~\ref{tab:symptoms} (in RQ2.2) maps each root-cause sub-category to its rec
 \subsection{\textbf{Answering} \RQThree{}}
 \label{rq3}
 
-This section evaluates performance of LLMs for detecting
+This section evaluates performance of tools for detecting
 (\textsection~\ref{sec:llm-detection}) and for fixing
 (\textsection~\ref{sec:llm-fixing}) portability issues.
 
@@ -863,6 +880,8 @@ Model & Precision & Recall & F1-Score & Accuracy \\
 \end{tabular}
   \end{subtable}
 \end{table}
+
+\Mar{Please, show **all** prompts you used.}
 
 \subsubsection{LLMs for detection}\sloppy
 \label{sec:llm-detection}
@@ -1058,14 +1077,32 @@ This section discusses the analysis of pull requests (PRs) submitted to open-sou
 \Fix{This subsubsction is old, please update if needed.}
 To validate our findings and contribute back to the open-source ecosystem, we submitted pull requests addressing the portability issues uncovered in our study. Our contributions focused on libraries where our analysis revealed systematic portability challenges, proposing fixes to improve cross-platform compatibility and robustness.
 
-Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total of \TotalPROpened{} pull requests (PRs) spanning 6 categories of portability issues, of which \TotalPRAccepted{} had been accepted at the time of writing. The overall acceptance rate of 33\%, along with a zero rejection rate, indicates that the issues we identified correspond to genuine portability problems recognized by library maintainers. Notably, ``File and Directories'' issues were the most frequent (18 PRs), reflecting the prevalence of path, encoding, and file handling inconsistencies across platforms. Conversely, ``Process and Signals'' issues exhibited the highest acceptance rate (100\%), likely due to their critical impact on application functionality.
+Table~\ref{tab:prs} summarizes the results of this effort. We
+submitted a total of \TotalPROpened{} pull requests (PRs) spanning 6
+categories of portability issues, of which \TotalPRAccepted{} had been
+accepted at the time of writing. The overall acceptance rate of 33\%,
+along with a zero rejection rate, indicates that the issues we
+identified correspond to genuine portability problems recognized by
+library\Mar{library? are you sure?} maintainers. Notably, ``File and Directories'' issues were the
+most frequent (18 PRs), reflecting the prevalence of path, encoding,
+and file handling inconsistencies across platforms. Conversely,
+``Process and Signals'' issues exhibited the highest acceptance rate
+(100\%), likely due to their critical impact on application
+functionality.
 
+Considering the location of the fix, we observe that the code is
+modified in \TotalPRInTestsCode{} cases to the test code only, in
+\TotalPRInProgramCode{} cases to the program code only, and in
+\TotalPRInBothCode{} cases to both the test and program code. This
+distribution suggests that while some portability issues can be
+resolved by adjusting tests to be more environment-aware, many require
+changes to the application logic itself to ensure consistent behavior
+across platforms.
 
-From this number of PRs, we observe that the fix was applied in \TotalPRInTestsCode{} cases to the test code only, in \TotalPRInProgramCode{} cases to the program code only, and in \TotalPRInBothCode{} cases to both the test and program code. This distribution suggests that while some portability issues can be resolved by adjusting tests to be more environment-aware, many require changes to the application logic itself to ensure consistent behavior across platforms.
-
-\begin{table}[h!]
+\begin{table}[t!]
     \centering
-    \footnotesize
+    \small
+    %footnotesize
     \setlength{\tabcolsep}{2pt}
     \caption{
       % \Fix{Ali, please update this table with the latest results.} 
