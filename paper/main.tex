@@ -1055,6 +1055,7 @@ This section discusses the analysis of pull requests (PRs) submitted to open-sou
 % For example: Figure 4 (Distribution of time-to-fix), Table 5 (Engagement metrics per project)
 
 \subsubsection{Methodology}
+\Fix{This subsubsction is old, please update if needed.}
 To validate our findings and contribute back to the open-source ecosystem, we submitted pull requests addressing the portability issues uncovered in our study. Our contributions focused on libraries where our analysis revealed systematic portability challenges, proposing fixes to improve cross-platform compatibility and robustness.
 
 Table~\ref{tab:prs} summarizes the results of this effort. We submitted a total of \TotalPROpened{} pull requests (PRs) spanning 6 categories of portability issues, of which \TotalPRAccepted{} had been accepted at the time of writing. The overall acceptance rate of 33\%, along with a zero rejection rate, indicates that the issues we identified correspond to genuine portability problems recognized by library maintainers. Notably, ``File and Directories'' issues were the most frequent (18 PRs), reflecting the prevalence of path, encoding, and file handling inconsistencies across platforms. Conversely, ``Process and Signals'' issues exhibited the highest acceptance rate (100\%), likely due to their critical impact on application functionality.
@@ -1087,29 +1088,90 @@ From this number of PRs, we observe that the fix was applied in \TotalPRInTestsC
     \end{tabular}
 \end{table}
 
-\textbf{Quick Answer.} Developers typically acknowledge portability problems but often give them lower priority than functional bugs, resulting in varied resolution times.  
+% \textbf{Quick Answer.} Developers typically acknowledge portability problems but often give them lower priority than functional bugs, resulting in varied resolution times.  
 
 
+\Den{The following three subsections are new. Please review.}
+\subsubsection{The webassets case study}
 
-\Den{Please review.}
-To better understand how open-source developers and project communities react when portability issues are reported, we submitted pull requests (PRs) across different projects. The responses we received illustrate a spectrum of engagement patterns, from prompt acceptance to rejection or non-merge due to project inactivity.
+We illustrate how portability issues manifest and are fixed through a case study of the webassets project~\cite{webassets}. Webassets is an asset management library for Python web development with 932 stars on GitHub, used for bundling and processing web assets like CSS and JavaScript files.
+
+The problem we encountered falls into the \textbf{File and Directories (FILE)} category, specifically the ``File locking'' sub-category. The issue occurred in the test suite where \CodeIn{tempfile.NamedTemporaryFile} was used without disabling automatic deletion, causing failures on Windows due to platform-specific file locking behavior. On Windows, the operating system locks open files more aggressively than on Unix-like systems, preventing the same file from being reopened while still in use.
+
+Listing~\ref{lst:webassets_fix} shows our fix applied to the test file. The original code created a temporary file within a context manager that automatically deleted the file upon exiting the \texttt{with} block. However, on Windows, attempting to reopen this file (which the test needed to do) failed because the file was still locked by the previous file handle.
+ %, language=diff
+
+\begin{lstlisting}[caption={Diff showing our approved PR for webassets temporary file handling issue.}, label={lst:webassets_fix}]
+ @pytest.fixture
+ def tmp_file():
+-  with tempfile.NamedTemporaryFile(mode="wt") as f:
++  with tempfile.NamedTemporaryFile(mode="wt", delete=False) as f:
+     for _ in range(100):
+       f.write("\n")
+     f.flush()
+-    yield f.name
++    tmp_path = f.name  # store path before file is closed
++  yield tmp_path
++  os.remove(tmp_path)  # clean up after the test
+\end{lstlisting}
+
+Our fix addresses this issue by modifying line 4 to disable automatic deletion using \texttt{delete=False}, storing the file path on line 8 before the file handle is closed, and manually cleaning up the temporary file on line 10 after the test completes. This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific behavior is accommodated through careful resource management.
+
+This case demonstrates how seemingly simple operations like temporary file creation can have subtle portability implications that only manifest under specific platform conditions, highlighting the importance of cross-platform testing for robust software development.
+
+
+\subsubsection{The pydantic-extra-types case study}
+
+We present another illustrative case study from the pydantic-extra-types project~\cite{pydantic_extra_types}. Pydantic-extra-types is a library that provides additional type validators for Pydantic with 290 stars on GitHub, used for extending Pydantic's validation capabilities with specialized data types.
+
+The problem we encountered also falls into the \textbf{File and Directories (FILE)} category, specifically the ``Path separators'' sub-category. The issue occurred in test fixtures where \CodeIn{os.path.relpath} was used to create relative paths from absolute paths. On Windows, this function fails when the source and target paths are on different drives (e.g., \texttt{C:\textbackslash} vs \texttt{D:\textbackslash}), as Windows cannot create relative paths between different drive letters.
+
+Listing~\ref{lst:pydantic_fix} shows our fix applied to three test fixtures in the \CodeIn{test\_path.py} file. The original code assumed that \CodeIn{os.path.relpath} would always succeed, but on Windows systems where temporary directories might be created on a different drive than the current working directory, this assumption breaks and causes test failures.
+
+\begin{lstlisting}[caption={Diff showing our fix for pydantic-extra-types cross-drive relative path issue.}, label={lst:pydantic_fix}]
+  @pytest.fixture
+  def relative_file_path(absolute_file_path: pathlib.Path) -> pathlib.Path:
++   cwd = pathlib.Path.cwd()
++   if os.name == 'nt' and absolute_file_path.anchor != cwd.anchor:
++     # on windows, cant create relative path when paths are on different drives
++     return absolute_file_path
+    return pathlib.Path(os.path.relpath(absolute_file_path, os.getcwd()))
+\end{lstlisting}
+
+Our fix addresses this Windows-specific limitation by detecting when the OS is Windows (lines 3-6) and checking whether the absolute path and current working directory have different anchors (drive letters). When this condition is met, the function returns the absolute path instead of attempting the problematic relative path conversion. This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific limitations are accommodated through conditional logic.
+
+This case demonstrates how path operations that work seamlessly on Unix-like systems can encounter fundamental limitations on Windows due to the multi-drive architecture, highlighting the importance of considering platform-specific filesystem constraints in cross-platform development.
+
+% 
+% OLD:
+% 
+% To better understand how open-source developers and project communities react when portability issues are reported, we submitted pull requests (PRs) across different projects. The responses we received illustrate a spectrum of engagement patterns, from prompt acceptance to rejection or non-merge due to project inactivity.
 
 % \cite{breds_pr_40}
-In one case, the proposed change addressed a test portability issue arising from platform-specific file handling. The original test used Python's \texttt{tempfile.NamedTemporaryFile} without disabling automatic deletion, which led to failures on Windows due to how temporary files are closed and reopened. Our fix stored the path before closing the file and explicitly removed it after the test execution. The maintainer accepted the contribution, commenting: \emph{``Thanks for this.''}, 
-in another PR, the maintainer expressed appreciation for the contribution and promptly merged the fix, stating: \emph{``Thanks a lot for this contribution! Good catch.''}
+% In one case, the proposed change addressed a test portability issue arising from platform-specific file handling. The original test used Python's \texttt{tempfile.NamedTemporaryFile} without disabling automatic deletion, which led to failures on Windows due to how temporary files are closed and reopened. Our fix stored the path before closing the file and explicitly removed it after the test execution. The maintainer accepted the contribution, commenting: \emph{``Thanks for this.''}, 
+% in another PR, the maintainer expressed appreciation for the contribution and promptly merged the fix, stating: \emph{``Thanks a lot for this contribution! Good catch.''}
 % \cite{python_doit_api_pr_9}. 
-These responses highlight a positive and collaborative stance, where developers value external input and promptly integrate fixes that improve cross-platform compatibility.
+% These responses highlight a positive and collaborative stance, where developers value external input and promptly integrate fixes that improve cross-platform compatibility.
 
 % \cite{frequenz_pr_1261}
-A different outcome emerged in a PR where we attempted to resolve a dependency portability issue. Specifically, the tests relied on the \texttt{zoneinfo} and \texttt{tzdata} modules, which are not consistently available across platforms. Our proposed patch included conditional installation of the dependency when running on Windows. However, the maintainer argued that the better solution was to avoid reliance on the library altogether, regardless of platform. As a result, the PR was reduced to removing the dependency and related tests. This case illustrates that communities sometimes prefer simplifying the codebase rather than maintaining platform-specific workarounds.
 
-Finally, in another project, the response was shaped less by technical considerations and more by the project's state of maintenance. The maintainer acknowledged the validity of the patch but declined to merge it, noting: \emph{``I do somewhat view that project as archived and inactive... My concern about merging is that an updated last commit date would make the project seem more active than it really is.''} This case illustrates how project activity levels and community sustainability strongly influence whether portability improvements are accepted, even if the technical changes are sound.
+\subsubsection{The frequenz-sdk-python case study}
 
-Overall, these three cases demonstrate that responses to portability
-contributions vary significantly: active projects may readily adopt
-fixes, maintainers may prefer design simplifications over
-platform-specific adjustments, and inactive projects may resist
-merging altogether to avoid signaling misleading project vitality.
+We encountered a different type of response when addressing a dependency portability issue in the frequenz-sdk-python project~\cite{frequenz_sdk_python}. Frequenz-sdk-python is an energy management SDK for Python applications. The problem we identified falls into the \textbf{System Information (SYS)} category, specifically the ``Timezone database'' sub-category.
+
+The issue occurred in the test suite where tests relied on the \CodeIn{zoneinfo} and \CodeIn{tzdata} modules for timezone operations. These modules are not consistently available across all platforms—while \CodeIn{zoneinfo} is included in Python 3.9+ on most systems, the timezone data (\CodeIn{tzdata}) may not be installed by default on some Windows configurations. This caused test failures when the required timezone information was unavailable.
+
+Our initial proposed solution involved conditional installation of the \CodeIn{tzdata} dependency specifically for Windows environments, following a \textbf{Defensive checks} approach by detecting the platform and installing the missing dependency when needed. However, during the discussion with the project maintainer, a different perspective emerged. The maintainer argued that rather than adding platform-specific complexity to handle the dependency, the better long-term solution was to remove the reliance on these timezone-specific modules altogether. This approach follows a \textbf{Simplification} strategy—instead of accommodating platform differences, the codebase was simplified to avoid the problematic dependency entirely. As a result, the PR was reduced to removing the timezone-dependent tests and related functionality.
+
+This case illustrates an important aspect of how development communities approach portability issues: sometimes maintainers prefer architectural simplification over platform-specific workarounds, prioritizing code maintainability and reducing complexity rather than supporting edge cases across all possible platform configurations.
+
+% Finally, in another project, the response was shaped less by technical considerations and more by the project's state of maintenance. The maintainer acknowledged the validity of the patch but declined to merge it, noting: \emph{``I do somewhat view that project as archived and inactive... My concern about merging is that an updated last commit date would make the project seem more active than it really is.''} This case illustrates how project activity levels and community sustainability strongly influence whether portability improvements are accepted, even if the technical changes are sound.
+
+% Overall, these three cases demonstrate that responses to portability
+% contributions vary significantly: active projects may readily adopt
+% fixes, maintainers may prefer design simplifications over
+% platform-specific adjustments, and inactive projects may resist
+% merging altogether to avoid signaling misleading project vitality.
 
 \section{Lessons Learned}
 \label{sec:lessons}
@@ -1176,7 +1238,7 @@ Finally, Sun \etal{}~\cite{sun2016bear} proposed \textit{Bear}, a framework that
 
 Maybe: \cite{sun2016bear}. Mobile apps testing: \cite{boushehrinejadmoradi2015testing}
 
-\section{Conclusions}
+\section{Conclusions and Future Work}
 \label{sec:conclusions}
 % - Recap of findings for each RQ
 % - Key contributions
