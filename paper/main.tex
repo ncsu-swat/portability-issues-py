@@ -21,7 +21,7 @@
 
 \begin{abstract}
   \sloppy
-Python is broadly used across operating systems, but our cross-OS test re-execution reveals persistent portability issues. We study \NumProjects{} repositories (currently \NumProjectsAnalyzed{} projects analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (e.g., guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.  
+Python is broadly used across operating systems, but our cross-OS test re-execution reveals persistent portability issues. We study \NumProjectsTotal{} repositories (currently \NumProjectsReExecution{} projects analyzed), execute 440{,}728 tests across operating systems, and observe 9{,}508 tests with divergent outcomes; 2{,}421 differences have been analyzed so far. We identify 7 actionable root-cause categories (e.g., unavailable \texttt{os.*} methods on Windows, terminal/GUI capability gaps in CI, path/line-ending mismatches, dynamic loading issues) and curate concrete repair patterns (e.g., guards and fallbacks, cross-platform APIs, normalization). These results provide early empirical evidence of the prevalence, causes, and fix patterns of Python portability issues and establish baselines for future tools and guidelines.  
 \end{abstract}
 
 \begin{CCSXML}
@@ -73,7 +73,7 @@ deployments and reduces developer
 productivity~\cite{mince2023,kiuwancodeportability,peng2024,job2024}. Although
 container technologies such as Docker and Singularity/Apptainer can
 mitigate these issues, most open-source Python projects are not
-containerized. In our analysis of \NumProjects\ \github\ repositories,
+containerized. In our analysis of \NumProjectsTotal{} \github\ repositories,
 only 19.9\% included Dockerfile or Docker compose configuration.
 
 %% A \emph{portability issue} is an observable difference in the
@@ -170,22 +170,35 @@ research questions we posed (\ref{sec:questions}).
 \subsection{Projects}
 \label{sec:projects}
 
-\textbf{Dataset.} We sampled \NumProjects{} Python repositories from
+\Ali{updated, please revise}
+
+\textbf{Dataset.} We sampled \NumProjectsTotal{} Python repositories from
 \github. We selected projects using \github{}'s REST API, focusing on
 repositories primarily implemented in Python that show evidence of
 testing activity (e.g., use of pytest or unittest), have at least one
 star, and contain at least one test case that can be executed
 successfully. This filtering ensures that the analyzed projects are
 active, testable, and representative of real-world Python software.
-%; the analyses reported here reflect the first \NumProjectsAnalyzed{} analyzed.  
-%\textbf{Selection criteria.}
 
-% i) \textbf{Language:} Python as primary language; ii) \textbf{Activity:} at least 100 commits and 10 contributors; iii) \textbf{Testing:} presence of an automated test suite (e.g., pytest, unittest); iv) \textbf{Popularity:} at least 50 stars on \github{}; v) \textbf{Diversity:} a mix of application domains (web, data science, utilities, etc.); vi) \textbf{Non-containerized:} absence of Dockerfile or Singularity recipe to create images.
+\textbf{Dataset partitioning.} To support different aspects of our study,
+we partitioned the dataset into two complementary subsets. First, we
+allocated \NumProjectsLearning{} projects to a \emph{learning set} used
+for identifying and categorizing portability issues through detailed
+analysis. This learning set was further divided based on the detection
+method employed: \NumProjectsReExecution{} projects were analyzed through
+cross-OS test re-execution, while \NumProjectsIssueMining{} projects were 
+analyzed through systematic mining of \github{} issues and pull requests 
+(both methods described in Section~\ref{sec:methods}). These two subsets 
+are non-overlapping, ensuring independent observations across detection 
+methods. The remaining \NumProjectsApplication{} projects constitute an 
+\emph{application set}, used to validate our findings by submitting pull 
+requests that address identified portability issues (discussed in 
+Section~\ref{sec:pr-discussion}).
 
 \begin{table}[H]
 
 \centering
-\caption{Stats on \NumProjects{} evaluated projects: no. of tests (\#Tests), size (SLOC), no. of commits (\#Sha), age in years (Age), no. of \github{} stars ($\star$).\label{tab:project-stats}}
+\caption{Stats on \NumProjectsTotal{} evaluated projects: no. of tests (\#Tests), size (SLOC), no. of commits (\#Sha), age in years (Age), no. of \github{} stars ($\star$).\label{tab:project-stats}}
 \begin{tabular}{lrrrrr}
 \hline
 Statistic & \#Tests & SLOC & \#Sha & Age & $\star$ \\
@@ -201,7 +214,7 @@ Sum & 1,169,056 & 85,019,457 & - & - & - \\
 
 
 Table~\ref{tab:project-stats} summarizes key characteristics of the
-\NumProjects{} evaluated projects.  On average, each project comprises
+\NumProjectsTotal{} evaluated projects.  On average, each project comprises
 approximately 584 tests and 42K lines of Python code (SLOC), with a
 median of 72 tests and 7.5K SLOC, indicating a distribution skewed by
 a few very large systems. Regarding repository activity, projects have
@@ -302,6 +315,8 @@ This section provides answering to the posed research questions.
 \subsection{\textbf{Answering} \RQOne{}}
 \label{rq1}
 
+\Ali{updated, please revise}
+
 % add here: statistics, tables, and plots showing the frequency and distribution of portability issues
 % for example: Table 1 (Projects analyzed, tests executed, failures observed), Figure 1 (Distribution of failures by OS)
 
@@ -316,7 +331,7 @@ This section provides answering to the posed research questions.
     \begin{tabular}{lr}
     \toprule
 %     Number of projects mined & \NumProjects{} \\
-     Number of projects selected & \NumProjectsAnalyzed{} \\
+     Number of projects selected & \NumProjectsReExecution{} \\
     \hspace{2ex} Number of projects with OS differences & \NumProjectsWithOSDiffInTests{} \\    
      Number of tests executed & \NumTestsExecuted{} \\
     \hspace{2ex} Number of test runs with OS differences & \NumTestRunsWithOSDiff{} \\
@@ -330,7 +345,7 @@ This section provides answering to the posed research questions.
     \caption{\label{tab:dataset-b}Problems detected in issues with manual inspection.}
     \begin{tabular}{lr}
       \toprule
-       Number of projects selected & \Fix{???} \\
+       Number of projects selected & \NumProjectsIssueMining{} \\
       \hspace{2ex} Number of projects with OS differences & \NumProjectsWithOSDiffInIssues{} \\      
        Number of issues mined & \NumIssuesMined{} \\
       \hspace{2ex} Number of issues analyzed & \NumIssuesAnalyzed{} \\
@@ -348,18 +363,22 @@ This section provides answering to the posed research questions.
 \subsubsection{Methods}
 \label{sec:methods}
 
-We use two complementary methods to identify portability issues: (1)
-test re-execution systematically reveals behavioral differences across
-platforms but it is inherently incomplete as tests may not cover
-important code paths; (2) issue mining includes developer's
-perspectives with discussion. We discuss them in detail.
+We use two complementary methods to identify portability issues. The 
+first method, test re-execution, systematically reveals behavioral 
+differences across platforms but is inherently incomplete as tests may 
+not cover important code paths. The second method, issue mining, 
+complements test re-execution by including developer perspectives and 
+discussions, though it is costly as it requires manual analysis of 
+discussion threads to rule out spurious cases. We discuss both methods 
+in detail below.
 
 \textbf{Cross-OS test re-execution.} For each project we run the test suite
 on multiple operating systems and record divergent outcomes. We then
 triage failures via logs and small code inspections, mapping each
-instance to a concrete category.\Mar{Is this the first time the term
-  ``category'' appears? If so, explain!!.} We execute tests on
-ephemeral virtual machines provided by GitHub-hosted
+instance to a concrete category (i.e., a classification of the root cause 
+of the portability issue, such as file handling, missing APIs, or library 
+dependencies; the full taxonomy is presented in answering \RQTwo{}). We 
+execute tests on ephemeral virtual machines provided by GitHub-hosted
 runners~\cite{github_actions_runners}. Each virtual machine is
 automatically provisioned with 4~CPUs and 16~GB of RAM. We implemented
 a single GitHub Actions workflow (YAML) that uses a matrix strategy to
@@ -372,8 +391,9 @@ uploads the JSON files as workflow artifacts for later analysis. This
 approach ensures reproducible, parallel cross-platform testing while
 GitHub manages VM provisioning and maintenance.
 
-\textbf{Issues Mining.} To complement test-based findings, we mine
-\github{} issues and pull requests. We wrote a “candidate finder”
+\textbf{Issues Mining.} To complement test-based findings, we selected
+\NumProjectsIssueMining{} projects from the learning set and mined
+\github{} issues and pull requests from them. We wrote a "candidate finder"
 combining multiple \emph{types} of keyword:  
 (a) OS/platform indicators (e.g., Windows, Linux, macOS, specific distros/architectures),  
 (b) failure/fix language (e.g., fails, error, bug, fix, workaround),  
@@ -403,30 +423,18 @@ description, comments) archived for analysis.
 
 \subsubsection{Results}
 
-This question assesses the prevalence of portability problems in
-Python projects through cross-OS test re-execution and issue mining
-(Section~\ref{sec:methods}). Recall that the first method is precise
-but incomplete as tests can fail to reach code locations with
-portability problems. The issue mining method complements the test
-re-execution method but it is costly; it requires authors to
-read discussion threads associated with issues to rule out spurious
-cases.
+We applied both methods described in Section~\ref{sec:methods} to the 
+learning set. Table~\ref{tab:dataset} reports on the prevalence of 
+portability problems in \github{} Python projects. 
+Table~\ref{tab:dataset-a} details results from test re-execution, while
+Table~\ref{tab:dataset-b} details results from issue mining. 
 
-Table~\ref{tab:dataset} reports on the prevalence of portability
-problems in \github{} Python projects. Table~\ref{tab:dataset-a}
-details the results we obtain when re-executing test cases whereas
-Table~\ref{tab:dataset-b} details the results we obtain when
-inspecting issues from projects. 
-
-Table~\ref{tab:dataset-a} shows that we re-executed test suites (see
-Section~\ref{sec:methods}) from a sample of \NumProjectsAnalyzed{}
-projects mined from \github. Of these, we found discrepant behavior in
-\PercentProjectsWithPortabilityReExecution{} of the projects, \ie{}, projects where test suites had at least one test
-manifesting OS differences. The \NumProjectsAnalyzed{} projects whose
-test suites were executed included a total of \NumTestsExecuted{} test
-cases. Of those, we found discrepant outcomes in
-\NumTestRunsWithOSDiff{} cases, which corresponds to
-\PercentDiscrepantTests{}. 
+Table~\ref{tab:dataset-a} shows that of the \NumProjectsReExecution{} projects 
+analyzed, we found discrepant behavior in \NumProjectsWithOSDiffInTests{} 
+(\PercentProjectsWithPortabilityReExecution{}) of them, \ie{}, projects where 
+test suites had at least one test manifesting OS differences. These projects 
+included a total of \NumTestsExecuted{} test cases, of which \NumTestRunsWithOSDiff{} 
+showed discrepant outcomes, corresponding to \PercentDiscrepantTests{}. 
 %% , due to the 
 %% resource-intensive nature of cross-platform test execution across
 %% three operating systems.
@@ -443,16 +451,15 @@ cases. Of those, we found discrepant outcomes in
 %% discussion threads of the issues to confirm whether they indicate real
 %% portability issues.
 
-Table~\ref{tab:dataset-b} shows the results from mining and analyzing
-\github{} issues. We mined a total of \NumIssuesMined{} candidate
-issues using keyword search (see Section~\ref{sec:methods}). From this
-set, we randomly sampled \NumIssuesAnalyzed{} of the most recent
-issues for manual inspection. Through careful manual analysis, we
-confirmed that \NumIssuesRelated{} of these were genuine portability
-issues, spanning \NumProjectsWithOSDiffInIssues{} distinct
-projects. Importantly, these projects have no overlap with those
-analyzed in Table~\ref{tab:dataset-a}. So, we found \TotalProjectsWithPortabilityIssues{} Python projects with
-portability issues.
+Table~\ref{tab:dataset-b} shows the results from issue mining. 
+From the \NumProjectsIssueMining{} projects selected (see Section~\ref{sec:methods}), 
+we mined a total of \NumIssuesMined{} candidate issues. From this set, we randomly 
+sampled \NumIssuesAnalyzed{} of the most recent issues for manual inspection. 
+Through careful manual analysis, we confirmed that \NumIssuesRelated{} of 
+these were genuine portability issues, spanning \NumProjectsWithOSDiffInIssues{} 
+distinct projects. Combined with the test re-execution results, we identified
+\TotalProjectsWithPortabilityIssues{} Python projects with portability issues 
+across both methods.
 
 %% \Ali{Explained where 95 distinct projects comes from.}
 %% \Ali{Moved methodology discussion to RQ2 and added Table 4 showing data sources for taxonomy components.}
@@ -474,7 +481,7 @@ portability issues.
 \textbf{RQ\textsubscript{1} (prevalence)}: We find that portability
 issues are relatively prevalent. For example,
 \PercentProjectsWithPortabilityReExecution{} of the
-\NumProjectsAnalyzed{} projects we analyzed with cross-OS test
+\NumProjectsReExecution{} projects we analyzed with cross-OS test
 re-execution have portability problems.  Additionally, our issue
 mining approach shows that \NumProjectsWithOSDiffInIssues{} of the
 projects we analyzed have genuine portability issues.

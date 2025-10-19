@@ -263,39 +263,44 @@ and fixing portability issues?}
 % NUMBERS OF THE PAPER
 
 % ========================================
-% Test Re-execution Approach (RQ1 table a)
+% DATASET PARTITIONING
 % ========================================
-\newcommand{\NumProjects}{2,042}
-\newcommand{\NumProjectsAnalyzed}{500}
-\newcommand{\NumProjectsWithOSDiffInTests}{56}
-\newcommand{\NumTestsExecuted}{440,728}
-\newcommand{\NumTestRunsWithOSDiff}{9,508}
-\newcommand{\PercentDiscrepantTests}{2.16\%}
-\newcommand{\NumCodeUsedLLM}{90}
-\newcommand{\NumCodeNonPortableByLLM}{30}
-\newcommand{\NumCodePortableIssue}{30}
-\newcommand{\NumCodePortableManual}{30}
-
-
-
-% Calculated percentage: projects with portability issues from test re-execution
-\usepackage{xfp}
-\newcommand{\PercentProjectsWithPortabilityReExecution}{%
-  \fpeval{round(56/500*100, 1)}\%}
+\newcommand{\NumProjectsTotal}{2{,}042}              % Total projects sampled from GitHub
+\newcommand{\NumProjectsLearning}{900}                % Projects in learning set (for categorization)
+\newcommand{\NumProjectsReExecution}{500}             % Projects analyzed via cross-OS test re-execution
+\newcommand{\NumProjectsIssueMining}{400}             % Projects analyzed via GitHub issue mining
+\newcommand{\NumProjectsApplication}{1{,}142}         % Projects in application set (for PR validation)
 
 % ========================================
-% Issue Mining Approach (RQ1 - Table b)
+% RQ1: PREVALENCE - Test Re-execution Approach
 % ========================================
-\newcommand{\NumProjectsWithOSDiffInIssues}{95}
-\newcommand{\NumIssuesMined}{2,617}
-\newcommand{\NumIssuesAnalyzed}{240}
-\newcommand{\NumIssuesRelated}{102}
-
-% Total projects with portability issues (from both test re-execution and issue mining)
-\newcommand{\TotalProjectsWithPortabilityIssues}{151}
+\newcommand{\NumProjectsWithOSDiffInTests}{56}        % Projects with at least one test showing OS differences
+\newcommand{\NumTestsExecuted}{440,728}               % Total number of test cases executed across all OSes
+\newcommand{\NumTestRunsWithOSDiff}{9,508}            % Test runs showing divergent outcomes across OSes
+\newcommand{\PercentDiscrepantTests}{2.16\%}          % Percentage of tests with OS differences
+\newcommand{\PercentProjectsWithPortabilityReExecution}{11.2\%}  % Percentage of projects with portability issues
 
 % ========================================
-% Pull Request Statistics (RQ4)
+% RQ1: PREVALENCE - Issue Mining Approach
+% ========================================
+\newcommand{\NumIssuesMined}{2,617}                   % Total GitHub issues mined using keyword search
+\newcommand{\NumIssuesAnalyzed}{240}                  % Issues manually analyzed for relevance
+\newcommand{\NumIssuesRelated}{102}                   % Issues confirmed as genuine portability problems
+\newcommand{\NumProjectsWithOSDiffInIssues}{95}       % Projects with confirmed portability issues from mining
+
+% Combined results from both approaches
+\newcommand{\TotalProjectsWithPortabilityIssues}{151} % Total unique projects with portability issues (56 + 95)
+
+% ========================================
+% RQ3: LLM EVALUATION - Detection and Repair
+% ========================================
+\newcommand{\NumCodeUsedLLM}{90}                      % Total code snippets used for LLM evaluation
+\newcommand{\NumCodeNonPortableByLLM}{30}             % Non-portable snippets with OS-specific issues
+\newcommand{\NumCodePortableIssue}{30}                % Portable snippets (fixed versions from issues)
+\newcommand{\NumCodePortableManual}{30}               % Portable snippets (manually categorized as unrelated)
+
+% ========================================
+% RQ4: PULL REQUEST STATISTICS
 % ========================================
 \newcommand{\TotalPROpened}{33}
 \newcommand{\TotalPRAccepted}{16}
