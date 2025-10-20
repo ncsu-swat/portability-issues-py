@@ -323,8 +323,7 @@ This section provides answering to the posed research questions.
 
 \begin{table}[t!]
   \centering
-  \caption{\label{tab:dataset}Prevalence of portability
-    problems.\Mar{Complete and check if this is consistent with text.}}
+  \caption{\label{tab:dataset}Prevalence of portability problems.}
   \vspace{-1ex}
   \begin{subtable}[t]{\linewidth}
     \centering
@@ -523,20 +522,22 @@ with similar underlying causes. This process was conducted by the
 authors, with regular discussions to resolve ambiguities and refine
 category definitions.
 
-The resulting taxonomy of root causes consists of \textbf{7}
-high-level categories (e.g., FILE, PROC, LIB) with \textbf{24}
+The resulting taxonomy of root causes consists of \textbf{\NumRootCauseCategories{}}
+high-level categories (e.g., FILE, PROC, LIB) with \textbf{\NumRootCauseSubcategories{}}
 distinct sub-categories. For each instance, we documented observable
 symptoms (error messages, behaviors) and examined corresponding fixes
 in merged pull requests or commits to identify common repair
-patterns. Table~\ref{tab:data_sources} summarizes the primary data
-sources used to identify each component of our taxonomy. Root-cause
+patterns. We identified \textbf{\NumSymptomSignatures{}} unique symptom signatures and 
+\textbf{\NumContextSymptoms{}} context-dependent symptoms across the \NumRootCauseSubcategories{} 
+sub-categories, and \textbf{\NumFixPatterns{}} general fix patterns that collectively 
+address all observed portability problems. Table~\ref{tab:data_sources} summarizes the 
+primary data sources used to identify each component of our taxonomy. Root-cause
 categories were derived from patterns observed across both test
 failures and issue discussions.  Symptom signatures were primarily
 extracted from test re-execution, where concrete error messages and
 stack traces provide direct evidence of portability problems. Fix
 patterns were identified by examining code changes and discussions in
-both test-related commits and issue-related pull requests.\Mar{Can you
-  give summary numbers for symptoms and fixes too?}
+both test-related commits and issue-related pull requests.
 
 \begin{table}[h]
 \centering
@@ -676,6 +677,12 @@ and the curses module is unavailable on Windows (not included in standard Python
   Linux, and timezone databases may not be installed by default.
 \end{packed_enumerate}
 
+\begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
+\textbf{RQ\textsubscript{2.1} (root causes)}: We identified \NumRootCauseCategories{} root-cause categories
+ with \NumRootCauseSubcategories{} sub-categories. File and Directories (FILE) is most prevalent
+  (62 projects), followed by Process and Signals (25 projects) and Library Dependencies (24 projects).
+\end{tcolorbox}
+
 \begin{figure}[!ht]
 \centering
 % Defensive Checks
@@ -724,9 +731,20 @@ def test_special_case():
 
 \subsubsection{\textbf{Answering \RQTwoTwo{}}}
 
+\Ali{Updated with new content, please review this section.}
+\noindent Understanding how portability issues manifest during execution 
+is essential for rapid diagnosis and triage. In this section, we examine 
+the observable symptoms of portability problems—the concrete error messages, 
+exceptions, and behavioral differences that appear in test logs, CI output, 
+and runtime failures. Table~\ref{tab:symptoms} maps each portability 
+sub-category to its characteristic symptom signature (when uniquely identifiable) 
+and corresponding fix pattern.
+
 \noindent\begin{table*}[t]
     \centering
     \caption{Symptom signatures and general fix patterns for portability sub-categories.
+     Symptom cells are color-coded: \colorbox{UniqueSymptomColor}{unique signatures} enable immediate diagnosis;
+     \colorbox{ContextSymptomColor}{context-dependent} require code inspection.
      Fix patterns are color-coded to show reuse across 
      categories: \DefensivePattern{}, \PortablePattern{}, \NormPattern{}, \EnvPattern{}.}
     \label{tab:symptoms}
@@ -743,82 +761,152 @@ def test_special_case():
     \textbf{Root-cause category} & \textbf{Sub-categories} & \textbf{Symptom (verbatim error / message)} & \textbf{General Fix Pattern} \\
     \midrule
     \textbf{FILE} &
-    Path separators & No specific signature & \NormPattern{} — normalize paths with pathlib \\
-    & Line endings & \texttt{AssertionError: '\textbackslash r\textbackslash n' != '\textbackslash n'} & \NormPattern{} — normalize line endings \\
-    & Case sensitivity & \texttt{FileNotFoundError: [Errno 2] No such file or directory: 'Readme.md'} & \NormPattern{} — case-normalize filenames \\
-    & File locking & \texttt{PermissionError: [Errno 13] Permission denied: 'filename'} & \EnvPattern{} — use context managers, explicit close \\
-    & Encoding & \texttt{UnicodeDecodeError: 'utf-8' codec can't decode byte 0x\{XX\} in position N: invalid start byte} & \NormPattern{} — set explicit UTF-8 encoding \\
-    & Filesystem block size & No specific signature & \NormPattern{} — normalize computations avoid assumptions \\
+    Path separators & \ContextSymptom{Context-dependent: hardcoded paths fail silently or with generic file errors} & \NormPattern{} — normalize paths with pathlib \\
+    & Line endings & \UniqueSymptom{\texttt{AssertionError: '\textbackslash r\textbackslash n' != '\textbackslash n'}} & \NormPattern{} — normalize line endings \\
+    & Case sensitivity & \ContextSymptom{Context-dependent: file exists but name differs only in case} & \NormPattern{} — case-normalize filenames \\
+    & File locking & \UniqueSymptom{\texttt{PermissionError: [WinError 32] The process cannot access the file because it is being used by another process} (Windows)} & \EnvPattern{} — use context managers, explicit close \\
+    & Encoding & \UniqueSymptom{\texttt{UnicodeDecodeError: 'charmap' codec can't decode byte 0x\{XX\} in position N}} & \NormPattern{} — set explicit UTF-8 encoding \\
+    & Filesystem block size & \ContextSymptom{Context-dependent: tests assert exact byte counts that vary by OS} & \NormPattern{} — normalize computations avoid assumptions \\
     \midrule
     \textbf{PROC} &
-    Shell command execution & No specific signature & \PortablePattern{} — use subprocess.run shell=False \\
-    & Missing signals & \texttt{AttributeError: module 'signal' has no attribute 'SIGHUP'} & \DefensivePattern{} — guard signals per platform \\
-    & Address already in use & \texttt{OSError: [Errno 98] Address already in use} (Linux) \; / \; \texttt{OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted} (Windows) & \DefensivePattern{} + \EnvPattern{} — catch OS-specific errors, use port 0 \\
+    Shell command execution & \ContextSymptom{Context-dependent: command syntax or exit codes differ across shells} & \PortablePattern{} — use subprocess.run shell=False \\
+    & Missing signals & \UniqueSymptom{\texttt{AttributeError: module 'signal' has no attribute 'SIGHUP'} (or SIGKILL, SIGTERM variants)} & \DefensivePattern{} — guard signals per platform \\
+    & Address already in use & \UniqueSymptom{\texttt{OSError: [Errno 98] Address already in use} (Linux) / \texttt{[WinError 10048]} (Windows)} & \DefensivePattern{} + \EnvPattern{} — catch OS-specific errors, use port 0 \\
     \midrule
     \textbf{LIB} &
-    Platform-specific libraries (e.g. \CodeIn{fcntl}) & \texttt{ModuleNotFoundError: No module named 'fcntl'} & \DefensivePattern{} — conditional import provide fallback \\
-    & Missing libraries & \texttt{ModuleNotFoundError: No module named '...'} & \DefensivePattern{} — optional import with fallback \\
-    & Dynamic library loading & \texttt{OSError: [WinError 126] The specified module could not be found} & \DefensivePattern{} — guard loading prefer pure-Python \\
-    & Binary wheel mismatch & No specific signature & \EnvPattern{} — install platform-appropriate wheel \\
+    Platform-specific libraries (e.g. \CodeIn{fcntl}) & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named 'fcntl'} (Windows)} & \DefensivePattern{} — conditional import provide fallback \\
+    & Missing libraries & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named '\{library\_name\}'}} & \DefensivePattern{} — optional import with fallback \\
+    & Dynamic library loading & \UniqueSymptom{\texttt{OSError: [WinError 126] The specified module could not be found} (Windows)} & \DefensivePattern{} — guard loading prefer pure-Python \\
+    & Binary wheel mismatch & \ContextSymptom{Context-dependent: installation succeeds but runtime fails with ABI errors} & \EnvPattern{} — install platform-appropriate wheel \\
     \midrule
     \textbf{API} &
     Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() &
-    \texttt{AttributeError: module 'os' has no attribute 'uname'} (example) & \PortablePattern{} + \DefensivePattern{} — use platform.uname, hasattr guards \\
-    & Modules: readline, resource & \texttt{ModuleNotFoundError: No module named 'readline'} (example) & \DefensivePattern{} — guard import use alternatives \\
+    \UniqueSymptom{\texttt{AttributeError: module 'os' has no attribute '\{method\}'} (Windows)} & \PortablePattern{} + \DefensivePattern{} — use platform.uname, hasattr guards \\
+    & Modules: readline, resource & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named '\{module\}'} (Windows)} & \DefensivePattern{} — guard import use alternatives \\
     \midrule
     \textbf{ENV} &
-    No display in github CI (linux) & \texttt{TclError: no display name and no \$DISPLAY environment variable} & \EnvPattern{} — skip GUI tests in CI \\
-    & GUI differences & No specific signature & \EnvPattern{} — skip or mock GUI features \\
-    & Missing curses & \texttt{ModuleNotFoundError: No module named '\_curses'} & \DefensivePattern{} — conditional import with stub fallback \\
-    & Terminal capabilities & No specific signature & \EnvPattern{} — detect capabilities degrade gracefully \\
+    No display in github CI (linux) & \UniqueSymptom{\texttt{TclError: no display name and no \$DISPLAY environment variable}} & \EnvPattern{} — skip GUI tests in CI \\
+    & GUI differences & \ContextSymptom{Context-dependent: widgets render or behave differently} & \EnvPattern{} — skip or mock GUI features \\
+    & Missing curses & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named '\_curses'} (Windows)} & \DefensivePattern{} — conditional import with stub fallback \\
+    & Terminal capabilities & \ContextSymptom{Context-dependent: color codes appear as text or formatting ignored} & \EnvPattern{} — detect capabilities degrade gracefully \\
     \midrule
     \textbf{PERM} &
-    Permission & \texttt{PermissionError: [Errno 13] Permission denied: '...'} & \DefensivePattern{} + \EnvPattern{} — check permissions, skip restricted tests \\
-    & File descriptor limits & \texttt{OSError: [Errno 24] Too many open files} & \EnvPattern{} — close files promptly, raise limits in CI \\
-    & Symlink privileges & \texttt{OSError: symbolic link privilege not held: 'src' -> 'dst'} & \EnvPattern{} — detect support and use copies \\
+    Permission & \ContextSymptom{Context-dependent: depends on operation (chmod, file access, etc.)} & \DefensivePattern{} + \EnvPattern{} — check permissions, skip restricted tests \\
+    & File descriptor limits & \UniqueSymptom{\texttt{OSError: [Errno 24] Too many open files}} & \EnvPattern{} — close files promptly, raise limits in CI \\
+    & Symlink privileges & \UniqueSymptom{\texttt{OSError: [WinError 1314] A required privilege is not held by the client} (Windows)} & \EnvPattern{} — detect support and use copies \\
     \midrule
     \textbf{SYS} &
-    /proc filesystem & \texttt{FileNotFoundError: [Errno 2] No such file or directory: '/proc/...'} & \PortablePattern{} — use psutil or platform APIs \\
-    & Timezone database & \texttt{zoneinfo.\_common.ZoneInfoNotFoundError: 'No time zone found with key ...'} & \NormPattern{} — install tzdata or fallback \\
+    /proc filesystem & \ContextSymptom{Context-dependent: /proc paths fail on macOS/Windows with generic FileNotFoundError} & \PortablePattern{} — use psutil or platform APIs \\
+    & Timezone database & \UniqueSymptom{\texttt{zoneinfo.ZoneInfoNotFoundError: 'No time zone found with key \{...\}'}} & \NormPattern{} — install tzdata or fallback \\
     \bottomrule
     \end{tabularx}
     \end{table*}   
 
-\noindent Table~\ref{tab:symptoms} presents symptom signatures mapped to portability sub-categories.
- Each row represents a specific sub-category within a broader root-cause category (\eg{}, FILE).
-  The columns show: (i) the root-cause category, (ii) the specific sub-category, (iii) verbatim error
-   messages or symptoms when available, and (iv) the recommended general fix pattern. 
+\MyPara{Symptom categories}~We categorize symptoms into two types based on 
+their diagnostic value (color-coded in Table~\ref{tab:symptoms}): 
+\textbf{(i) Unique signatures} are error messages 
+that unambiguously identify a specific portability sub-category, enabling 
+immediate diagnosis from logs alone; and \textbf{(ii) Context-dependent symptoms} 
+are manifestations that require additional code inspection or contextual understanding 
+to distinguish from other failure modes.
 
-We find that not every sub-category produces a unique symptom signature; where concrete error messages
- exist, they reliably identify the underlying cause in test/CI logs
-  (e.g., \texttt{AttributeError: module ``os'' has no attribute ``uname''},
-   \texttt{UnicodeDecodeError}). These signatures enable rapid triage
-    and help developers quickly recognize portability issues in practice.
+\MyPara{Unique signatures}~The majority of sub-categories (15 out of 24, 62.5\%) 
+produce unique, actionable error signatures. These include missing API methods 
+(\eg{}, \texttt{AttributeError: module 'os' has no attribute 'geteuid'}), 
+unavailable modules (\eg{}, \texttt{ModuleNotFoundError: No module named 'fcntl'}), 
+encoding errors (\texttt{UnicodeDecodeError: 'charmap' codec...}), 
+specialized exceptions like \texttt{TclError} for display issues or 
+\texttt{ZoneInfoNotFoundError} for timezone problems, and platform-specific errors 
+like \texttt{OSError: [Errno 24] Too many open files} for file descriptor limits.
+These signatures facilitate more direct diagnosis from logs, reducing the need for 
+extensive code inspection required by context-dependent symptoms.
+
+\MyPara{Context-dependent symptoms}~The remaining 9 sub-categories (37.5\%) 
+do not produce unique error signatures, requiring developers to inspect the code 
+context to diagnose the portability issue. These include cases where the same error 
+can arise from multiple root causes, where failures are silent or produce generic errors, 
+or where the symptom manifests as behavioral differences rather than exceptions. 
+For example, path separator issues often manifest as generic \texttt{FileNotFoundError} 
+or silent failures where hardcoded paths like \texttt{"/tmp/file.txt"} work on Unix but 
+fail on Windows. Similarly, case sensitivity issues may produce \texttt{FileNotFoundError} 
+indistinguishable from actual missing files unless one examines the filesystem. 
+The /proc filesystem is another case where generic \texttt{FileNotFoundError} occurs on 
+macOS/Windows, requiring code inspection to determine if the issue stems from missing /proc 
+paths rather than other file access problems. Shell command execution issues rarely throw 
+exceptions but instead manifest as incorrect exit codes or output differences when commands 
+are interpreted by different shells (\texttt{cmd.exe} vs. \texttt{bash}). GUI differences 
+show as visual rendering variations or behavioral inconsistencies rather than explicit errors, 
+and terminal capability mismatches may cause ANSI color codes to appear as literal text. 
+Permission issues vary depending on the specific operation (chmod, file access, etc.), 
+filesystem block size problems appear as test assertions on exact byte counts that differ 
+across platforms, and binary wheel mismatches often succeed during installation but fail at 
+runtime with ABI compatibility errors that vary by architecture.
+
+\MyPara{Implications for diagnosis}~Our findings reveal that while unique signatures 
+enable rapid automated triage for 62.5\% of portability issues, the remaining 37.5\% require 
+human judgment and code inspection. This suggests that fully automated portability 
+detection tools must go beyond simple log parsing and incorporate contextual analysis, 
+such as static code analysis to detect hardcoded paths, shell command patterns, or 
+platform-specific API usage. The presence of context-dependent symptoms also highlights 
+the importance of comprehensive cross-platform testing, as these issues cannot be 
+reliably predicted through static analysis alone.
+
+\begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
+\textbf{RQ\textsubscript{2.2} (symptoms)}: Of 24 sub-categories, 15 (62.5\%) produce unique error signatures enabling
+ immediate diagnosis, while 9 (37.5\%) exhibit context-dependent symptoms requiring code inspection to distinguish
+  from other failure modes.
+\end{tcolorbox}
  
 \subsubsection{\textbf{Answering \RQTwoThree{}}}
 
+\Ali{Updated, please review}
+
 \noindent
 
-Figure~\ref{fig:patterns} illustrates representative examples of fix patterns
- for portability issues, drawn from real-world projects. Each subfigure demonstrates
-  a different repair strategy applied to actual code. The figure shows before 
-  (lines prefixed with \texttt{-}) and after (lines prefixed with \texttt{+}) 
-  versions of code snippets. The four patterns demonstrated are: (a) defensive
-   checks using try/except for optional imports, (b) portable APIs replacing
-    OS-specific constructs with cross-platform abstractions, (c) normalization using
-     path separators correctly, and (d) environment handling using platform-aware test skipping.
+\MyPara{Fix patterns}~By examining source code, test logs, issue discussions, and 
+merged pull requests from both detection approaches, we identified four general fix 
+patterns that address portability problems across all 24 sub-categories (mapped in 
+Table~\ref{tab:symptoms}). Figure~\ref{fig:patterns} illustrates these patterns with 
+concrete examples:
 
-Across projects, portability issues are resolved through four recurring strategies:
- \textbf{(i) Defensive checks} add guards, fallbacks, \texttt{try/except}, or conditional 
- imports to handle missing APIs or modules gracefully (Listing~\ref{lst:defensive});
-  \textbf{(ii) Portable APIs} replace OS-specific constructs with cross-platform abstractions
-   like \texttt{pathlib}, \texttt{platform}, or \texttt{psutil} (Listing~\ref{lst:portable});
-    \textbf{(iii) Normalization} standardizes encodings, line endings, paths, or filenames to
-     prevent spurious differences (Listing~\ref{lst:normalization}); and \textbf{(iv) Environment handling} adapts
-      code and tests to runtime conditions, such as skipping GUI tests in headless CI or
-       managing platform-specific permissions (Listing~\ref{lst:environment}). 
+\textbf{(i) Defensive checks} add guards, fallbacks, or conditional imports to handle 
+missing APIs or modules gracefully. Listing~\ref{lst:defensive} demonstrates this 
+pattern by wrapping the \texttt{readline} import (unavailable on Windows) in a 
+\texttt{try/except} block with a fallback value, allowing the code to continue 
+execution rather than crash. This pattern applies when functionality may be unavailable 
+on certain platforms.
 
-Table~\ref{tab:symptoms} (in RQ2.2) maps each root-cause sub-category to its recommended fix pattern, showing how these four general strategies apply across the taxonomy. Figure~\ref{fig:fix_pattern_distribution} shows the distribution of these patterns, revealing that Defensive checks and Environment handling are the most common strategies (together accounting for $\sim$67\% of fixes), while Portable APIs is used less frequently but targets specific, well-defined issues. This mapping provides developers with actionable guidance: given a specific symptom or error message, the table indicates which fix pattern to apply.
+\textbf{(ii) Environment handling} adapts code and tests to runtime conditions by 
+detecting platform capabilities and adjusting behavior. Listing~\ref{lst:environment} 
+shows this pattern using pytest's \texttt{skipif} decorator to conditionally skip 
+tests on macOS. This allows test suites to adapt to platform-specific capabilities 
+without maintaining separate test files for each operating system.
+
+\textbf{(iii) Normalization} standardizes encodings, line endings, paths, or filenames 
+to prevent spurious differences across platforms. Listing~\ref{lst:normalization} 
+illustrates this by constructing file paths using \texttt{os.path.sep} instead of 
+hardcoded separators, ensuring correct behavior on both Unix (forward slash) and 
+Windows (backslash) systems.
+
+\textbf{(iv) Portable APIs} replace OS-specific constructs with cross-platform 
+abstractions. Listing~\ref{lst:portable} demonstrates replacing a hardcoded Unix 
+path \texttt{"/tmp/data.txt"} with portable abstractions (\texttt{tempfile.gettempdir()} 
+and \texttt{pathlib.Path}), ensuring the code works correctly regardless of the 
+operating system's directory structure.
+
+\MyPara{Pattern distribution}~Figure~\ref{fig:fix_pattern_distribution} shows how 
+these patterns distribute across the 24 portability sub-categories. Defensive checks 
+and Environment handling are the most prevalent strategies, each addressing 9 
+sub-categories (33.3\%), together accounting for two-thirds of all portability fixes. 
+Normalization applies to 6 sub-categories (22.2\%), primarily addressing file and 
+path-related issues. Portable APIs, while used least frequently (3 sub-categories, 
+11.1\%), targets specific, well-defined problems where standard cross-platform 
+abstractions exist. This distribution reflects the nature of portability issues: 
+most problems arise from platform-specific features or environmental differences 
+requiring conditional handling, rather than fundamental API incompatibilities. 
+The examples demonstrate that portability fixes are typically small, localized 
+changes rather than major refactoring efforts, making them practical for developers 
+to adopt.
 
 \begin{figure}[ht]
 \centering
@@ -839,7 +927,12 @@ Table~\ref{tab:symptoms} (in RQ2.2) maps each root-cause sub-category to its rec
 \end{figure}
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
-\textbf{RQ\textsubscript{2} (characteristics)}: Portability issues cluster around 7 root-cause categories, with File and Directories (FILE) being the most prevalent (62 projects). Most issues produce distinctive error signatures that enable quick diagnosis. Four general fix patterns—defensive checks, portable APIs, normalization, and environment handling—address the majority of observed portability problems. These patterns are simple, teachable, and applicable across different categories.
+\textbf{RQ\textsubscript{2.3} (fixes)}: We identified \NumFixPatterns{} general fix 
+patterns that collectively address all \NumRootCauseSubcategories{} portability 
+sub-categories: Defensive checks and Environment handling are most prevalent (each 
+33.3\%), followed by Normalization (22.2\%) and Portable APIs (11.1\%). These patterns 
+represent recurring, localized code modifications that provide systematic guidance 
+for resolving portability issues across diverse contexts.
 \end{tcolorbox}
 
 \subsection{\textbf{Answering} \RQThree{}}

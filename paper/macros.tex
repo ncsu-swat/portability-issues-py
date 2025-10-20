@@ -14,7 +14,7 @@
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable,listings}
 \usepackage{listings}
-\usepackage{xcolor}
+\usepackage[table]{xcolor}  % table option loads colortbl for \cellcolor
 \usepackage{array}
 % Listings styles
 \lstdefinestyle{code}{
@@ -52,8 +52,7 @@
 
 
 %% \usepackage{soul}
-% xcolor is loaded by the class with the 'table' option
-\usepackage{xcolor}
+% xcolor is loaded by the class with the 'table' option (now explicitly loaded above)
 \usepackage{tabularx}
 %% %% Custom packages end here
 
@@ -248,7 +247,7 @@ in Python Projects}
 
 \newcommand{\RQTwo}{\EQ{2}:~What are the causes, symptoms, and fixes of portability problems?}
 \newcommand{\RQTwoOne}{\EQ{2.1}: What are the root causes of portability problems in Python?}
-\newcommand{\RQTwoTwo}{\EQ{2.2}: What are the symptoms of portability problems in Python?}
+\newcommand{\RQTwoTwo}{\EQ{2.2}: What are the observable symptoms of portability issues?}
 \newcommand{\RQTwoThree}{\EQ{2.3}: What are fix patterns for addressing portability issues?}
 
 \newcommand{\RQThree}{\EQ{3}: How good are existing tools at detecting
@@ -292,6 +291,15 @@ and fixing portability issues?}
 
 % Combined results from both approaches
 \newcommand{\TotalProjectsWithPortabilityIssues}{151} % Total unique projects with portability issues (56 + 95)
+
+% ========================================
+% RQ2: TAXONOMY STATISTICS
+% ========================================
+\newcommand{\NumRootCauseCategories}{7}               % Number of high-level root-cause categories
+\newcommand{\NumRootCauseSubcategories}{24}           % Number of distinct sub-categories
+\newcommand{\NumSymptomSignatures}{15}                % Number of unique symptom signatures (not context-dependent)
+\newcommand{\NumContextSymptoms}{9}                   % Number of context-dependent symptoms
+\newcommand{\NumFixPatterns}{4}                       % Number of general fix patterns
 
 % ========================================
 % RQ3: LLM EVALUATION - Detection and Repair
@@ -499,8 +507,16 @@ and fixing portability issues?}
 \definecolor{NormColor}{RGB}{205,92,92}            % red
 \definecolor{EnvColor}{RGB}{138,43,226}            % violet
 
+% Define colors for symptom types (used only in Table~\ref{tab:symptoms})
+\definecolor{UniqueSymptomColor}{RGB}{200,230,255}     % light blue background
+\definecolor{ContextSymptomColor}{RGB}{255,250,205}    % light yellow background
+
 % Commands for colored fix patterns (used only in Table~\ref{tab:symptoms})
 \newcommand{\DefensivePattern}{\textcolor{DefensiveColor}{\textbf{Defensive checks}}}
 \newcommand{\PortablePattern}{\textcolor{PortableColor}{\textbf{Portable APIs}}}
 \newcommand{\NormPattern}{\textcolor{NormColor}{\textbf{Normalization}}}
 \newcommand{\EnvPattern}{\textcolor{EnvColor}{\textbf{Environment handling}}}
+
+% Commands for symptom cell backgrounds
+\newcommand{\UniqueSymptom}[1]{\cellcolor{UniqueSymptomColor}#1}
+\newcommand{\ContextSymptom}[1]{\cellcolor{ContextSymptomColor}#1}
