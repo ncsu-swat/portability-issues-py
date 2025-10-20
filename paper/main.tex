@@ -1204,13 +1204,40 @@ This case demonstrates how path operations that work seamlessly on Unix-like sys
 \subsubsection{The frequenz-sdk-python case study}
 % https://github.com/frequenz-floss/frequenz-sdk-python/pull/1261
 
-We encountered a different type of response when addressing a dependency portability issue in the frequenz-sdk-python project~\cite{frequenz_sdk_python}. Frequenz-sdk-python is an energy management SDK for Python applications. The problem we identified falls into the \textbf{System Information (SYS)} category, specifically the ``Timezone database'' sub-category.
+We encountered a different type of response when addressing a dependency
+ portability issue in the frequenz-sdk-python project~\cite{frequenz_sdk_python}.
+  Frequenz-sdk-python is an energy management SDK for Python applications.
+   The problem we identified falls into the \textbf{System Information (SYS)} category
+    from Table~\ref{tab:categories}, specifically the ``Timezone database'' sub-category.
 
-The issue occurred in the test suite where tests relied on the \CodeIn{zoneinfo} and \CodeIn{tzdata} modules for timezone operations. These modules are not consistently available across all platforms—while \CodeIn{zoneinfo} is included in Python 3.9+ on most systems, the timezone data (\CodeIn{tzdata}) may not be installed by default on some Windows configurations. This caused test failures when the required timezone information was unavailable.
+The issue occurred in the test suite where tests relied on the \CodeIn{zoneinfo}
+ and \CodeIn{tzdata} modules for timezone operations. These modules are not
+  consistently available across all platforms—while \CodeIn{zoneinfo} is included
+   in Python 3.9+ on most systems, the timezone data (\CodeIn{tzdata}) may not be
+    installed by default on some Windows configurations. This caused test failures
+     when the required timezone information was unavailable, manifesting as
+      \texttt{zoneinfo.\_common.ZoneInfoNotFoundError} (see Table~\ref{tab:symptoms}).
 
-Our initial proposed solution involved conditional installation of the \CodeIn{tzdata} dependency specifically for Windows environments, following a \textbf{Defensive checks} approach by detecting the platform and installing the missing dependency when needed. However, during the discussion with the project maintainer, a different perspective emerged. The maintainer argued that rather than adding platform-specific complexity to handle the dependency, the better long-term solution was to remove the reliance on these timezone-specific modules altogether. This approach follows a \textbf{Simplification} strategy—instead of accommodating platform differences, the codebase was simplified to avoid the problematic dependency entirely. As a result, the PR was reduced to removing the timezone-dependent tests and related functionality.
+Our proposed solution applied the \textbf{Defensive checks} pattern from 
+Table~\ref{tab:symptoms}: conditionally installing the \CodeIn{tzdata}
+dependency specifically for Windows environments. This approach would 
+detect the platform and provide the missing dependency as a fallback, 
+consistent with how other library dependency issues are resolved in our taxonomy.
 
-This case illustrates an important aspect of how development communities approach portability issues: sometimes maintainers prefer architectural simplification over platform-specific workarounds, prioritizing code maintainability and reducing complexity rather than supporting edge cases across all possible platform configurations.
+However, during the PR discussion, the maintainer took a different perspective.
+ Rather than adding platform-specific complexity to accommodate the dependency,
+  they chose to remove the timezone-dependent tests altogether—eliminating the 
+  portability issue by removing the feature that caused it. While this falls 
+  outside our documented fix patterns, it represents a pragmatic trade-off: 
+  prioritizing long-term maintainability and code simplicity over comprehensive
+   cross-platform test coverage.
+
+This case illustrates that while our taxonomy captures common repair strategies,
+ maintainers may choose architectural simplification when the cost of maintaining
+  platform-specific code outweighs the value of the affected functionality. The fact
+   that this approach was chosen does not invalidate our fix patterns—it simply
+    shows that project-specific priorities can lead to solutions beyond tactical
+     code repairs.
 
 % Finally, in another project, the response was shaped less by technical considerations and more by the project's state of maintenance. The maintainer acknowledged the validity of the patch but declined to merge it, noting: \emph{``I do somewhat view that project as archived and inactive... My concern about merging is that an updated last commit date would make the project seem more active than it really is.''} This case illustrates how project activity levels and community sustainability strongly influence whether portability improvements are accepted, even if the technical changes are sound.
 
