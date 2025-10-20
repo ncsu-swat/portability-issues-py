@@ -171,8 +171,7 @@ research questions we posed (\ref{sec:questions}).
 \subsection{Projects}
 \label{sec:projects}
 
-\Ali{updated, please revise}
-
+\noindent
 \textbf{Dataset.} We sampled \NumProjectsTotal{} Python repositories from
 \github. We selected projects using \github{}'s REST API, focusing on
 repositories primarily implemented in Python that show evidence of
@@ -188,13 +187,13 @@ for identifying and categorizing portability issues through detailed
 analysis. This learning set was further divided based on the detection
 method employed: \NumProjectsReExecution{} projects were analyzed through
 cross-OS test re-execution, while \NumProjectsIssueMining{} projects were 
-analyzed through systematic mining of \github{} issues and pull requests 
-(both methods described in Section~\ref{sec:methods}). These two subsets 
+analyzed through systematic mining of \github{} issues and pull
+requests; Section~\ref{sec:methods} describes these methods. These two subsets 
 are non-overlapping, ensuring independent observations across detection 
 methods. The remaining \NumProjectsApplication{} projects constitute an 
 \emph{application set}, used to validate our findings by submitting pull 
-requests that address identified portability issues (discussed in 
-Section~\ref{sec:pr-discussion}).
+requests that address identified portability issues; 
+Section~\ref{sec:pr-discussion} elaborates the validation stage.
 
 \begin{table}[H]
 
@@ -316,8 +315,6 @@ This section provides answering to the posed research questions.
 \subsection{\textbf{Answering} \RQOne{}}
 \label{rq1}
 
-\Ali{updated, please revise}
-
 % add here: statistics, tables, and plots showing the frequency and distribution of portability issues
 % for example: Table 1 (Projects analyzed, tests executed, failures observed), Figure 1 (Distribution of failures by OS)
 
@@ -364,9 +361,9 @@ This section provides answering to the posed research questions.
 \label{sec:methods}
 
 We use two complementary methods to identify portability issues. The 
-first method, test re-execution, systematically reveals behavioral 
-differences across platforms but is inherently incomplete as tests may 
-not cover important code paths. The second method, issue mining, 
+first method, \emph{cross-OS test re-execution}, systematically reveals behavioral 
+differences across platforms but it is inherently incomplete as tests may 
+not cover important code paths. The second method, \emph{issue mining}, 
 complements test re-execution by including developer perspectives and 
 discussions, though it is costly as it requires manual analysis of 
 discussion threads to rule out spurious cases. We discuss both methods 
@@ -458,8 +455,8 @@ sampled \NumIssuesAnalyzed{} of the most recent issues for manual inspection.
 Through careful manual analysis, we confirmed that \NumIssuesRelated{} of 
 these were genuine portability issues, spanning \NumProjectsWithOSDiffInIssues{} 
 distinct projects. Combined with the test re-execution results, we identified
-\TotalProjectsWithPortabilityIssues{} Python projects with portability issues 
-across both methods.
+\textbf{\TotalProjectsWithPortabilityIssues{}} Python projects with portability issues 
+considering both methods.
 
 %% \Ali{Explained where 95 distinct projects comes from.}
 %% \Ali{Moved methodology discussion to RQ2 and added Table 4 showing data sources for taxonomy components.}
@@ -539,7 +536,7 @@ stack traces provide direct evidence of portability problems. Fix
 patterns were identified by examining code changes and discussions in
 both test-related commits and issue-related pull requests.
 
-\begin{table}[h]
+\begin{table}[t!]
 \centering
 \caption{Data sources for portability taxonomy components.}
 \label{tab:data_sources}
@@ -664,16 +661,16 @@ We identify seven main root-cause categories that explain why portability proble
    like readline and resource may be missing.
 
 \item \textbf{Environment and Display (ENV):} These problems (14 projects) 
-arise from runtime environment differences. Headless CI lacks display servers 
+arise from runtime environment differences. For example, headless CI lacks display servers 
 for GUI testing, window managers behave differently, terminal capabilities vary, 
 and the curses module is unavailable on Windows (not included in standard Python distributions).
 
 \item \textbf{Permissions and Limits (PERM):} These issues (7 projects) reflect OS
- differences in access control. Permission models differ (Unix chmod vs. Windows ACLs),
+ differences in access control. For example, permission models differ (Unix chmod versus Windows ACLs),
   file descriptor limits vary, and symbolic link creation requires admin privileges on Windows.
 
 \item \textbf{System Information (SYS):} This category (2 projects) includes failures
- from platform-specific system information mechanisms. The /proc filesystem exists only on
+ from platform-specific system information mechanisms. For example, the /proc filesystem exists only on
   Linux, and timezone databases may not be installed by default.
 \end{packed_enumerate}
 
@@ -733,11 +730,11 @@ def test_special_case():
 
 \Ali{Updated with new content, please review this section.}
 \noindent Understanding how portability issues manifest during execution 
-is essential for rapid diagnosis and triage. In this section, we examine 
+is essential for rapid diagnosis and triaging. In this section, we examine 
 the observable symptoms of portability problems—the concrete error messages, 
 exceptions, and behavioral differences that appear in test logs, CI output, 
 and runtime failures. Table~\ref{tab:symptoms} maps each portability 
-sub-category to its characteristic symptom signature (when uniquely identifiable) 
+sub-category to its characteristic symptom signature --when uniquely identifiable--
 and corresponding fix pattern.
 
 \noindent\begin{table*}[t]
@@ -844,10 +841,10 @@ runtime with ABI compatibility errors that vary by architecture.
 
 \MyPara{Implications for diagnosis}~Our findings reveal that while unique signatures 
 enable rapid automated triage for 62.5\% of portability issues, the remaining 37.5\% require 
-human judgment and code inspection. This suggests that fully automated portability 
+more sophisticated analysis. This suggests that fully automated portability 
 detection tools must go beyond simple log parsing and incorporate contextual analysis, 
-such as static code analysis to detect hardcoded paths, shell command patterns, or 
-platform-specific API usage. The presence of context-dependent symptoms also highlights 
+such as static code analysis to detect portability ``bugs'' (\eg{}, hardcoded paths, shell command patterns, or 
+platform-specific API usage)\Mar{please, confirm}. The presence of context-dependent symptoms also highlights 
 the importance of comprehensive cross-platform testing, as these issues cannot be 
 reliably predicted through static analysis alone.
 
@@ -859,8 +856,6 @@ reliably predicted through static analysis alone.
  
 \subsubsection{\textbf{Answering \RQTwoThree{}}}
 
-\Ali{Updated, please review}
-
 \noindent
 
 \MyPara{Fix patterns}~By examining source code, test logs, issue discussions, and 
@@ -869,44 +864,52 @@ patterns that address portability problems across all 24 sub-categories (mapped 
 Table~\ref{tab:symptoms}). Figure~\ref{fig:patterns} illustrates these patterns with 
 concrete examples:
 
-\textbf{(i) Defensive checks} add guards, fallbacks, or conditional imports to handle 
+\begin{packed_enumerate}
+\item \textbf{Defensive checks} add guards, fallbacks, or conditional imports to handle 
 missing APIs or modules gracefully. Listing~\ref{lst:defensive} demonstrates this 
 pattern by wrapping the \texttt{readline} import (unavailable on Windows) in a 
 \texttt{try/except} block with a fallback value, allowing the code to continue 
 execution rather than crash. This pattern applies when functionality may be unavailable 
 on certain platforms.
 
-\textbf{(ii) Environment handling} adapts code and tests to runtime conditions by 
+\item \textbf{Environment handling} adapts code and tests to runtime conditions by 
 detecting platform capabilities and adjusting behavior. Listing~\ref{lst:environment} 
 shows this pattern using pytest's \texttt{skipif} decorator to conditionally skip 
 tests on macOS. This allows test suites to adapt to platform-specific capabilities 
 without maintaining separate test files for each operating system.
 
-\textbf{(iii) Normalization} standardizes encodings, line endings, paths, or filenames 
+\item \textbf{Normalization} standardizes encodings, line endings, paths, or filenames 
 to prevent spurious differences across platforms. Listing~\ref{lst:normalization} 
 illustrates this by constructing file paths using \texttt{os.path.sep} instead of 
 hardcoded separators, ensuring correct behavior on both Unix (forward slash) and 
 Windows (backslash) systems.
 
-\textbf{(iv) Portable APIs} replace OS-specific constructs with cross-platform 
+\item \textbf{Portable APIs} replace OS-specific constructs with cross-platform 
 abstractions. Listing~\ref{lst:portable} demonstrates replacing a hardcoded Unix 
 path \texttt{"/tmp/data.txt"} with portable abstractions (\texttt{tempfile.gettempdir()} 
 and \texttt{pathlib.Path}), ensuring the code works correctly regardless of the 
 operating system's directory structure.
 
-\MyPara{Pattern distribution}~Figure~\ref{fig:fix_pattern_distribution} shows how 
-these patterns distribute across the 24 portability sub-categories. Defensive checks 
-and Environment handling are the most prevalent strategies, each addressing 9 
-sub-categories (33.3\%), together accounting for two-thirds of all portability fixes. 
-Normalization applies to 6 sub-categories (22.2\%), primarily addressing file and 
-path-related issues. Portable APIs, while used least frequently (3 sub-categories, 
-11.1\%), targets specific, well-defined problems where standard cross-platform 
-abstractions exist. This distribution reflects the nature of portability issues: 
-most problems arise from platform-specific features or environmental differences 
-requiring conditional handling, rather than fundamental API incompatibilities. 
-The examples demonstrate that portability fixes are typically small, localized 
-changes rather than major refactoring efforts, making them practical for developers 
-to adopt.
+\end{packed_enumerate}  
+
+
+\MyPara{Pattern
+  distribution}~Figure~\ref{fig:fix_pattern_distribution} shows how
+these patterns distribute across the 24 portability
+sub-categories. Defensive checks and Environment handling are the most
+prevalent strategies, each addressing 9 sub-categories (33.3\%),
+together accounting for two-thirds of all portability fixes.
+Normalization applies to 6 sub-categories (22.2\%), primarily
+addressing file and path-related issues. Portable APIs, while used
+least frequently (3 sub-categories, 11.1\%), targets specific,
+well-defined problems where standard cross-platform abstractions
+exist. This distribution reflects the nature of portability issues:
+most problems arise from platform-environmental differences
+(explaining fixes with conditional handling) rather than fundamental
+API incompatibilities. The data also show that portability fixes are
+typically short and localized rather than extensive or
+widespread. Consequently, they tend to impose a low workload on
+developers for both implementation and review.
 
 \begin{figure}[ht]
 \centering
@@ -922,7 +925,8 @@ to adopt.
     11.1/Portable APIs (3)
 }
 \end{tikzpicture}
-\caption{Distribution of fix patterns across 24 portability sub-categories.}
+\caption{Distribution of fix patterns across 24 portability
+  sub-categories.\Mar{Legends are out of margins. Check.}}
 \label{fig:fix_pattern_distribution}
 \end{figure}
 
@@ -997,7 +1001,8 @@ potential portability concerns, namely the
 ``Encoding'' sub-category within the ``File and Directories''
 category. The remaining tools focus primarily on style, type
 correctness, security, and general code quality. For that reason, we
-focus on LLMs. We consider three LLMs of moderate model size, namely
+explored the use of Large Language Models (LLMs) to detect portability
+problems and repair them. We consider three LLMs of moderate model size, namely
 \texttt{llama-3.3}~\cite{llama3}, \texttt{Grok-4-Fast}~\cite{grok4},
 and \texttt{GPT-4o-Mini}~\cite{gpt4o}
 
@@ -1028,13 +1033,13 @@ classification decisions.
 %% Unrelated code was treated as portable for classification purposes, since such snippets do not exhibit any portability problems. Consequently, the dataset comprised 60 portable samples (30 corrected + 30 unrelated) and 30 non-portable samples. 
 % 
 
-\noindent\textbf{Metrics.}~We used standard metrics in data sciences
-to measure performance of binary classifiers (e.g., precision, recall,
-accuracy, etc.). Table~\ref{tab:llm_detection_results} shows
+\noindent\textbf{Metrics.}~We used standard metrics to measure
+performance of binary classifiers (e.g., precision, recall, accuracy,
+etc.). Table~\ref{tab:llm_detection_results} shows
 results. Table~\ref{tab:confusion_matrices_combined} shows the
 confusion matrices associated with each LLM, illustrating the
-classification of the \NumCodeUsedLLM{} samples and
-Table~\ref{tab:llm_performance} shows the metrics.
+classification of the \NumCodeUsedLLM{} samples.
+Table~\ref{tab:llm_performance} shows the metrics for each model.
 
 %% By comparing the models' predictions against the known classification
 %% of each snippet, we quantitatively assessed their ability to identify
@@ -1048,7 +1053,7 @@ Table~\ref{tab:llm_performance} shows the metrics.
 %% insights into potential cross-platform
 %% hazards.
 
-\noindent\textbf{Analysis of results.}~ Their results indicate a
+\noindent\textbf{Analysis of results.}~ The results we obtain indicate
 limited ability of LLMs to accurately reason about portability
 issues. llama-3.3 and GPT-4o-Mini are ``pessimistic'' and report too
 many alarms, most of which are false positives. In contrast,
