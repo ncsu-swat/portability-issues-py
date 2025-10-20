@@ -159,6 +159,7 @@ This paper makes the following contributions:
     \github\ projects;
   \item[\Contrib] A dataset of \Fix{xxx} portability issues across \Fix{yyy}
     Python projects.
+  \item \Fix{Add our artifact link here? \ourrepo{}}
 \end{packed_itemize}
 
 \section{Projects and Questions}
@@ -691,10 +692,10 @@ and the curses module is unavailable on Windows (not included in standard Python
 % Portable APIs
 \begin{subfigure}{0.48\textwidth}
 \begin{lstlisting}[caption={Portable APIs: Using pathlib for cross-platform paths}, label={lst:portable}]
-- import os
-- home_dir = os.path.expanduser('~')
+- temp_file = "/tmp/data.txt"  # unix-only path
++ import tempfile
 + from pathlib import Path
-+ home_dir = Path.home()  # Cross-platform home directory
++ temp_file = Path(tempfile.gettempdir()) / "data.txt" # cross-platform
 \end{lstlisting}
 \end{subfigure}
 \vspace{0.2cm}
@@ -1106,6 +1107,8 @@ resolved by adjusting tests to be more environment-aware, many require
 changes to the application logic itself to ensure consistent behavior
 across platforms.
 
+
+
 \begin{table}[t!]
     \centering
     \small
@@ -1140,6 +1143,9 @@ across platforms.
 % https://github.com/miracle2k/webassets/pull/562
 
 We illustrate how portability issues manifest and are fixed through a case study of the webassets project~\cite{webassets}. Webassets is an asset management library for Python web development with 932 stars on GitHub, used for bundling and processing web assets like CSS and JavaScript files.
+
+\Fix{add a Reference to your PR list in the artifact? \ourrepo{}}
+\Fix{but we used your personal account to create the PRs.}
 
 The problem we encountered falls into the \textbf{File and Directories (FILE)} category, specifically the ``File locking'' sub-category. The issue occurred in the test suite where \CodeIn{tempfile.NamedTemporaryFile} was used without disabling automatic deletion, causing failures on Windows due to platform-specific file locking behavior. On Windows, the operating system locks open files more aggressively than on Unix-like systems, preventing the same file from being reopened while still in use.
 
@@ -1318,10 +1324,10 @@ Maybe: \cite{sun2016bear}. Mobile apps testing: \cite{boushehrinejadmoradi2015te
 % - Key contributions
 % - Long-term impact on research and practice
 % - Future directions
-
-%% \section*{Data Availability}
-
-%% The artifacts -- including datasets and scripts -- are publicly available~\cite{ourrepo}.
+\Fix{...}
+\section*{Data Availability}
+\Fix{I dont know if we need this section.}
+The artifacts -- including datasets and scripts -- are publicly available~\ourrepo{}.
 
 \onecolumn \begin{multicols}{2}
 %\balance
