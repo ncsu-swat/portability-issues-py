@@ -1049,7 +1049,7 @@ You are a Python expert. Check the following code and answer: \\
 \midrule
 You are a Python expert. The following code has a portability problem: \\
 \\
-This code has \texttt{<symptom-description>}.  Consider using one of the following fixes \textit{<list-of-possible-fixes-for-the-symptom>}. \\
+This code has \texttt{<root-cause-subcategory>}.  Consider using one of the following fixes \textit{<list-of-possible-fixes-for-the-root-cause>}. \\
 % \\
 % \textbf{Concrete Examples:} \\
 % \\
@@ -1183,7 +1183,15 @@ positives.
 In the first configuration (\textit{generic prompt}), each model received a general instruction stating that the code exhibited portability issues and was asked to produce a corrected version (see Table~\ref{tab:llm_prompts}).  
 In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue (derived from our taxonomy in \ref{rq2-1}) and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}. 
 
-The rationale for this approach is: (1) observe symptoms in the code, (2) look up the mapping in Table~\ref{tab:symptoms} (Symptom $\rightarrow$ General Fix Pattern), and (3) prompt the LLM with specific fix pattern guidance. For example, when encountering code that produces \texttt{AttributeError: module `signal' has no attribute `SIGHUP'}, we would prompt: ``This code has \texttt{AttributeError: module `signal' has no attribute `SIGHUP'}. Consider using the \texttt{Defensive checks} pattern: \texttt{guard signals per platform}.'' Table~\ref{tab:llm_prompts} shows the template structure used for these pattern-guided prompts.  
+The rationale for this approach is: (1) observe root-causes in the code,
+(2) look up the mapping in Table~\ref{tab:symptoms} 
+(Root-cause $\rightarrow$ General Fix Pattern), and (3) prompt
+the LLM with specific fix pattern guidance. For example, when 
+ncountering code with \textit{Missing signals} issues (platform-specific 
+signal constants), we would prompt: ``This code has platform-specific 
+signal handling issues. Consider using the \texttt{Defensive checks} 
+pattern: \texttt{guard signals per platform}.'' Table~\ref{tab:llm_prompts} 
+shows the template structure used for these pattern-guided prompts.  
 
 This design aimed to evaluate whether structured repair guidance could improve the models' ability to generate functionally portable code. Each model attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in 90 repair attempts per configuration.
 
