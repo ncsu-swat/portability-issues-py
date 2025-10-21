@@ -1017,7 +1017,59 @@ Model & Precision & Recall & F1-Score & Accuracy \\
   \end{subtable}
 \end{table}
 
-\Mar{Please, show **all** prompts you used.}
+\begin{table*}[t!]
+\centering
+\caption{Prompts used for LLM evaluation.}
+\label{tab:llm_prompts}
+\begin{subtable}[t]{\textwidth}
+\centering
+\caption{Generic prompt used for portability detection and fixing.}
+\label{tab:generic_prompt}
+\begin{tabular}{p{0.9\textwidth}}
+\toprule
+\textbf{Generic Prompt} \\
+\midrule
+You are a Python expert. Check the following code and answer: \\
+\\
+1. Is there any operation in the code that could fail on a specific operating system (Linux, Mac, Windows)? \\
+2. If yes, explain why and on which OS it might fail. If it is fully portable finish saying ``Portable'' \\
+\bottomrule
+\end{tabular}
+\end{subtable}
+
+\vspace{1ex}
+
+\begin{subtable}[t]{\textwidth}
+\centering
+\caption{Examples of pattern-guided prompts used for specific portability issues.}
+\label{tab:specific_prompts}
+\begin{tabular}{p{0.9\textwidth}}
+\toprule
+\textbf{Pattern-Guided Prompt Examples} \\
+\midrule
+\textbf{Example 1 (Shell command execution):} \\
+You are a Python expert. Check the following code and answer: \\
+This code has a shell command execution issue (PROC category). Apply the Portable APIs pattern to use subprocess.run with shell=False. \\
+\\
+\textbf{Example 2 (Missing OS methods):} \\
+You are a Python expert. Check the following code and answer: \\
+This code has a missing OS method issue like os.geteuid() (API category). Apply the Portable APIs + Defensive checks pattern to use platform.uname and hasattr guards. \\
+\\
+\textbf{Example 3 (GUI differences):} \\
+You are a Python expert. Check the following code and answer: \\
+This code has a GUI differences issue (ENV category). Apply the Environment handling pattern to skip or mock GUI features. \\
+\\
+\textbf{Example 4 (File locking):} \\
+You are a Python expert. Check the following code and answer: \\
+This code has a Windows file locking issue (FILE category). Apply the Environment handling pattern to use context managers and explicit close. \\
+\\
+\textbf{Example 5 (Missing signals):} \\
+You are a Python expert. Check the following code and answer: \\
+This code has a missing signals issue (PROC category). Apply the Defensive checks pattern to guard signals per platform. \\
+\bottomrule
+\end{tabular}
+\end{subtable}
+\end{table*}
 
 \subsubsection{LLMs for detection}\sloppy
 \label{sec:llm-detection}
@@ -1058,7 +1110,7 @@ portability violations are less frequent. We used the openrouter.ai
 API~\cite{openrouter} to interact with the models. Each model was
 prompted with a consistent template that included the code snippet and
 a question asking whether the code was portable across Windows, Linux,
-and Mac. The models' responses were parsed to extract their
+and Mac (see Table~\ref{tab:llm_prompts} for the exact prompts used). The models' responses were parsed to extract their
 classification decisions.
 % 
 %% Unrelated code was treated as portable for classification purposes, since such snippets do not exhibit any portability problems. Consequently, the dataset comprised 60 portable samples (30 corrected + 30 unrelated) and 30 non-portable samples. 
@@ -1133,8 +1185,8 @@ positives.
 \subsubsection{LLMs for fixing.}
 \label{sec:llm-fixing}
 \noindent\textbf{Setup.}~ Following the classification experiment, we designed a complementary evaluation focused on the corrective capabilities of LLMs. In this phase, we used the \NumCodeNonPortableByLLM{} non-portable Python snippets identified earlier and prompted each model with two distinct repair configurations.  
-In the first configuration (\textit{generic prompt}), each model received a general instruction stating that the code exhibited portability issues and was asked to produce a corrected version.  
-In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue (derived from our taxonomy in \ref{rq2-1}) and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}.  
+In the first configuration (\textit{generic prompt}), each model received a general instruction stating that the code exhibited portability issues and was asked to produce a corrected version (see Table~\ref{tab:llm_prompts}).  
+In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue (derived from our taxonomy in \ref{rq2-1}) and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}. Table~\ref{tab:llm_prompts} shows examples of how these pattern-guided prompts were structured to provide specific guidance for different portability issues.  
 This design aimed to evaluate whether structured repair guidance could improve the models' ability to generate functionally portable code. Each model attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in 90 repair attempts per configuration.
 
 \noindent\textbf{Metrics.} ~We evaluated the correctness of each generated fix using two criteria:  
