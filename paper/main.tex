@@ -1041,31 +1041,26 @@ You are a Python expert. Check the following code and answer: \\
 
 \begin{subtable}[t]{\textwidth}
 \centering
-\caption{Examples of pattern-guided prompts used for specific portability issues.}
+\caption{Pattern-guided prompt template to fix portability issues.}
 \label{tab:specific_prompts}
 \begin{tabular}{p{0.9\textwidth}}
 \toprule
-\textbf{Pattern-Guided Prompt Examples} \\
+\textbf{Pattern-Guided Prompt Template} \\
 \midrule
-\textbf{Example 1 (Shell command execution):} \\
-You are a Python expert. Check the following code and answer: \\
-This code has a shell command execution issue (PROC category). Apply the Portable APIs pattern to use subprocess.run with shell=False. \\
+You are a Python expert. The following code has a portability problem: \\
 \\
-\textbf{Example 2 (Missing OS methods):} \\
-You are a Python expert. Check the following code and answer: \\
-This code has a missing OS method issue like os.geteuid() (API category). Apply the Portable APIs + Defensive checks pattern to use platform.uname and hasattr guards. \\
-\\
-\textbf{Example 3 (GUI differences):} \\
-You are a Python expert. Check the following code and answer: \\
-This code has a GUI differences issue (ENV category). Apply the Environment handling pattern to skip or mock GUI features. \\
-\\
-\textbf{Example 4 (File locking):} \\
-You are a Python expert. Check the following code and answer: \\
-This code has a Windows file locking issue (FILE category). Apply the Environment handling pattern to use context managers and explicit close. \\
-\\
-\textbf{Example 5 (Missing signals):} \\
-You are a Python expert. Check the following code and answer: \\
-This code has a missing signals issue (PROC category). Apply the Defensive checks pattern to guard signals per platform. \\
+This code has \texttt{<symptom-description>}.  Consider using one of the following fixes \textit{<list-of-possible-fixes-for-the-symptom>}. \\
+% \\
+% \textbf{Concrete Examples:} \\
+% \\
+% \textbf{For unique symptoms (e.g., Missing signals):} \\
+% ``This code has \texttt{AttributeError: module 'signal' has no attribute 'SIGHUP'}. Consider using the \texttt{Defensive checks} approach: \texttt{guard signals per platform}.'' \\
+% \\
+% \textbf{For context-dependent symptoms (e.g., Shell command execution):} \\
+% ``This code has \texttt{context-dependent command syntax or exit codes that differ across shells}. Consider using the \texttt{Portable APIs} approach: \texttt{use subprocess.run shell=False}.'' \\
+% \\
+% \textbf{For combined patterns (e.g., OS methods):} \\
+% ``This code has \texttt{AttributeError: module 'os' has no attribute '\{method\}'}. Consider using the \texttt{Portable APIs + Defensive checks} approach: \texttt{use platform.uname, hasattr guards}.'' \\
 \bottomrule
 \end{tabular}
 \end{subtable}
@@ -1186,7 +1181,10 @@ positives.
 \label{sec:llm-fixing}
 \noindent\textbf{Setup.}~ Following the classification experiment, we designed a complementary evaluation focused on the corrective capabilities of LLMs. In this phase, we used the \NumCodeNonPortableByLLM{} non-portable Python snippets identified earlier and prompted each model with two distinct repair configurations.  
 In the first configuration (\textit{generic prompt}), each model received a general instruction stating that the code exhibited portability issues and was asked to produce a corrected version (see Table~\ref{tab:llm_prompts}).  
-In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue (derived from our taxonomy in \ref{rq2-1}) and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}. Table~\ref{tab:llm_prompts} shows examples of how these pattern-guided prompts were structured to provide specific guidance for different portability issues.  
+In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue (derived from our taxonomy in \ref{rq2-1}) and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}. 
+
+The rationale for this approach is: (1) observe symptoms in the code, (2) look up the mapping in Table~\ref{tab:symptoms} (Symptom $\rightarrow$ General Fix Pattern), and (3) prompt the LLM with specific fix pattern guidance. For example, when encountering code that produces \texttt{AttributeError: module `signal' has no attribute `SIGHUP'}, we would prompt: ``This code has \texttt{AttributeError: module `signal' has no attribute `SIGHUP'}. Consider using the \texttt{Defensive checks} pattern: \texttt{guard signals per platform}.'' Table~\ref{tab:llm_prompts} shows the template structure used for these pattern-guided prompts.  
+
 This design aimed to evaluate whether structured repair guidance could improve the models' ability to generate functionally portable code. Each model attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in 90 repair attempts per configuration.
 
 \noindent\textbf{Metrics.} ~We evaluated the correctness of each generated fix using two criteria:  
@@ -1454,8 +1452,8 @@ This suggests a practical workflow for developers: (1)~when encountering a
 portability issue, first classify it using our taxonomy (Table~\ref{tab:categories} 
 and Table~\ref{tab:symptoms}); (2)~then prompt the LLM with both the problematic 
 code \emph{and} the appropriate fix pattern. For example: ``This code has a 
-Windows file locking issue (FILE category). Apply the Environment handling 
-pattern to use context managers and explicit close.''
+Windows file locking issue. Consider using the \texttt{Environment handling} 
+pattern: \texttt{use context managers and explicit close}.''
 
 These results suggest that providing taxonomic context significantly improves 
 LLM repair capabilities. This approach may be particularly useful when addressing 
