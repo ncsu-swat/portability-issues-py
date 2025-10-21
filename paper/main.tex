@@ -44,7 +44,7 @@ distinct sub-categories, \NumSymptomSignatures{} diagnostic signatures,
 and \NumFixPatterns{} systematic repair patterns. Our evaluation reveals
 that existing static analysis tools provide minimal support for
 portability detection, while large language models achieve 65--79\% 
-accuracy in identifying issues and 50--77\% success in generating fixes
+accuracy in identifying issues and 40--77\% success in generating fixes
 when provided with structured guidance. Through \TotalPROpened{} contributed pull requests,
 we demonstrate practical applicability and developer acceptance 
 (\TotalPRAccepted{} merged, zero rejected) of our findings. This work establishes
@@ -1390,7 +1390,7 @@ for developers working on cross-platform Python projects.
 
 Our evaluation of large language models reveals a striking pattern: while LLMs 
 struggle with generic ``fix this code'' prompts (27--43\% success rate), they 
-become remarkably effective when provided with structured guidance. By supplying 
+become effective when provided with structured guidance. By supplying 
 the specific portability issue category (\eg{}, ``File and Directories - Encoding'') 
 and the corresponding fix pattern (\eg{}, ``Normalization - set explicit UTF-8 
 encoding''), repair success rates jumped to 50--77\%, with the best model 
@@ -1413,12 +1413,12 @@ category can be identified from error logs before invoking the LLM.
 Container technologies such as Docker and Singularity/Apptainer are effective 
 tools for mitigating portability issues by standardizing deployment environments. 
 However, our analysis reveals that only 19.9\% of the \NumProjectsTotal{} Python 
-projects we examined include Dockerfile or Docker Compose configurations. This 
+projects we examined include \CodeIn{Dockerfile} or Docker Compose configurations. This 
 surprisingly low adoption rate—far below what we expected—means that the vast 
 majority of Python projects (80.1\%) must handle portability concerns natively 
 in their code.
 
-Even when targeting containerized production environments, developers frequently 
+Even when targeting containerized production environments, developers sometimes 
 work directly on host systems during development and testing, where portability 
 issues manifest. Additionally, many deployment contexts (serverless platforms, 
 embedded systems, CI/CD environments, educational settings, and enterprises with 
@@ -1436,9 +1436,9 @@ solutions to recurring portability challenges in Python development.
 Our symptom analysis (Table~\ref{tab:symptoms}) shows that the majority of 
 sub-categories (15 out of 24, 62.5\%) produce unique, actionable error 
 signatures that enable immediate diagnosis from logs alone. Examples include 
-\texttt{AttributeError: module 'os' has no attribute 'geteuid'}, 
-\texttt{ModuleNotFoundError: No module named 'fcntl'}, 
-\texttt{UnicodeDecodeError: 'charmap' codec...}, and 
+\texttt{AttributeError: module `os' has no attribute `geteuid'}, 
+\texttt{ModuleNotFoundError: No module named `fcntl'}, 
+\texttt{UnicodeDecodeError: `charmap' codec...}, and 
 \texttt{OSError: [Errno 24] Too many open files}. These signatures facilitate 
 direct diagnosis without extensive code inspection.
 
