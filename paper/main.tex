@@ -788,32 +788,32 @@ and corresponding fix pattern.
     \midrule
     \textbf{FILE} &
     Path separators & \ContextSymptom{Context-dependent: hardcoded paths fail silently or with generic file errors} & \NormPattern{} — normalize paths with pathlib \\
-    & Line endings & \UniqueSymptom{\texttt{AssertionError: '\textbackslash r\textbackslash n' != '\textbackslash n'}} & \NormPattern{} — normalize line endings \\
+    & Line endings & \UniqueSymptom{\texttt{AssertionError: `\textbackslash r\textbackslash n' != `\textbackslash n'}} & \NormPattern{} — normalize line endings \\
     & Case sensitivity & \ContextSymptom{Context-dependent: file exists but name differs only in case} & \NormPattern{} — case-normalize filenames \\
     & File locking & \UniqueSymptom{\texttt{PermissionError: [WinError 32] The process cannot access the file because it is being used by another process} (Windows)} & \EnvPattern{} — use context managers, explicit close \\
-    & Encoding & \UniqueSymptom{\texttt{UnicodeDecodeError: 'charmap' codec can't decode byte 0x\{XX\} in position N}} & \NormPattern{} — set explicit UTF-8 encoding \\
+    & Encoding & \UniqueSymptom{\texttt{UnicodeDecodeError: `charmap' codec can't decode byte 0x\{XX\} in position N}} & \NormPattern{} — set explicit UTF-8 encoding \\
     & Filesystem block size & \ContextSymptom{Context-dependent: tests assert exact byte counts that vary by OS} & \NormPattern{} — normalize computations avoid assumptions \\
     \midrule
     \textbf{PROC} &
     Shell command execution & \ContextSymptom{Context-dependent: command syntax or exit codes differ across shells} & \PortablePattern{} — use subprocess.run shell=False \\
-    & Missing signals & \UniqueSymptom{\texttt{AttributeError: module 'signal' has no attribute 'SIGHUP'} (or SIGKILL, SIGTERM variants)} & \DefensivePattern{} — guard signals per platform \\
+    & Missing signals & \UniqueSymptom{\texttt{AttributeError: module `signal' has no attribute `SIGHUP'} (or SIGKILL, SIGTERM variants)} & \DefensivePattern{} — guard signals per platform \\
     & Address already in use & \UniqueSymptom{\texttt{OSError: [Errno 98] Address already in use} (Linux) / \texttt{[WinError 10048]} (Windows)} & \DefensivePattern{} + \EnvPattern{} — catch OS-specific errors, use port 0 \\
     \midrule
     \textbf{LIB} &
-    Platform-specific libraries (e.g. \CodeIn{fcntl}) & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named 'fcntl'} (Windows)} & \DefensivePattern{} — conditional import provide fallback \\
-    & Missing libraries & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named '\{library\_name\}'}} & \DefensivePattern{} — optional import with fallback \\
+    Platform-specific libraries (e.g. \CodeIn{fcntl}) & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `fcntl'} (Windows)} & \DefensivePattern{} — conditional import provide fallback \\
+    & Missing libraries & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `\{library\_name\}'}} & \DefensivePattern{} — optional import with fallback \\
     & Dynamic library loading & \UniqueSymptom{\texttt{OSError: [WinError 126] The specified module could not be found} (Windows)} & \DefensivePattern{} — guard loading prefer pure-Python \\
     & Binary wheel mismatch & \ContextSymptom{Context-dependent: installation succeeds but runtime fails with ABI errors} & \EnvPattern{} — install platform-appropriate wheel \\
     \midrule
     \textbf{API} &
     Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() &
-    \UniqueSymptom{\texttt{AttributeError: module 'os' has no attribute '\{method\}'} (Windows)} & \PortablePattern{} + \DefensivePattern{} — use platform.uname, hasattr guards \\
-    & Modules: readline, resource & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named '\{module\}'} (Windows)} & \DefensivePattern{} — guard import use alternatives \\
+    \UniqueSymptom{\texttt{AttributeError: module `os' has no attribute `'\{method\}'} (Windows)} & \PortablePattern{} + \DefensivePattern{} — use platform.uname, hasattr guards \\
+    & Modules: readline, resource & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `\{module\}'} (Windows)} & \DefensivePattern{} — guard import use alternatives \\
     \midrule
     \textbf{ENV} &
     No display in github CI (linux) & \UniqueSymptom{\texttt{TclError: no display name and no \$DISPLAY environment variable}} & \EnvPattern{} — skip GUI tests in CI \\
     & GUI differences & \ContextSymptom{Context-dependent: widgets render or behave differently} & \EnvPattern{} — skip or mock GUI features \\
-    & Missing curses & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named '\_curses'} (Windows)} & \DefensivePattern{} — conditional import with stub fallback \\
+    & Missing curses & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `\_curses'} (Windows)} & \DefensivePattern{} — conditional import with stub fallback \\
     & Terminal capabilities & \ContextSymptom{Context-dependent: color codes appear as text or formatting ignored} & \EnvPattern{} — detect capabilities degrade gracefully \\
     \midrule
     \textbf{PERM} &
@@ -823,7 +823,7 @@ and corresponding fix pattern.
     \midrule
     \textbf{SYS} &
     /proc filesystem & \ContextSymptom{Context-dependent: /proc paths fail on macOS/Windows with generic FileNotFoundError} & \PortablePattern{} — use psutil or platform APIs \\
-    & Timezone database & \UniqueSymptom{\texttt{zoneinfo.ZoneInfoNotFoundError: 'No time zone found with key \{...\}'}} & \NormPattern{} — install tzdata or fallback \\
+    & Timezone database & \UniqueSymptom{\texttt{zoneinfo.ZoneInfoNotFoundError: `No time zone found with key \{...\}'}} & \NormPattern{} — install tzdata or fallback \\
     \bottomrule
     \end{tabularx}
     \end{table*}   
@@ -838,9 +838,9 @@ to distinguish from other failure modes.
 
 \MyPara{Unique signatures}~The majority of sub-categories (15 out of 24, 62.5\%) 
 produce unique, actionable error signatures. These include missing API methods 
-(\eg{}, \texttt{AttributeError: module 'os' has no attribute 'geteuid'}), 
-unavailable modules (\eg{}, \texttt{ModuleNotFoundError: No module named 'fcntl'}), 
-encoding errors (\texttt{UnicodeDecodeError: 'charmap' codec...}), 
+(\eg{}, \texttt{AttributeError: module `os' has no attribute `geteuid'}), 
+unavailable modules (\eg{}, \texttt{ModuleNotFoundError: No module named `fcntl'}), 
+encoding errors (\texttt{UnicodeDecodeError: `charmap' codec...}), 
 specialized exceptions like \texttt{TclError} for display issues or 
 \texttt{ZoneInfoNotFoundError} for timezone problems, and platform-specific errors 
 like \texttt{OSError: [Errno 24] Too many open files} for file descriptor limits.
@@ -1326,10 +1326,10 @@ across platforms.
 
 
 \Den{The following three subsections are new. Please review.}
-\subsubsection{The webassets case study}
+\subsubsection{The webassets Pull Request}
 % https://github.com/miracle2k/webassets/pull/562
 
-We illustrate how portability issues manifest and are fixed through a case study of the webassets project~\cite{webassets}. Webassets is an asset management library for Python web development with 932 stars on GitHub, used for bundling and processing web assets like CSS and JavaScript files.
+We illustrate how portability issues manifest and are fixed through the webassets project~\cite{webassets}. Webassets is an asset management library for Python web development with 932 stars, used for bundling and processing web assets like CSS and JavaScript files.
 
 \Fix{add a Reference to your PR list in the artifact? \ourrepo{}}
 \Fix{but we used your personal account to create the PRs.}
@@ -1358,10 +1358,10 @@ Our fix addresses this issue by modifying line 4 to disable automatic deletion u
 This case demonstrates how seemingly simple operations like temporary file creation can have subtle portability implications that only manifest under specific platform conditions, highlighting the importance of cross-platform testing for robust software development.
 
 
-\subsubsection{The pydantic-extra-types case study}
+\subsubsection{The pydantic-extra-types Pull Request}
 % https://github.com/pydantic/pydantic-extra-types/pull/333
 
-We present another illustrative case study from the pydantic-extra-types project~\cite{pydantic_extra_types}. Pydantic-extra-types is a library that provides additional type validators for Pydantic with 290 stars on GitHub, used for extending Pydantic's validation capabilities with specialized data types.
+We present another case from the pydantic-extra-types project~\cite{pydantic_extra_types}. Pydantic-extra-types is a library that provides additional type validators for Pydantic with 290 stars, used for extending Pydantic's~\cite{pydantic_validation} validation capabilities with specialized data types.
 
 The problem we encountered also falls into the \textbf{File and Directories (FILE)} category, specifically the ``Path separators'' sub-category. The issue occurred in test fixtures where \CodeIn{os.path.relpath} was used to create relative paths from absolute paths. On Windows, this function fails when the source and target paths are on different drives (e.g., \texttt{C:\textbackslash} vs \texttt{D:\textbackslash}), as Windows cannot create relative paths between different drive letters.
 
@@ -1442,6 +1442,7 @@ This case illustrates that while our taxonomy captures common repair strategies,
 
 \section{Lessons Learned}
 \label{sec:lessons}
+\Fix{Update the section to use the observation and the recommendations.}
 
 This section distills key insights from our study into actionable guidance 
 for developers working on cross-platform Python projects.
