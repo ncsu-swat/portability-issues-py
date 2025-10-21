@@ -872,8 +872,8 @@ runtime with ABI compatibility errors that vary by architecture.
 enable rapid automated triage for 62.5\% of portability issues, the remaining 37.5\% require 
 more sophisticated analysis. This suggests that fully automated portability 
 detection tools must go beyond simple log parsing and incorporate contextual analysis, 
-such as static code analysis to detect portability ``bugs'' (\eg{}, hardcoded paths, shell command patterns, or 
-platform-specific API usage)\Mar{please, confirm}. The presence of context-dependent symptoms also highlights 
+such as static code analysis to detect potential portability problems (\eg{}, hardcoded paths, shell command patterns, or 
+platform-specific API usage). The presence of context-dependent symptoms also highlights 
 the importance of comprehensive cross-platform testing, as these issues cannot be 
 reliably predicted through static analysis alone.
 
@@ -1475,8 +1475,8 @@ in their code.
 Even when targeting containerized production environments, developers sometimes 
 work directly on host systems during development and testing, where portability 
 issues manifest. Additionally, many deployment contexts (serverless platforms, 
-embedded systems, CI/CD environments, educational settings, and enterprises with 
-container restrictions) require code to run portably without containerization.
+embedded systems, CI/CD environments, and enterprises with container 
+restrictions) require code to run portably without containerization.
 
 Given this low adoption rate, native code portability remains important. Our 
 study identifies four systematic fix patterns—defensive checks, environment 
