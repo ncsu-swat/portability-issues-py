@@ -1030,9 +1030,9 @@ Model & Precision & Recall & F1-Score & Accuracy \\
 \textbf{Generic Prompt} \\
 \midrule
 You are a Python expert. Check the following code and answer: \\
-\\
+% \\
 1. Is there any operation in the code that could fail on a specific operating system (Linux, Mac, Windows)? \\
-2. If yes, explain why and on which OS it might fail. If it is fully portable finish saying ``Portable'' \\
+2. If yes, explain why and on which OS it might fail. If it is fully portable finish saying ``Portable''. \\
 \bottomrule
 \end{tabular}
 \end{subtable}
@@ -1048,8 +1048,8 @@ You are a Python expert. Check the following code and answer: \\
 \textbf{Pattern-Guided Prompt Template} \\
 \midrule
 You are a Python expert. The following code has a portability problem: \\
-\\
-This code has \texttt{<root-cause-subcategory>}.  Consider using one of the following fixes \textit{<list-of-possible-fixes-for-the-root-cause>}. \\
+% \\
+This code has \textit{<root-cause-subcategory>}.  Consider using one of the following fixes \textit{<list-of-possible-fixes-for-the-root-cause>}. \\
 % \\
 % \textbf{Concrete Examples:} \\
 % \\
