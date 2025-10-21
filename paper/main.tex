@@ -1248,21 +1248,26 @@ The \texttt{llama-3.3} model also showed moderate improvement (50\%), particular
 Overall, these findings highlight the strong impact of guided contextualization on LLM-based repair.  
 When supplied with explicit repair patterns, the models produced significantly more reliable and semantically consistent fixes, confirming that structured guidance can substantially enhance cross-platform reasoning capabilities in code generation tasks.
 
+
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
-\textbf{RQ\textsubscript{3}:} Traditional static analysis tools provide very limited support for portability issues—only Ruff includes a specific rule related to encoding. 
-
-\textbf{For detection}, LLMs show potential over traditional tools. They achieved strong recall and precision, with the best model reaching approximately 70\%, suggesting that they can reliably identify portability-related problems in source code. 
-
-\textbf{For repair}, however, their performance remains less limited. When prompted to fix 30 faulty snippets, success rates ranged from 33--43\% with generic prompts, increasing to 50--77\% only when explicit issue descriptions and repair patterns were provided. Overall, results indicate that while LLMs can recognize and occasionally correct portability issues, achieving reliable automated repairs still requires structured guidance or integration with static verification tools.
-
-
+  \textbf{RQ\textsubscript{3}:}~ The results show that the
+  medium-sized LLMs analyzed perform poorly at detecting portability
+  issues. Their performance improves in repair tasks when distinct
+  symptoms can be clearly associated with specific fixes
+  (Table~\ref{tab:symptoms}).
+%% —only Ruff includes a
+%% specific rule related to encoding.
+%% Traditional static analysis tools provide support to detect or fix
+%% portability issues.
+%% \textbf{For detection}, LLMs show potential over traditional tools. They achieved strong recall and precision, with the best model reaching approximately 70\%, suggesting that they can reliably identify portability-related problems in source code. 
+%% \textbf{For repair}, however, their performance remains less limited. When prompted to fix 30 faulty snippets, success rates ranged from 33--43\% with generic prompts, increasing to 50--77\% only when explicit issue descriptions and repair patterns were provided. Overall, results indicate that while LLMs can recognize and occasionally correct portability issues, achieving reliable automated repairs still requires structured guidance or integration with static verification tools.
 \end{tcolorbox}
 
 
 \subsection{\textbf{Answering} \RQFour{}}
-\Den{New, please review.}
 
-This section discusses the analysis of pull requests (PRs) submitted to open-source projects to address portability issues identified in our study.
+This section discusses the pull requests (PRs) we submitted.
+%to open-source projects to address portability issues identified in our study.
 \label{sec:pr-discussion}
 
 %
@@ -1271,12 +1276,15 @@ This section discusses the analysis of pull requests (PRs) submitted to open-sou
 % For example: Figure 4 (Distribution of time-to-fix), Table 5 (Engagement metrics per project)
 
 \subsubsection{Method}
+We run the cross-OS test re-execution method
+(\textsection~\ref{sec:methods}) to detect portability problems on our
+application set (\textsection~\ref{sec:projects}). After finding
+problems, we employ one of the four fix patterns this work finds
+(Table~\ref{tab:symptoms}), test the fix locally, and elaborate a pull
+request including a detailed explanation of the portability problem
+and the proposed fix.\Mar{I revised this. Please check.}
 
-\noindent\textbf{Setup.}~To validate our findings and assess how the open-source community responds to portability issues, we submitted pull requests addressing the portability problems that we identified in real-world Python projects. 
-
-We applied our four general fix patterns (defensive checks, environment handling, normalization, and portable APIs) to real-world portability issues found in active Python projects. Each pull request included a detailed explanation of the portability problem and the proposed fix following the corresponding pattern from Table~\ref{tab:symptoms}.
-
-\Den{Add a Reference to your PR list in the artifact? \ourrepo{}}
+\Den{Add a Reference to your PR list in the artifact? \ourrepo{}}\Mar{No}
 \Den{but we used your personal account to create the PRs.}
 
 \subsubsection{Results}
@@ -1294,16 +1302,16 @@ and file handling inconsistencies across platforms. Conversely,
 (100\%), likely due to their critical impact on application
 functionality.
 
-Considering the location of the fix, we observe that the code is
-modified in \TotalPRInTestsCode{} cases to the test code only, in
-\TotalPRInProgramCode{} cases to the program code only, and in
-\TotalPRInBothCode{} cases to both the test and program code. This
-distribution suggests that while some portability issues can be
-resolved by adjusting tests to be more environment-aware, many require
-changes to the application logic itself to ensure consistent behavior
-across platforms.
+Considering the location of the fix, we observe that in
+\TotalPRInTestsCode{} only the test code changes, in
+\TotalPRInProgramCode{} cases only the program code changes, and in
+\TotalPRInBothCode{} cases both the test and program code
+changes. This distribution suggests that while some portability issues
+can be resolved by adjusting tests to be more environment-aware, many
+require changes to the application logic itself to ensure consistent
+behavior across platforms.
 
-Next, we highlight three representative pull requests that illustrate
+Next, we highlight three\Fix{two?} representative pull requests that illustrate
 how portability issues manifest in practice and how our identified fix 
 patterns address them.
 
@@ -1438,6 +1446,14 @@ code repairs.
 % fixes, maintainers may prefer design simplifications over
 % platform-specific adjustments, and inactive projects may resist
 % merging altogether to avoid signaling misleading project vitality.
+
+\Mar{I don't see a need for three example. Show two only. Choose the
+  two most interesting ones.}
+
+\begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
+  \textbf{RQ\textsubscript{4}:}~ \Mar{We need a summary here!!!}
+\end{tcolorbox}
+
 
 \section{Lessons Learned}
 \label{sec:lessons}
