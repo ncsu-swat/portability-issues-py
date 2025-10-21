@@ -21,7 +21,36 @@
 
 \begin{abstract}
   \sloppy
-While Python is designed as a cross-platform language, real-world applications encounter portability failures when deployed across different operating systems. We present the first large-scale empirical study of portability issues in Python, analyzing \NumProjectsTotal{} open-source repositories using two complementary approaches: systematic cross-OS test re-execution and manual analysis of GitHub issues. Our cross-platform testing of \NumProjectsReExecution{} projects reveals that \PercentProjectsWithPortabilityReExecution{} exhibit OS-dependent test failures, with \NumTestRunsWithOSDiff{} divergent outcomes across \NumTestsExecuted{} test executions. Through systematic analysis of \NumIssuesAnalyzed{} GitHub issues, we confirm \NumIssuesRelated{} genuine portability problems spanning \NumProjectsWithOSDiffInIssues{} additional projects. We develop a comprehensive taxonomy identifying \NumRootCauseCategories{} primary failure categories—with file/directory operations, process management, and library dependencies being most prevalent—along with \NumRootCauseSubcategories{} distinct sub-categories, \NumSymptomSignatures{} diagnostic signatures, and \NumFixPatterns{} systematic repair patterns. Our evaluation reveals that existing static analysis tools provide minimal support for portability detection, while large language models achieve 65--79\% accuracy in identifying issues and 50--77\% success in generating fixes when provided with structured guidance. Through \TotalPROpened{} contributed pull requests, we demonstrate practical applicability and developer acceptance (\TotalPRAccepted{} merged, zero rejected) of our findings. This work establishes the first comprehensive baseline for understanding and addressing Python portability issues, providing actionable insights for developers, tool designers, and the broader research community. 
+While Python is designed as a cross-platform language,
+real-world applications encounter portability failures
+when deployed across different operating systems.
+We present the first large-scale empirical study of
+portability issues in Python, analyzing \NumProjectsTotal{}
+open-source repositories using two complementary approaches:
+systematic cross-OS test re-execution and manual analysis
+of GitHub issues. Our cross-platform testing of
+\NumProjectsReExecution{} projects reveals that
+\PercentProjectsWithPortabilityReExecution{} exhibit
+OS-dependent test failures, with \NumTestRunsWithOSDiff{}
+divergent outcomes across \NumTestsExecuted{} test executions.
+Through systematic analysis of \NumIssuesAnalyzed{} GitHub issues,
+we confirm \NumIssuesRelated{} genuine portability problems
+spanning \NumProjectsWithOSDiffInIssues{} additional projects.
+We develop a comprehensive taxonomy identifying
+\NumRootCauseCategories{} primary failure categories—with
+file/directory operations, process management, and library dependencies
+being most prevalent—along with \NumRootCauseSubcategories{} 
+distinct sub-categories, \NumSymptomSignatures{} diagnostic signatures, 
+and \NumFixPatterns{} systematic repair patterns. Our evaluation reveals
+that existing static analysis tools provide minimal support for
+portability detection, while large language models achieve 65--79\% 
+accuracy in identifying issues and 50--77\% success in generating fixes
+when provided with structured guidance. Through \TotalPROpened{} contributed pull requests,
+we demonstrate practical applicability and developer acceptance 
+(\TotalPRAccepted{} merged, zero rejected) of our findings. This work establishes
+the first comprehensive baseline for understanding and addressing
+Python portability issues, providing actionable insights
+for developers, tool designers, and the broader research community. 
 \end{abstract}
 
 \begin{CCSXML}
@@ -255,7 +284,7 @@ resolving portability issues is an important problem, it is also
 essential to understand how these issues manifest (i.e., their
 symptoms), what their root causes are, and how they are typically
 repaired. For instance, automated solutions become more feasible when
-a small number of recurring fix patterns can be observe
+a small number of recurring fix patterns can be observed and documented.
 
 %% Assuming problem of finding and
 %% fixing portability issues is important, it is also important to
@@ -293,9 +322,9 @@ exercise the affected code locations.
 
 
 \MyPara{\RQFour{}}~This question aims to further understand technical
-and social dimensions of portability issues, namely what are the
+and social dimensions of portability issues, namely, what are the
 common fixes developers employ and how developers react to pull
-request we submit to fix portability issues in their projects.
+requests we submit to fix portability issues in their projects.
 
 %% \noindent\textit{\RQFourOne{}}
 %% \noindent\textit{\RQFourTwo{}}
@@ -1190,7 +1219,7 @@ accepted at the time of writing. The overall acceptance rate of 48\%,
 along with a zero rejection rate, indicates that the issues we
 identified correspond to genuine portability problems recognized by
 repository maintainers. Notably, ``File and Directories'' issues were the
-most frequent (18 PRs), reflecting the prevalence of path, encoding,
+most frequent (15 PRs), reflecting the prevalence of path, encoding,
 and file handling inconsistencies across platforms. Conversely,
 ``Process and Signals'' issues exhibited the highest acceptance rate
 (100\%), likely due to their critical impact on application
@@ -1221,8 +1250,8 @@ across platforms.
         \toprule
         \textbf{Category} & \textbf{Opened} & \textbf{Accepted} & \textbf{Rejected} \\
         \midrule
-        File and Directories & 18 & 6 & 0 \\
-        API Availability & 12 & 2 & 0 \\
+        File and Directories & 15 & 9 & 0 \\
+        API Availability & 12 & 3 & 0 \\
         Process and Signals & 2 & 2 & 0 \\
         System Information & 2 & 1 & 0 \\
         Library Dependencies & 1 & 1 & 0 \\
@@ -1354,37 +1383,100 @@ This case illustrates that while our taxonomy captures common repair strategies,
 \section{Lessons Learned}
 \label{sec:lessons}
 
-This section synthesizes key insights from our comprehensive analysis of portability issues in Python, offering actionable guidance for developers, tool designers, and researchers working on cross-platform software systems.
+This section distills key insights from our study into actionable guidance 
+for developers working on cross-platform Python projects.
 
-\subsection{Lesson 1}
+\subsection{LLMs Are Effective Portability Assistants When Given Structure}
 
-Our taxonomy reveals that portability failures are \textit{not} random or project-specific anomalies, but instead cluster around a small set of well-defined categories. The 7 root-cause categories and 24 sub-categories we identified capture the vast majority of cross-platform issues encountered in real-world Python projects. More importantly, 62.5\% of these issues produce unique error signatures that enable immediate diagnosis from logs alone.
+Our evaluation of large language models reveals a striking pattern: while LLMs 
+struggle with generic ``fix this code'' prompts (27--43\% success rate), they 
+become remarkably effective when provided with structured guidance. By supplying 
+the specific portability issue category (\eg{}, ``File and Directories - Encoding'') 
+and the corresponding fix pattern (\eg{}, ``Normalization - set explicit UTF-8 
+encoding''), repair success rates jumped to 50--77\%, with the best model 
+(Grok-4-Fast) achieving 77\% accuracy.
 
-\textbf{For developers:} Focus defensive coding efforts on the most prevalent categories: file operations (62 projects affected), process management (25 projects), and library dependencies (24 projects). Use our symptom signatures (Table~\ref{tab:symptoms}) as diagnostic checklists when triaging cross-platform failures.
+This suggests a practical workflow for developers: (1)~when encountering a 
+portability issue, first classify it using our taxonomy (Table~\ref{tab:categories} 
+and Table~\ref{tab:symptoms}); (2)~then prompt the LLM with both the problematic 
+code \emph{and} the appropriate fix pattern. For example: ``This code has a 
+Windows file locking issue (FILE category). Apply the Environment handling 
+pattern to use context managers and explicit close.''
 
-\textbf{For researchers:} Portability research should shift from ad-hoc case studies toward systematic approaches based on our established categories. Future work can develop domain-specific taxonomies or investigate emerging categories as the Python ecosystem evolves.
+These results suggest that providing taxonomic context significantly improves 
+LLM repair capabilities. This approach may be particularly useful when addressing 
+portability issues flagged by CI/CD pipelines or issue reports, where the issue 
+category can be identified from error logs before invoking the LLM.
 
-\subsection{Lesson 2: Cross-Platform Testing Requires High Test Coverage.}
+\subsection{Containerization Is Underutilized—Most Projects Need Native Portability}
 
-Our dual-method approach revealed that cross-platform testing is only effective with comprehensive test coverage, as test re-execution can only detect issues in exercised code paths. While test re-execution identified systematic behavioral differences, it missed issues in untested areas. Conversely, GitHub issue mining captured edge cases and developer discussions that tests don't exercise. The 48\% acceptance rate of our pull requests demonstrates that both approaches identify genuine problems.
+Container technologies such as Docker and Singularity/Apptainer are effective 
+tools for mitigating portability issues by standardizing deployment environments. 
+However, our analysis reveals that only 19.9\% of the \NumProjectsTotal{} Python 
+projects we examined include Dockerfile or Docker Compose configurations. This 
+surprisingly low adoption rate—far below what we expected—means that the vast 
+majority of Python projects (80.1\%) must handle portability concerns natively 
+in their code.
 
-\textbf{For developers:} Cross-platform testing effectiveness is directly limited by test coverage. Prioritize high coverage for file operations, subprocess calls, and platform-specific functionality before running cross-OS tests. 
+Even when targeting containerized production environments, developers frequently 
+work directly on host systems during development and testing, where portability 
+issues manifest. Additionally, many deployment contexts (serverless platforms, 
+embedded systems, CI/CD environments, educational settings, and enterprises with 
+container restrictions) require code to run portably without containerization.
 
-\textbf{For researchers:} Comprehensive portability assessment requires multi-faceted approaches. Future studies should combine technical analysis (code, tests, logs).
+Given this low adoption rate, native code portability remains important. Our 
+study identifies four systematic fix patterns—defensive checks, environment 
+handling, normalization, and portable APIs—that collectively address all 
+\NumRootCauseSubcategories{} portability sub-categories we encountered. The 
+prevalence of these patterns across our dataset suggests they represent common 
+solutions to recurring portability challenges in Python development.
 
-\subsection{Lesson 3: Prioritize Critical Categories for Maximum Impact}
+\subsection{Most Portability Issues Produce Unique Error Signatures}
 
-\noindent\textbf{Prioritize file and directory handling.}
-File-related issues (FILE) were both the most common category in our taxonomy (59 instances) and the most frequent target of our pull requests (18 PRs). Path separators, line endings, encoding defaults, and file locking behavior vary significantly across platforms. Use cross-platform abstractions such as \texttt{pathlib} for paths and explicitly specify encoding when opening files. Avoid hardcoding path separators or making assumptions about filesystem case sensitivity.
+Our symptom analysis (Table~\ref{tab:symptoms}) shows that the majority of 
+sub-categories (15 out of 24, 62.5\%) produce unique, actionable error 
+signatures that enable immediate diagnosis from logs alone. Examples include 
+\texttt{AttributeError: module 'os' has no attribute 'geteuid'}, 
+\texttt{ModuleNotFoundError: No module named 'fcntl'}, 
+\texttt{UnicodeDecodeError: 'charmap' codec...}, and 
+\texttt{OSError: [Errno 24] Too many open files}. These signatures facilitate 
+direct diagnosis without extensive code inspection.
 
-\noindent\textbf{Process and signal issues are rare but critical.}
-While process and signal-related problems (PROC) accounted for only 2
-pull requests, they achieved a 100\% acceptance rate from
-maintainers. When such issues occur, they typically have severe
-functional impact—crashes, hangs, or incorrect behavior. Developers
-should test subprocess invocation, signal handling, and process
-management across platforms early in development, as these issues are
-immediately recognized as critical by the community.
+This has two practical implications: First, developers can build simple detection 
+tools using grep patterns to scan CI/CD logs for known portability signatures. 
+Second, cross-platform CI/CD pipelines are highly effective at catching these 
+issues, as most failures produce immediate and unambiguous error messages.
+
+The remaining 9 sub-categories (37.5\%) exhibit context-dependent symptoms 
+requiring code inspection to diagnose. These include hardcoded path separators 
+that fail silently, shell command execution differences, and GUI behavioral 
+variations. For these cases, code review practices that specifically check for 
+platform-specific constructs become essential, along with cross-platform testing 
+to reveal behavioral differences.
+
+\subsection{Test Suites Require the Same Portability Scrutiny as Application Code}
+
+Our pull request analysis reveals an important distribution: the code was 
+modified in \TotalPRInTestsCode{} cases (51.5\%) to the test code only, in 
+\TotalPRInProgramCode{} cases (30.3\%) to the program code only, and in 
+\TotalPRInBothCode{} cases (18.2\%) to both test and program code. This 
+distribution suggests that while some portability issues can be resolved by 
+adjusting tests to be more environment-aware, many require changes to the 
+application logic itself to ensure consistent behavior across platforms.
+
+The high proportion of test-only fixes (more than half) indicates that test 
+suites frequently contain platform-specific assumptions that don't exist in the 
+application code. Common issues include hardcoded paths in test fixtures, 
+assumptions about filesystem behavior (such as file locking or case sensitivity), 
+and environment-dependent test conditions (display servers, signal availability).
+
+Developers should apply the same portability scrutiny to test code as they do 
+to production code. This includes using platform detection decorators (\eg{}, 
+pytest's \texttt{@pytest.mark.skipif}), employing portable abstractions like 
+\texttt{tempfile} and \texttt{pathlib} in test fixtures, and avoiding OS-specific 
+assertions. Cross-platform CI execution is essential, as test failures often 
+reveal platform assumptions that remain invisible during development on a single 
+system.
 
 
 
