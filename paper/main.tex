@@ -1260,6 +1260,8 @@ When supplied with explicit repair patterns, the models produced significantly m
 
 
 \subsection{\textbf{Answering} \RQFour{}}
+\Den{New, please review.}
+
 This section discusses the analysis of pull requests (PRs) submitted to open-source projects to address portability issues identified in our study.
 \label{sec:pr-discussion}
 
@@ -1268,17 +1270,24 @@ This section discusses the analysis of pull requests (PRs) submitted to open-sou
 % Add here: time-to-fix statistics, issue/PR comment analysis
 % For example: Figure 4 (Distribution of time-to-fix), Table 5 (Engagement metrics per project)
 
-\subsubsection{Methodology}
-\Fix{This subsubsction is old, please update if needed.}
-To validate our findings and contribute back to the open-source ecosystem, we submitted pull requests addressing the portability issues uncovered in our study. Our contributions focused on libraries where our analysis revealed systematic portability challenges, proposing fixes to improve cross-platform compatibility and robustness.
+\subsubsection{Method}
+
+\noindent\textbf{Setup.}~To validate our findings and assess how the open-source community responds to portability issues, we submitted pull requests addressing the portability problems that we identified in real-world Python projects. 
+
+We applied our four general fix patterns (defensive checks, environment handling, normalization, and portable APIs) to real-world portability issues found in active Python projects. Each pull request included a detailed explanation of the portability problem and the proposed fix following the corresponding pattern from Table~\ref{tab:symptoms}.
+
+\Den{Add a Reference to your PR list in the artifact? \ourrepo{}}
+\Den{but we used your personal account to create the PRs.}
+
+\subsubsection{Results}
 
 Table~\ref{tab:prs} summarizes the results of this effort. We
-submitted a total of \TotalPROpened{} pull requests (PRs) spanning 6
+submitted a total of \TotalPROpened{} pull requests spanning 6
 categories of portability issues, of which \TotalPRAccepted{} had been
 accepted at the time of writing. The overall acceptance rate of 48\%,
 along with a zero rejection rate, indicates that the issues we
 identified correspond to genuine portability problems recognized by
-repository maintainers. Notably, ``File and Directories'' issues were the
+maintainers. Notably, ``File and Directories'' issues were the
 most frequent (15 PRs), reflecting the prevalence of path, encoding,
 and file handling inconsistencies across platforms. Conversely,
 ``Process and Signals'' issues exhibited the highest acceptance rate
@@ -1294,6 +1303,9 @@ resolved by adjusting tests to be more environment-aware, many require
 changes to the application logic itself to ensure consistent behavior
 across platforms.
 
+Next, we highlight three representative pull requests that illustrate
+how portability issues manifest in practice and how our identified fix 
+patterns address them.
 
 
 \begin{table}[t!]
@@ -1305,7 +1317,6 @@ across platforms.
       % \Fix{Ali, please update this table with the latest results.} 
       Summary of Pull Requests (PRs) by issue type, showing opened, accepted, and rejected. The last row shows totals.}
     \label{tab:prs}
-    % Creating a compact tabular environment
     \begin{tabular}{lccc}
         \toprule
         \textbf{Category} & \textbf{Opened} & \textbf{Accepted} & \textbf{Rejected} \\
@@ -1322,24 +1333,19 @@ across platforms.
     \end{tabular}
 \end{table}
 
-% \textbf{Quick Answer.} Developers typically acknowledge portability problems but often give them lower priority than functional bugs, resulting in varied resolution times.  
 
-
-\Den{The following three subsections are new. Please review.}
 \subsubsection{The webassets Pull Request}
 % https://github.com/miracle2k/webassets/pull/562
 
 We illustrate how portability issues manifest and are fixed through the webassets project~\cite{webassets}. Webassets is an asset management library for Python web development with 932 stars, used for bundling and processing web assets like CSS and JavaScript files.
 
-\Fix{add a Reference to your PR list in the artifact? \ourrepo{}}
-\Fix{but we used your personal account to create the PRs.}
 
 The problem we encountered falls into the \textbf{File and Directories (FILE)} category, specifically the ``File locking'' sub-category. The issue occurred in the test suite where \CodeIn{tempfile.NamedTemporaryFile} was used without disabling automatic deletion, causing failures on Windows due to platform-specific file locking behavior. On Windows, the operating system locks open files more aggressively than on Unix-like systems, preventing the same file from being reopened while still in use.
 
-Listing~\ref{lst:webassets_fix} shows our fix applied to the test file. The original code created a temporary file within a context manager that automatically deleted the file upon exiting the \texttt{with} block. However, on Windows, attempting to reopen this file (which the test needed to do) failed because the file was still locked by the previous file handle.
+Listing~\ref{lst:webassets_fix} shows the diff of our fix applied to the test file. The original code created a temporary file within a context manager that automatically deleted the file upon exiting the \texttt{with} block. However, on Windows, attempting to reopen this file (which the test needed to do because it's a fixture) failed because the file was still locked by the previous file handle.
  %, language=diff
 
-\begin{lstlisting}[caption={Diff showing our approved PR for webassets temporary file handling issue.}, label={lst:webassets_fix}]
+\begin{lstlisting}[caption={Diff showing our approved PR for temporary file handling issue.}, label={lst:webassets_fix}]
  @pytest.fixture
  def tmp_file():
 -  with tempfile.NamedTemporaryFile(mode="wt") as f:
@@ -1353,7 +1359,7 @@ Listing~\ref{lst:webassets_fix} shows our fix applied to the test file. The orig
 +  os.remove(tmp_path)  # clean up after the test
 \end{lstlisting}
 
-Our fix addresses this issue by modifying line 4 to disable automatic deletion using \texttt{delete=False}, storing the file path on line 8 before the file handle is closed, and manually cleaning up the temporary file on line 10 after the test completes. This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific behavior is accommodated through careful resource management.
+Our fix addresses this issue by modifying line 4 to disable automatic deletion using \CodeIn{delete=False}, storing the file path on line 8 before the file handle is closed, and manually cleaning up the temporary file on line 10 after the test completes. This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific behavior is accommodated through careful resource management.
 
 This case demonstrates how seemingly simple operations like temporary file creation can have subtle portability implications that only manifest under specific platform conditions, highlighting the importance of cross-platform testing for robust software development.
 
@@ -1363,18 +1369,18 @@ This case demonstrates how seemingly simple operations like temporary file creat
 
 We present another case from the pydantic-extra-types project~\cite{pydantic_extra_types}. Pydantic-extra-types is a library that provides additional type validators for Pydantic with 290 stars, used for extending Pydantic's~\cite{pydantic_validation} validation capabilities with specialized data types.
 
-The problem we encountered also falls into the \textbf{File and Directories (FILE)} category, specifically the ``Path separators'' sub-category. The issue occurred in test fixtures where \CodeIn{os.path.relpath} was used to create relative paths from absolute paths. On Windows, this function fails when the source and target paths are on different drives (e.g., \texttt{C:\textbackslash} vs \texttt{D:\textbackslash}), as Windows cannot create relative paths between different drive letters.
+The problem we encountered also falls into the \textbf{File and Directories (FILE)} category, specifically the ``Path separators'' sub-category. The issue occurred in test fixtures where \CodeIn{os.path.relpath} was used to create relative paths from absolute paths. On Windows, this function fails when the source and target paths are on different drives (e.g., \texttt{C:\textbackslash} vs \texttt{D:\textbackslash}), as Windows cannot create relative paths between different drive letters~\cite{python-relpath}.
 
-Listing~\ref{lst:pydantic_fix} shows our fix applied to three test fixtures in the \CodeIn{test\_path.py} file. The original code assumed that \CodeIn{os.path.relpath} would always succeed, but on Windows systems where temporary directories might be created on a different drive than the current working directory, this assumption breaks and causes test failures.
+Listing~\ref{lst:pydantic_fix} shows our fix applied to test fixtures. The original code assumed that \CodeIn{os.path.relpath} would always succeed, but on Windows this assumption may not hold. For example, when tests are executed from a project directory located on drive \texttt{D:} while the system temporary directory (used to create fixture files) resides on drive \texttt{C:}, the function call fails because it attempts to compute a relative path across drives. Since the location of temporary directories on Windows is determined by environment variables and may differ from the working drive~\cite{python-tempfile}, this behavior can lead to path resolution errors and subsequent test failures.
 
-\begin{lstlisting}[caption={Diff showing our fix for pydantic-extra-types cross-drive relative path issue.}, label={lst:pydantic_fix}]
-  @pytest.fixture
-  def relative_file_path(absolute_file_path: pathlib.Path) -> pathlib.Path:
-+   cwd = pathlib.Path.cwd()
-+   if os.name == 'nt' and absolute_file_path.anchor != cwd.anchor:
-+     # on windows, cant create relative path when paths are on different drives
-+     return absolute_file_path
-    return pathlib.Path(os.path.relpath(absolute_file_path, os.getcwd()))
+
+\begin{lstlisting}[caption={Diff showing our fix for cross-drive relative path issue.}, label={lst:pydantic_fix}]
+ @pytest.fixture
+ def relative_file_path(absolute_file_path: Path) -> Path:
++ cwd = Path.cwd()
++ if os.name == 'nt' and absolute_file_path.anchor != cwd.anchor:
++   return absolute_file_path
+  return Path(os.path.relpath(absolute_file_path, os.getcwd()))
 \end{lstlisting}
 
 Our fix addresses this Windows-specific limitation by detecting when the OS is Windows (lines 3-6) and checking whether the absolute path and current working directory have different anchors (drive letters). When this condition is met, the function returns the absolute path instead of attempting the problematic relative path conversion. This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific limitations are accommodated through conditional logic.
@@ -1394,22 +1400,16 @@ This case demonstrates how path operations that work seamlessly on Unix-like sys
 
 % \cite{frequenz_pr_1261}
 
-\subsubsection{The frequenz-sdk-python case study}
+\subsubsection{The frequenz-sdk-python Pull Request}
 % https://github.com/frequenz-floss/frequenz-sdk-python/pull/1261
 
+Frequenz-sdk-python is an energy management SDK for Python applications.
+The problem we identified falls into the \textbf{System Information (SYS)} category from Table~\ref{tab:categories}, specifically the ``Timezone database'' sub-category.
 We encountered a different type of response when addressing a dependency
- portability issue in the frequenz-sdk-python project~\cite{frequenz_sdk_python}.
-  Frequenz-sdk-python is an energy management SDK for Python applications.
-   The problem we identified falls into the \textbf{System Information (SYS)} category
-    from Table~\ref{tab:categories}, specifically the ``Timezone database'' sub-category.
+portability issue in the \texttt{frequenz-sdk-python} project~\cite{frequenz_sdk_python}.
 
-The issue occurred in the test suite where tests relied on the \CodeIn{zoneinfo}
- and \CodeIn{tzdata} modules for timezone operations. These modules are not
-  consistently available across all platforms—while \CodeIn{zoneinfo} is included
-   in Python 3.9+ on most systems, the timezone data (\CodeIn{tzdata}) may not be
-    installed by default on some Windows configurations. This caused test failures
-     when the required timezone information was unavailable, manifesting as
-      \texttt{zoneinfo.\_common.ZoneInfoNotFoundError} (see Table~\ref{tab:symptoms}).
+The issue occurred in the test suite where tests relied on the \CodeIn{zoneinfo} and \CodeIn{tzdata} modules for timezone operations. These modules are not consistently available across all platforms—while \CodeIn{zoneinfo} is included in Python~3.9+ on most systems, the timezone data (\CodeIn{tzdata}) may not be installed by default on some Windows configurations. According to the official documentation, the \CodeIn{zoneinfo} module depends on the system's IANA time zone database or the PyPI package \CodeIn{tzdata}, and on systems such as Windows where this database is not available, users must install \CodeIn{tzdata} explicitly~\cite{python-zoneinfo, python-tzdata}. This caused test failures when the required timezone information was unavailable, manifesting as \texttt{zoneinfo.\_common.ZoneInfoNotFoundError} (see Table~\ref{tab:symptoms}).
+
 
 Our proposed solution applied the \textbf{Defensive checks} pattern from 
 Table~\ref{tab:symptoms}: conditionally installing the \CodeIn{tzdata}
@@ -1418,19 +1418,18 @@ detect the platform and provide the missing dependency as a fallback,
 consistent with how other library dependency issues are resolved in our taxonomy.
 
 However, during the PR discussion, the maintainer took a different perspective.
- Rather than adding platform-specific complexity to accommodate the dependency,
-  they chose to remove the timezone-dependent tests altogether—eliminating the 
-  portability issue by removing the feature that caused it. While this falls 
-  outside our documented fix patterns, it represents a pragmatic trade-off: 
-  prioritizing long-term maintainability and code simplicity over comprehensive
-   cross-platform test coverage.
+Rather than adding platform-specific fix to accommodate the dependency,
+they chose to remove the timezone-dependent tests altogether, eliminating the
+portability issue by removing the feature that caused it. 
+% While this falls outside our documented fix patterns, 
+% it represents a pragmatic trade-off:  prioritizing long-term maintainability and code simplicity over comprehensive cross-platform test coverage.
 
 This case illustrates that while our taxonomy captures common repair strategies,
- maintainers may choose architectural simplification when the cost of maintaining
-  platform-specific code outweighs the value of the affected functionality. The fact
-   that this approach was chosen does not invalidate our fix patterns—it simply
-    shows that project-specific priorities can lead to solutions beyond tactical
-     code repairs.
+maintainers may choose architectural simplification when the cost of maintaining
+platform-specific code outweighs the value of the affected functionality. The fact
+that this approach was chosen does not invalidate our fix patterns—it simply
+shows that project-specific priorities can lead to solutions beyond tactical
+code repairs.
 
 % Finally, in another project, the response was shaped less by technical considerations and more by the project's state of maintenance. The maintainer acknowledged the validity of the patch but declined to merge it, noting: \emph{``I do somewhat view that project as archived and inactive... My concern about merging is that an updated last commit date would make the project seem more active than it really is.''} This case illustrates how project activity levels and community sustainability strongly influence whether portability improvements are accepted, even if the technical changes are sound.
 
