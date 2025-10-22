@@ -1521,24 +1521,29 @@ This case demonstrates how path operations that work seamlessly on Unix-like sys
 This section distills key insights from our study into actionable guidance 
 for developers working on cross-platform Python projects.
 
-\Ali{Updated, please review.}
+\textbf{Porting code remains important despite the rise of
+  containerization technology.} We find that a relatively small
+fraction of open-source projects (19.9\%) from our dataset include
+Docker configurations. The majority of projects need to handle
+portability natively in code.
+%% Even projects targeting containerized production often run development
+%% and testing on host operating systems, where portability issues still
+%% manifest.
+\emph{Recommendations.}~(1)~Maintain cross-OS CI test
+matrices~\cite{github2025matrix} to catch issues early, regardless of
+deployment target; (2) Fine tune code
+agents~\cite{microsoft2025copilot} to detect (and fix) portability
+issues as code is written.
 
-\begin{packed_enumerate}
-\item \textbf{Native Portability Remains Essential Despite Containers}
-
-\noindent\textbf{Observation.}~Only 19.9\% of projects in our dataset include
-Docker or container configurations, meaning the vast majority (80.1\%) must
-handle portability natively in their code. Even projects targeting containerized
-production often run development and testing on host operating systems, where
-portability issues still manifest.
-
-\noindent\textbf{Recommendation.}~When writing cross-platform Python code,
-prefer built-in portable abstractions (\eg{}, \texttt{pathlib} over hardcoded
-separators, \texttt{tempfile} over fixed paths).
+%% When writing cross-platform Python code, prefer
+%% built-in portable abstractions (\eg{}, \texttt{pathlib} over hardcoded
+%% separators, \texttt{tempfile} over fixed paths).
 % and use our four fix patterns (Table~\ref{tab:symptoms}) to
 % address the portability sub-categories in Table~\ref{tab:symptoms}. 
-Maintain
-cross-OS CI test matrices to catch issues early, regardless of deployment target.
+
+
+\begin{packed_enumerate}
+
 
 \item \textbf{Guided LLM Repair Using Error Signatures and Fix Patterns}
 
