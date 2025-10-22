@@ -1623,13 +1623,17 @@ common category of portability failures.
 % - Conclusion validity: statistical soundness, possible biases
 
 % \Fix{one thing we remember is that we do not explore other versions of OSs}
-\noindent\textbf{Internal validity:} Our cross-OS test re-execution relies on GitHub Actions runners, which may differ from physical machines. Manual GitHub issue analysis involved subjective interpretation. \emph{Mitigation:} We used standardized GitHub runners and employed iterative coding by multiple authors.
+\noindent\textbf{Internal validity:} Our cross-OS test re-execution relies on GitHub Actions runners, which may differ from physical machines. Manual GitHub issue analysis involved subjective interpretation. 
+\emph{Mitigation:} We used standardized GitHub runners across three OS configurations and conducted manual analysis independently by multiple researchers with consensus validation.
 
-\noindent\textbf{External validity:} Our \NumProjectsTotal{} GitHub projects may not represent private repositories, enterprise software, or domain-specific applications. \emph{Mitigation:} We sampled diverse projects across different domains and our taxonomy emerges from fundamental OS differences.
+\noindent\textbf{External validity:} Our \NumProjectsTotal{} GitHub projects may not represent private repositories, enterprise software, or domain-specific applications. 
+\emph{Mitigation:} We sampled projects across diverse domains and sizes, our taxonomy emerges from fundamental OS differences that transcend specific domains, and our high pull request acceptance rate validates findings across multiple communities.
 
-\noindent\textbf{Construct validity:} Our ``portability issues'' definition focuses on behavioral differences across Linux, macOS, and Windows, excluding hardware architectures, Python versions, or dependency variations. \emph{Mitigation:} We validated our taxonomy through systematic comparison across two independent data sources and community validation via pull requests.
+\noindent\textbf{Construct validity:} Our ``portability issues'' definition focuses on behavioral differences across Linux, macOS, and Windows, excluding hardware architectures, Python versions, or dependency variations.
+\emph{Mitigation:} We validated our taxonomy through systematic comparison across two independent data sources and community validation via pull requests.
 
-\noindent\textbf{Conclusion validity:} Sample sizes vary across research questions (\NumProjectsReExecution{}, \NumProjectsIssueMining{}, \NumCodeUsedLLM{} snippets), affecting comparison reliability. \emph{Mitigation:} We triangulated findings across multiple methods and achieved \TotalPRAprovedPorcent{} pull request acceptance rate.
+\noindent\textbf{Conclusion validity:} Sample sizes vary across research questions (\NumProjectsReExecution{}, \NumProjectsIssueMining{}, \NumCodeUsedLLM{} snippets), affecting comparison reliability. 
+\emph{Mitigation:} We triangulated findings across multiple independent methods, validated taxonomy through both detection approaches, and achieved \TotalPRAprovedPorcent{} pull request acceptance with zero rejections.
 
 
 \section{Related Work}
