@@ -1449,7 +1449,7 @@ Listing~\ref{lst:pydantic_fix} shows our fix applied to test fixtures. The origi
   return Path(os.path.relpath(absolute_file_path, os.getcwd()))
 \end{lstlisting}
 
-Our fix addresses this Windows-specific limitation by detecting when the OS is Windows (lines 3-6) and checking whether the absolute path and current working directory have different anchors (drive letters). When this condition is met, the function returns the absolute path instead of attempting the problematic relative path conversion. This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific limitations are accommodated through conditional logic.
+Our fix addresses this Windows-specific limitation by detecting when the OS is Windows (line 4) and checking whether the absolute path and current working directory have different anchors (drive letters). When this condition is met, the function returns the absolute path instead of attempting the problematic relative path conversion (line 5). This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific limitations are accommodated through conditional logic.
 
 This case demonstrates how path operations that work seamlessly on Unix-like systems can encounter fundamental limitations on Windows due to the multi-drive architecture, highlighting the importance of considering platform-specific filesystem constraints in cross-platform development.
 
