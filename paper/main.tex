@@ -159,19 +159,19 @@ only 19.9\% included Dockerfile or Docker compose configuration.
 
 
 This paper presents a study of portability issues in Python
-projects. Specifically, we analyze the prevalence of such issues,
+projects. Specifically, we analyze \NumProjectsTotal{} repositories to assess the prevalence of such issues,
 their characteristics (e.g., symptoms, root causes, and fixes), the
 effectiveness of existing tools (e.g., static analyzers and large
-language models) in detecting and repairing them, and developers’
-reactions to the pull requests we submitted to address portability
-issues in their code. We conclude with a set of lessons we learn.
-\Mar{Revise this!  $\rightarrow$} Our analysis reveals that these
-portability failures, while widespread, are not chaotic or
-unpredictable. Instead, they cluster around a small set of
-well-defined categories—path handling, character encoding,
-platform-specific APIs, and environment assumptions. Results indicate
+language models) in detecting and repairing them, and developers'
+reactions to the \TotalPROpened{} pull requests we submitted to address portability
+issues in their code. Our analysis reveals that these
+portability failures, while widespread (\PercentProjectsWithPortabilityReExecution{} of tested projects), are not chaotic or
+unpredictable. Instead, they cluster around \NumRootCauseCategories{} main root-cause categories and \NumRootCauseSubcategories{} 
+well-defined sub-categories—with file and directory operations, process management, and library dependencies
+being most prevalent. Results indicate
 that a combination of test re-execution and LLMs can complementary
-detect issues and that LLMs can further precisely repair the issues.
+detect issues, with LLMs achieving 65--79\% accuracy in detection and 50--77\% success in repair when provided with structured guidance.
+We conclude with a set of lessons we learn.
 
 This paper makes the following contributions:
 \begin{packed_itemize}
@@ -180,9 +180,7 @@ This paper makes the following contributions:
     and mining of issues with subsequent manual analysis;
   \item[\Contrib] A detailed categorization of symptoms, root causes, and fix
     patterns of portability issues;
-  \item[\Contrib] An evaluation of the ability of existing tools to detect and
-    repair portabi
-    lity issues;
+  \item[\Contrib] An evaluation of the ability of static analysis and LLMs to detect and repair portability issues;
   \item[\Contrib] An evaluation about the reaction of developers about the pull
     requests we open to fix portability issues in their
     \github\ projects;
@@ -1476,25 +1474,24 @@ for developers working on cross-platform Python projects.
 
 \Ali{Updated, please review.}
 
-\subsection{Guided LLM Repair Using Error Signatures and Fix Patterns}
+\begin{packed_enumerate}
+\item \textbf{Guided LLM Repair Using Error Signatures and Fix Patterns}
 
 \noindent\textbf{Observation.}~LLMs underperform with generic ``fix this code'' prompts
-(27--43\% success) but become effective when guided by structure: including the
+(27--43\% success) but become more effective when guided by structure: including the
 portability category and a mapped fix pattern increases repair rates to
 50--77\% (best: 77\% with Grok-4-Fast). In practice, this guidance is often
 available because many portability sub-categories produce distinctive,
 actionable error messages that allow immediate classification from logs
 (Table~\ref{tab:symptoms}).
 
-\noindent\textbf{Recommendation.}~Use a symptom+pattern workflow when---and only when---a
-specific portability symptom from Table~\ref{tab:symptoms} is present. Capture
-the OS, the exact error text, and a minimal snippet; then prompt the LLM with
-the code plus the symptom and the mapped fix pattern from our taxonomy (\eg{},
-Environment handling, Normalization, Portable APIs). Following this approach
-when a specific portability symptom is present significantly improves the
-chances of successful LLM repair (50--77\% vs. 27--43\% for generic prompts).
+\noindent\textbf{Recommendation.}~When using LLMs to fix portability issues,
+include the specific error message and suggest the corresponding fix pattern
+from Table~\ref{tab:symptoms} in your prompt. This structured approach
+nearly doubles success rates (50--77\%) compared to generic ``fix this code''
+prompts (27--43\%).
 
-\subsection{Native Portability Remains Essential Despite Containers}
+\item \textbf{Native Portability Remains Essential Despite Containers}
 
 \noindent\textbf{Observation.}~Only 19.9\% of projects in our dataset include
 Docker or container configurations, meaning the vast majority (80.1\%) must
@@ -1505,27 +1502,25 @@ portability issues still manifest.
 \noindent\textbf{Recommendation.}~When writing cross-platform Python code,
 prefer built-in portable abstractions (\eg{}, \texttt{pathlib} over hardcoded
 separators, \texttt{tempfile} over fixed paths) and use our four fix patterns
-(Defensive checks, Environment handling, Normalization, Portable APIs) to
+(Table~\ref{tab:symptoms}) to
 address the portability sub-categories in Table~\ref{tab:symptoms}. Maintain
 cross-OS CI test matrices to catch issues early, regardless of deployment target.
 
-\subsection{Portability Fixes Are Localized, Not Architectural}
+\item \textbf{Portability Fixes Are Localized, Not Architectural}
 
 \noindent\textbf{Observation.}~Portability fixes in our study were typically
-small, localized changes rather than architectural rewrites. The four fix
-patterns we identified (Defensive checks, Environment handling, Normalization,
-Portable APIs) address issues through targeted modifications—adding conditional
+small and localized. The four fix
+patterns we identified (Table~\ref{tab:symptoms}) address issues through targeted modifications—adding conditional
 imports, normalizing paths, or wrapping platform-specific calls—rather than
 redesigning system architecture.
 
-\noindent\textbf{Recommendation.}~When encountering a portability issue,
-consider it a localized problem rather than deferring it as ``too invasive.''
-Consult Table~\ref{tab:symptoms} to identify the sub-category and the
-corresponding fix pattern that has been effective for similar issues. Most
-solutions involve adding guards or normalization rather than rewriting APIs,
-making incremental fixes practical.
+\noindent\textbf{Recommendation.}~Treat portability issues as localized problems
+that can be fixed with small, targeted changes. Consult Table~\ref{tab:symptoms}
+to identify the issue type and apply the corresponding fix pattern rather than
+deferring the fix as ``too invasive.'' Most solutions require only adding
+guards, normalizing paths, or using portable APIs.
 
-\subsection{File and Path Issues Dominate Cross-Platform Failures}
+\item \textbf{File and Path Issues Dominate Cross-Platform Failures}
 
 \noindent\textbf{Observation.}~File and Directories is the most prevalent
 portability category, affecting 62 projects (41\% of all portability issues).
@@ -1540,6 +1535,7 @@ specify \texttt{encoding} when opening text files, and use context
 managers (\texttt{with} statements) for file operations to ensure proper closure
 and avoid Windows file locking issues. These simple practices prevent the most
 common category of portability failures.
+\end{packed_enumerate}
 
 
 
@@ -1581,8 +1577,10 @@ common category of portability failures.
 Our work relates to prior research on software portability and cross-platform testing, but differs in scope and methodology.
 
 \noindent
-\textbf{Static Analysis for Python.}~Pysa~\cite{pysa2021}, developed by Meta, is a static analysis framework for Python that performs data-flow tracking to identify potential security vulnerabilities. While Pysa demonstrates the effectiveness of static analysis for Python codebases, it focuses exclusively on security issues (taint analysis, SQL injection, XSS) rather than portability concerns. 
-In contrast, our work addresses cross-platform compatibility issues that manifest at runtime due to OS differences. Moreover, our evaluation shows that existing static analysis tools (including security-focused ones like Pysa) provide minimal support for detecting the portability issues we identify.
+\textbf{Empirical Studies on portability.}~Ghandorh \etal{}~\cite{ghandorh2020systematic} performed a systematic literature review of metrics and methodologies for assessing software portability. 
+Their work surveys existing approaches for measuring portability but does not provide empirical data on real-world portability issues or concrete solutions. 
+In contrast, our study provides the first large-scale empirical characterization of Python portability problems through systematic testing and issue analysis, developing both a comprehensive taxonomy and practical repair patterns. 
+While their review identifies the fragmented nature of portability research, our work addresses this gap by establishing a unified framework specifically for Python cross-platform issues.
 
 \noindent
 \textbf{Cross-Platform Testing and Defect Studies.}~Vahabzadeh \etal{}~\cite{vahabzadeh2015empirical} conducted an empirical study on test code defects, finding that approximately 18\% of test bugs stem from environmental factors, particularly Windows vs. Unix platform differences. 
@@ -1603,11 +1601,7 @@ While NonDex addresses non-determinism within a single platform (Java/JVM), our 
 However, both approaches share the insight that software often makes implicit assumptions about platform behavior that lead to failures in different environments.
 NonDex's methodology of systematically varying platform behavior to expose hidden assumptions parallels our cross-OS testing approach, though we focus on inter-platform rather than intra-platform variability.
 
-\noindent
-\textbf{Portability Measurement and Assessment.}~Ghandorh \etal{}~\cite{ghandorh2020systematic} performed a systematic literature review of metrics and methodologies for assessing software portability. 
-Their work surveys existing approaches for measuring portability but does not provide empirical data on real-world portability issues or concrete solutions. 
-In contrast, our study provides the first large-scale empirical characterization of Python portability problems through systematic testing and issue analysis, developing both a comprehensive taxonomy and practical repair patterns. 
-While their review identifies the fragmented nature of portability research, our work addresses this gap by establishing a unified framework specifically for Python cross-platform issues.
+
 
 \noindent
 \textbf{OS Variability and System Reliability.}~Sun \etal{}~\cite{sun2016bear} proposed \textit{Bear}, a framework that statistically measures application sensitivity to operating system (OS) variability. 
@@ -1615,22 +1609,20 @@ By analyzing how nondeterministic OS behaviors affect reliability and performanc
 While their work focuses on OS-level nondeterminism and statistical reliability analysis, our study addresses deterministic portability issues that arise from platform-specific APIs, file system differences, and library dependencies. 
 Additionally, Bear requires statistical modeling of OS behavior variability, whereas our approach directly identifies concrete portability problems through cross-platform testing and provides actionable fix patterns for developers.
 
+\noindent
+\textbf{Static Analysis for Python.}~Pysa~\cite{pysa2021}, developed by Meta, is a static analysis framework for Python that performs data-flow tracking to identify potential security vulnerabilities. While Pysa demonstrates the effectiveness of static analysis for Python codebases, it focuses exclusively on security issues (taint analysis, SQL injection, XSS) rather than portability concerns. 
+In contrast, our work addresses cross-platform compatibility issues that manifest at runtime due to OS differences. Moreover, our evaluation shows that existing static analysis tools (including security-focused ones like Pysa) provide minimal support for detecting the portability issues we identify.
+
+
 \Fix{Others}: \cite{sun2016bear}, Mobile apps testing: \cite{boushehrinejadmoradi2015testing}
 
 \section{Conclusions and Future Work}
 \label{sec:conclusions}
 
-\Den{Ali, please check the numbers below.}
-This study provides the first comprehensive empirical characterization of portability issues in Python code, demonstrating that cross-platform failures are both prevalent and systematically addressable. Through analysis using cross-OS test re-execution and issue mining, we found that 25.7\% of projects exhibit portability problems, with File and Directories operations being the dominant failure category (62 projects). 
-Our taxonomy identifies 7 root-cause categories with 24 sub-categories, revealing that 62.5\% of portability issues produce unique error signatures that enable immediate diagnosis, while the remainder require contextual analysis. We discovered 4 general fix patterns—Defensive checks, Environment handling, Normalization, and Portable APIs—that collectively address all observed portability problems through localized code modifications rather than architectural changes. 
-Our evaluation shows that existing static analysis tools provide minimal portability support, while LLMs achieve moderate detection accuracy (65-79\%) and substantially improved repair success (50-77\%) when guided by structured symptom-pattern mappings. 
-The practical value of our findings is validated through 33 submitted pull requests with a 48\% acceptance rate and zero rejections.
+This study provides the first comprehensive empirical characterization of portability issues in Python code. Through cross-OS test re-execution and issue mining, we found that 25.7\% of projects exhibit portability problems, with File and Directories operations being most prevalent. 
+Our taxonomy identifies 7 root-cause categories with 24 sub-categories and 4 general fix patterns. LLMs achieve 65-79\% detection accuracy and 50-77\% repair success when guided by structured patterns. Our findings are validated through 33 pull requests with 48\% acceptance rate.
 
-Future work should explore several promising directions to advance automated portability support. First, developing hybrid detection tools that combine static analysis for context-dependent symptoms with dynamic cross-platform testing could provide more comprehensive coverage than either approach alone. 
-Second, investigating fine-tuned or specialized LLMs trained specifically on portability patterns could improve both detection accuracy and repair success rates beyond current general-purpose models. 
-Third, extending our taxonomy to other cross-platform languages (e.g., JavaScript, Java, C++) would enable comparative analysis and identification of language-agnostic portability principles. 
-
-Finally, longitudinal studies tracking how portability issues evolve with language and ecosystem changes could inform proactive development practices. The systematic understanding established by this work provides a foundation for building more robust cross-platform development tools and practices that can significantly reduce the burden of portability maintenance in modern software development.
+Future work should develop hybrid detection tools and investigate specialized LLMs for portability patterns.
 
 \section*{Data Availability}
 \Fix{I dont know if we need this section.}
