@@ -1049,7 +1049,8 @@ You are a Python expert. Check the following code and answer: \\
 \midrule
 You are a Python expert. The following code has a portability problem: \\
 % \\
-This code has \textit{<root-cause-subcategory>}.  Consider using one of the following fixes \textit{<list-of-possible-fixes-for-the-root-cause>}. \\
+This code has \texttt{<symptom-description>}.  Consider using one of the 
+following fixes \textit{<list-of-possible-fixes-for-the-symptom>}. \\
 % \\
 % \textbf{Concrete Examples:} \\
 % \\
@@ -1183,15 +1184,15 @@ positives.
 In the first configuration (\textit{generic prompt}), each model received a general instruction stating that the code exhibited portability issues and was asked to produce a corrected version (see Table~\ref{tab:llm_prompts}).  
 In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue (derived from our taxonomy in \ref{rq2-1}) and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}. 
 
-The rationale for this approach is: (1) observe root-causes in the code,
-(2) look up the mapping in Table~\ref{tab:symptoms} 
-(Root-cause $\rightarrow$ General Fix Pattern), and (3) prompt
-the LLM with specific fix pattern guidance. For example, when 
-ncountering code with \textit{Missing signals} issues (platform-specific 
-signal constants), we would prompt: ``This code has platform-specific 
-signal handling issues. Consider using the \texttt{Defensive checks} 
-pattern: \texttt{guard signals per platform}.'' Table~\ref{tab:llm_prompts} 
-shows the template structure used for these pattern-guided prompts.  
+The rationale for this approach is: (1) observe symptoms in the code, (2)
+ look up the mapping in Table~\ref{tab:symptoms} (Symptom $\rightarrow$ 
+ General Fix Pattern), and (3) prompt the LLM with specific fix pattern 
+ guidance. For example, when encountering code that produces 
+ \texttt{AttributeError: module `signal' has no attribute `SIGHUP'}, 
+ we would prompt: ``This code has \texttt{AttributeError: module `signal' 
+ has no attribute `SIGHUP'}. Consider using the \texttt{Defensive checks} 
+ pattern: \texttt{guard signals per platform}.'' Table~\ref{tab:llm_prompts} 
+ shows the template structure used for these pattern-guided prompts.   
 
 This design aimed to evaluate whether structured repair guidance could improve the models' ability to generate functionally portable code. Each model attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in 90 repair attempts per configuration.
 
@@ -1276,13 +1277,13 @@ This section discusses the pull requests (PRs) we submitted.
 % For example: Figure 4 (Distribution of time-to-fix), Table 5 (Engagement metrics per project)
 
 \subsubsection{Method}
-We run the cross-OS test re-execution method
-(\textsection~\ref{sec:methods}) to detect portability problems on our
-application set (\textsection~\ref{sec:projects}). After finding
-problems, we employ one of the four fix patterns this work finds
-(Table~\ref{tab:symptoms}), test the fix locally, and elaborate a pull
-request including a detailed explanation of the portability problem
-and the proposed fix.\Mar{I revised this. Please check.}
+We applied the cross-OS test re-execution method
+(\textsection~\ref{sec:methods}) to detect portability problems in our
+application set (\textsection~\ref{sec:projects}). For each identified
+issue, we applied one of the four fix patterns from our taxonomy
+(Table~\ref{tab:symptoms}), tested the fix locally on the affected
+platforms, and submitted a pull request with a detailed explanation of the
+portability problem and the proposed solution.\Ali{Minor updates, please review}
 
 % \Den{Add a Reference to your PR list in the artifact? \ourrepo{}}\Mar{No}
 % \Den{but we used your personal account to create the PRs.}
@@ -1461,102 +1462,76 @@ This case demonstrates how path operations that work seamlessly on Unix-like sys
 
 \section{Lessons Learned}
 \label{sec:lessons}
-\Fix{Update the section to use the observation and the recommendations.}
 
 This section distills key insights from our study into actionable guidance 
 for developers working on cross-platform Python projects.
 
-\subsection{LLMs Are Effective Portability Assistants When Given Structure}
+\Ali{Updated, please review.}
 
-Our evaluation of large language models reveals a striking pattern: while LLMs 
-struggle with generic ``fix this code'' prompts (27--43\% success rate), they 
-become effective when provided with structured guidance. By supplying 
-the specific portability issue category (\eg{}, ``File and Directories - Encoding'') 
-and the corresponding fix pattern (\eg{}, ``Normalization - set explicit UTF-8 
-encoding''), repair success rates jumped to 50--77\%, with the best model 
-(Grok-4-Fast) achieving 77\% accuracy.
+\subsection{Guided LLM Repair Using Error Signatures and Fix Patterns}
 
-This suggests a practical workflow for developers: (1)~when encountering a 
-portability issue, first classify it using our taxonomy (Table~\ref{tab:categories} 
-and Table~\ref{tab:symptoms}); (2)~then prompt the LLM with both the problematic 
-code \emph{and} the appropriate fix pattern. For example: ``This code has a 
-Windows file locking issue. Consider using the \texttt{Environment handling} 
-pattern: \texttt{use context managers and explicit close}.''
+\noindent\textbf{Observation.}~LLMs underperform with generic ``fix this code'' prompts
+(27--43\% success) but become effective when guided by structure: including the
+portability category and a mapped fix pattern increases repair rates to
+50--77\% (best: 77\% with Grok-4-Fast). In practice, this guidance is often
+available because many portability sub-categories produce distinctive,
+actionable error messages that allow immediate classification from logs
+(Table~\ref{tab:symptoms}).
 
-These results suggest that providing taxonomic context significantly improves 
-LLM repair capabilities. This approach may be particularly useful when addressing 
-portability issues flagged by CI/CD pipelines or issue reports, where the issue 
-category can be identified from error logs before invoking the LLM.
+\noindent\textbf{Recommendation.}~Use a symptom+pattern workflow when---and only when---a
+specific portability symptom from Table~\ref{tab:symptoms} is present. Capture
+the OS, the exact error text, and a minimal snippet; then prompt the LLM with
+the code plus the symptom and the mapped fix pattern from our taxonomy (\eg{},
+Environment handling, Normalization, Portable APIs). Following this approach
+when a specific portability symptom is present significantly improves the
+chances of successful LLM repair (50--77\% vs. 27--43\% for generic prompts).
 
-\subsection{Containerization Is Underutilized—Most Projects Need Native Portability}
+\subsection{Native Portability Remains Essential Despite Containers}
 
-Container technologies such as Docker and Singularity/Apptainer are effective 
-tools for mitigating portability issues by standardizing deployment environments. 
-However, our analysis reveals that only 19.9\% of the \NumProjectsTotal{} Python 
-projects we examined include \CodeIn{Dockerfile} or Docker Compose configurations. This 
-surprisingly low adoption rate—far below what we expected—means that the vast 
-majority of Python projects (80.1\%) must handle portability concerns natively 
-in their code.
+\noindent\textbf{Observation.}~Only 19.9\% of projects in our dataset include
+Docker or container configurations, meaning the vast majority (80.1\%) must
+handle portability natively in their code. Even projects targeting containerized
+production often run development and testing on host operating systems, where
+portability issues still manifest.
 
-Even when targeting containerized production environments, developers sometimes 
-work directly on host systems during development and testing, where portability 
-issues manifest. Additionally, many deployment contexts (\eg{}, serverless platforms, 
-embedded systems, CI/CD environments, and companies with container 
-restrictions) require code to run portably without containerization.
+\noindent\textbf{Recommendation.}~When writing cross-platform Python code,
+prefer built-in portable abstractions (\eg{}, \texttt{pathlib} over hardcoded
+separators, \texttt{tempfile} over fixed paths) and use our four fix patterns
+(Defensive checks, Environment handling, Normalization, Portable APIs) to
+address the portability sub-categories in Table~\ref{tab:symptoms}. Maintain
+cross-OS CI test matrices to catch issues early, regardless of deployment target.
 
-Given this low adoption rate, native code portability remains important. Our 
-study identifies four systematic fix patterns—defensive checks, environment 
-handling, normalization, and portable APIs—that collectively address all 
-\NumRootCauseSubcategories{} portability sub-categories we encountered. The 
-prevalence of these patterns across our dataset suggests they represent common 
-solutions to recurring portability challenges in Python development.
+\subsection{Portability Fixes Are Localized, Not Architectural}
 
-\subsection{Most Portability Issues Produce Unique Error Signatures}
+\noindent\textbf{Observation.}~Portability fixes in our study were typically
+small, localized changes rather than architectural rewrites. The four fix
+patterns we identified (Defensive checks, Environment handling, Normalization,
+Portable APIs) address issues through targeted modifications—adding conditional
+imports, normalizing paths, or wrapping platform-specific calls—rather than
+redesigning system architecture.
 
-Our symptom analysis (Table~\ref{tab:symptoms}) shows that the majority of 
-sub-categories (15 out of 24, 62.5\%) produce unique, actionable error 
-signatures that enable immediate diagnosis from logs alone. Examples include 
-\texttt{AttributeError: module `os' has no attribute `geteuid'}, 
-\texttt{ModuleNotFoundError: No module named `fcntl'}, 
-\texttt{UnicodeDecodeError: `charmap' codec...}, and 
-\texttt{OSError: [Errno 24] Too many open files}. These signatures facilitate 
-direct diagnosis without extensive code inspection.
+\noindent\textbf{Recommendation.}~When encountering a portability issue,
+consider it a localized problem rather than deferring it as ``too invasive.''
+Consult Table~\ref{tab:symptoms} to identify the sub-category and the
+corresponding fix pattern that has been effective for similar issues. Most
+solutions involve adding guards or normalization rather than rewriting APIs,
+making incremental fixes practical.
 
-This has two practical implications: First, developers can build simple detection 
-tools using grep patterns to scan CI/CD logs for known portability signatures. 
-Second, cross-platform CI/CD pipelines are highly effective at catching these 
-issues, as most failures produce immediate and unambiguous error messages.
+\subsection{File and Path Issues Dominate Cross-Platform Failures}
 
-The remaining 9 sub-categories (37.5\%) exhibit context-dependent symptoms 
-requiring code inspection to diagnose. These include hardcoded path separators 
-that fail silently, shell command execution differences, and GUI behavioral 
-variations. For these cases, code review practices that specifically check for 
-platform-specific constructs become essential, along with cross-platform testing 
-to reveal behavioral differences.
+\noindent\textbf{Observation.}~File and Directories is the most prevalent
+portability category, affecting 62 projects (41\% of all portability issues).
+The most common sub-categories are path separators (34 projects), encoding
+(9 projects), and file locking (11 projects), reflecting fundamental
+differences in how operating systems handle files and paths.
 
-\subsection{Test Suites Require the Same Portability Scrutiny as Application Code}
-
-Our pull request analysis reveals an important distribution: the code was 
-modified in \TotalPRInTestsCode{} cases (51.5\%) to the test code only, in 
-\TotalPRInProgramCode{} cases (30.3\%) to the program code only, and in 
-\TotalPRInBothCode{} cases (18.2\%) to both test and program code. This 
-distribution suggests that while some portability issues can be resolved by 
-adjusting tests to be more environment-aware, many require changes to the 
-application logic itself to ensure consistent behavior across platforms.
-
-The high proportion of test-only fixes (more than half) indicates that test 
-suites frequently contain platform-specific assumptions that don't exist in the 
-application code. Common issues include hardcoded paths in test fixtures, 
-assumptions about filesystem behavior (such as file locking or case sensitivity), 
-and environment-dependent test conditions (display servers, signal availability).
-
-Developers should apply the same portability scrutiny to test code as they do 
-to production code. This includes using platform detection decorators (\eg{}, 
-pytest's \texttt{@pytest.mark.skipif}), employing portable abstractions like 
-\texttt{tempfile} and \texttt{pathlib} in test fixtures, and avoiding OS-specific 
-assertions. Cross-platform CI execution is essential, as test failures often 
-reveal platform assumptions that remain invisible during development on a single 
-system.
+\noindent\textbf{Recommendation.}~Prioritize file and path portability in code
+reviews and when writing new code. Use \texttt{pathlib.Path} for all path
+construction instead of string concatenation or hardcoded separators, explicitly
+specify \texttt{encoding="utf-8"} when opening text files, and use context
+managers (\texttt{with} statements) for file operations to ensure proper closure
+and avoid Windows file locking issues. These simple practices prevent the most
+common category of portability failures.
 
 
 
