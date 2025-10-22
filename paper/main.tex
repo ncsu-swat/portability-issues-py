@@ -1348,7 +1348,7 @@ portability problem and the proposed solution.\Ali{Minor updates, please review}
 Table~\ref{tab:prs} summarizes the results of this effort. We
 submitted a total of \TotalPROpened{} pull requests spanning 6
 categories of portability issues, of which \TotalPRAccepted{} had been
-accepted at the time of writing. The overall acceptance rate of 48\%,
+accepted at the time of writing. The overall acceptance rate of \TotalPRAprovedPorcent{},
 along with a zero rejection rate, indicates that the issues we
 identified correspond to genuine portability problems recognized by
 maintainers. Notably, ``File and Directories'' issues were the
@@ -1511,7 +1511,7 @@ This case demonstrates how path operations that work seamlessly on Unix-like sys
 
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
-  \textbf{RQ\textsubscript{4} (community validation):}~ We submitted \TotalPROpened{} pull requests to open-source projects, achieving a 48\% acceptance rate with zero rejections. File and Directories issues were most frequent (15 PRs), while Process and Signals issues had the highest acceptance rate (100\%). The results validate that our identified issues represent genuine portability problems recognized by maintainers, with fixes typically requiring localized changes to either test code (51.5\%) or application logic (30.3\%).
+  \textbf{RQ\textsubscript{4} (community validation):}~ We submitted \TotalPROpened{} pull requests to open-source projects, achieving a \TotalPRAprovedPorcent{} acceptance rate with zero rejections. File and Directories issues were most frequent (15 PRs), while Process and Signals issues had the highest acceptance rate (100\%). The results validate that our identified issues represent genuine portability problems recognized by maintainers, with fixes typically requiring localized changes to either test code (\TotalPRInProgramPorcent{}), application logic (\TotalPRInTestsPorcent{}), or both (\TotalPRInBothPorcent{}).
 \end{tcolorbox}
 
 
@@ -1633,7 +1633,7 @@ Results may not generalize to legacy systems or embedded applications, though ou
 The taxonomy remains subjective despite systematic comparison across data sources and community validation.
 
 \noindent\textbf{Conclusion validity:} Sample sizes vary across research questions (\NumProjectsReExecution{}, \NumProjectsIssueMining{}, \NumCodeUsedLLM{} snippets), affecting comparison reliability. 
-The 48\% pull request acceptance rate provides validation, but \TotalPROpened{} samples limit statistical confidence. Results may not generalize beyond moderate-sized LLMs or English-language discussions.
+The \TotalPRAprovedPorcent{} pull request acceptance rate provides validation, but \TotalPROpened{} samples limit statistical confidence. Results may not generalize beyond moderate-sized LLMs or English-language discussions.
 
 
 \section{Related Work}
@@ -1690,7 +1690,7 @@ Other specialized frameworks like Pysa~\cite{pysa2021} (Meta's security-focused 
 \label{sec:conclusions}
 
 This study provides the first comprehensive empirical characterization of portability issues in Python code. Through cross-OS test re-execution and issue mining, we found that 16.8\% of projects exhibit portability problems (11.2\% via test re-execution, 23.8\% via issue mining), with File and Directories operations being most prevalent. 
-Our taxonomy identifies 7 root-cause categories with 24 sub-categories and 4 general fix patterns. LLMs achieve 40-79\% detection accuracy and 50-77\% repair success when guided by structured patterns. Our findings are validated through 33 pull requests with 48\% acceptance rate.
+Our taxonomy identifies 7 root-cause categories with 24 sub-categories and 4 general fix patterns. LLMs achieve 40-79\% detection accuracy and 50-77\% repair success when guided by structured patterns. Our findings are validated through 33 pull requests with \TotalPRAprovedPorcent{} acceptance rate.
 
 Future work should develop hybrid detection tools and investigate specialized LLMs for portability patterns.
 
