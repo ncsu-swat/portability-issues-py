@@ -1604,10 +1604,10 @@ NonDex's methodology of systematically varying platform behavior to expose hidde
 
 
 \noindent
-\textbf{OS Variability and System Reliability.}~Sun \etal{}~\cite{sun2016bear} proposed \textit{Bear}, a framework that statistically measures application sensitivity to operating system (OS) variability. 
-By analyzing how nondeterministic OS behaviors affect reliability and performance, they demonstrate that assumptions about OS predictability can lead to unforeseen failures. 
-While their work focuses on OS-level nondeterminism and statistical reliability analysis, our study addresses deterministic portability issues that arise from platform-specific APIs, file system differences, and library dependencies. 
-Additionally, Bear requires statistical modeling of OS behavior variability, whereas our approach directly identifies concrete portability problems through cross-platform testing and provides actionable fix patterns for developers.
+\textbf{OS Variability and System Reliability.}~Sun \etal{}~\cite{sun2016bear} proposed \textit{Bear}, a framework that quantifies how nondeterministic OS behaviors (e.g., scheduling and I/O timing) affect application reliability. 
+They show that even minor OS-level variations can propagate to failures or performance drops, revealing hidden fragility in applications that assume predictable OS behavior. 
+While Bear focuses on statistical modeling of OS nondeterminism, our work addresses deterministic portability issues stemming from platform-specific APIs, file systems, and libraries, providing concrete fix patterns through cross-platform testing.
+
 
 \noindent
 \textbf{Static Analysis for Python.}~Pysa~\cite{pysa2021}, developed by Meta, is a static analysis framework for Python that performs data-flow tracking to identify potential security vulnerabilities. While Pysa demonstrates the effectiveness of static analysis for Python codebases, it focuses exclusively on security issues (taint analysis, SQL injection, XSS) rather than portability concerns. 
