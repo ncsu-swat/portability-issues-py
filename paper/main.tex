@@ -43,8 +43,8 @@ being most prevalent—along with \NumRootCauseSubcategories{}
 distinct sub-categories, \NumSymptomSignatures{} diagnostic signatures, 
 and \NumFixPatterns{} systematic repair patterns. Our evaluation reveals
 that existing static analysis tools provide minimal support for
-portability detection, while large language models achieve 65--79\% 
-accuracy in identifying issues and 40--77\% success in generating fixes
+portability detection, while large language models achieve 40--79\% 
+accuracy in identifying issues and 50--77\% success in generating fixes
 when provided with structured guidance. Through \TotalPROpened{} contributed pull requests,
 we demonstrate practical applicability and developer acceptance 
 (\TotalPRAccepted{} merged, zero rejected) of our findings. This work establishes
@@ -171,7 +171,7 @@ unpredictable. Instead, they cluster around \NumRootCauseCategories{} main root-
 well-defined sub-categories—with file and directory operations, process management, and library dependencies
 being most prevalent. Results indicate
 that a combination of test re-execution and LLMs can complementary
-detect issues, with LLMs achieving 65--79\% accuracy in detection and 50--77\% success in repair when provided with structured guidance.
+detect issues, with LLMs achieving 40--79\% accuracy in detection and 50--77\% success in repair when provided with structured guidance.
 We conclude with a set of lessons we learn.
 
 This paper makes the following contributions:
@@ -1637,8 +1637,8 @@ Other specialized frameworks like Pysa~\cite{pysa2021} (Meta's security-focused 
 \section{Conclusions and Future Work}
 \label{sec:conclusions}
 
-This study provides the first comprehensive empirical characterization of portability issues in Python code. Through cross-OS test re-execution and issue mining, we found that 25.7\% of projects exhibit portability problems, with File and Directories operations being most prevalent. 
-Our taxonomy identifies 7 root-cause categories with 24 sub-categories and 4 general fix patterns. LLMs achieve 65-79\% detection accuracy and 50-77\% repair success when guided by structured patterns. Our findings are validated through 33 pull requests with 48\% acceptance rate.
+This study provides the first comprehensive empirical characterization of portability issues in Python code. Through cross-OS test re-execution and issue mining, we found that 16.8\% of projects exhibit portability problems (11.2\% via test re-execution, 23.8\% via issue mining), with File and Directories operations being most prevalent. 
+Our taxonomy identifies 7 root-cause categories with 24 sub-categories and 4 general fix patterns. LLMs achieve 40-79\% detection accuracy and 50-77\% repair success when guided by structured patterns. Our findings are validated through 33 pull requests with 48\% acceptance rate.
 
 Future work should develop hybrid detection tools and investigate specialized LLMs for portability patterns.
 
