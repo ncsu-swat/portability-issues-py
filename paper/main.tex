@@ -97,13 +97,14 @@ TPUs. Similar challenges occur at the operating-system level; for
 example, the function \CodeIn{os.geteuid()} is unavailable in Windows
 distributions of Python.
 
-Non-portable code is a significant problem: it leads to failed
-deployments and reduces developer
+Portability issues in software projects leads to failed deployments
+and reduces developer's
 productivity~\cite{mince2023,kiuwancodeportability,peng2024,job2024}. Although
 container technologies such as Docker and Singularity/Apptainer can
 mitigate these issues, most open-source Python projects are not
-containerized. In our analysis of \NumProjectsTotal{} \github\ repositories,
-only 19.9\% included Dockerfile or Docker compose configuration.
+containerized. In our analysis of \NumProjectsTotal{}
+\github\ repositories, only 19.9\% included Dockerfile or Docker
+compose configuration.
 
 %% A \emph{portability issue} is an observable difference in the
 %% execution of a project caused by the underlying platform, \eg{},
@@ -186,8 +187,9 @@ This paper makes the following contributions:
     \github\ projects;
   \item[\Contrib] A dataset of \Fix{xxx} portability issues across \Fix{yyy}
     Python projects.
-  \item \Fix{Add our artifact link here? \ourrepo{}}
 \end{packed_itemize}
+
+Our artifacts, including code and data, is publicly available at \ourrepo{}.
 
 \section{Projects and Questions}
 \label{sec:methodology}
