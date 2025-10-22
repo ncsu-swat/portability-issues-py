@@ -1406,7 +1406,7 @@ patterns address them.
 We illustrate how portability issues manifest and are fixed through the webassets project~\cite{webassets}. Webassets is an asset management library for Python web development with 932 stars, used for bundling and processing web assets like CSS and JavaScript files.
 
 
-The problem we encountered falls into the \textbf{File and Directories (FILE)} category, specifically the ``File locking'' sub-category. The issue occurred in the test suite where \CodeIn{tempfile.NamedTemporaryFile} was used without disabling automatic deletion, causing failures on Windows due to platform-specific file locking behavior. On Windows, the operating system locks open files more aggressively than on Unix-like systems, preventing the same file from being reopened while still in use.
+The problem we encountered falls into the \textbf{File and Directories (FILE)} category, specifically the ``File locking'' sub-category. The issue occurred in the test suite where \CodeIn{tempfile.NamedTemporaryFile} was used without disabling automatic deletion, causing failures on Windows due to platform-specific file locking behavior~\cite{pythonnamedtemporaryfile}. On Windows, the operating system locks open files more aggressively than on Unix-like systems, preventing the same file from being reopened while still in use.
 
 Listing~\ref{lst:webassets_fix} shows the diff of our fix applied to the test file. The original code created a temporary file within a context manager that automatically deleted the file upon exiting the \texttt{with} block. However, on Windows, attempting to reopen this file (which the test needed to do because it's a fixture) failed because the file was still locked by the previous file handle.
  %, language=diff
@@ -1425,7 +1425,7 @@ Listing~\ref{lst:webassets_fix} shows the diff of our fix applied to the test fi
 +  os.remove(tmp_path)  # clean up after the test
 \end{lstlisting}
 
-Our fix addresses this issue by modifying line 4 to disable automatic deletion using \CodeIn{delete=False}, storing the file path on line 8 before the file handle is closed, and manually cleaning up the temporary file on line 10 after the test completes. This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific behavior is accommodated through careful resource management.
+Our fix addresses this issue by modifying line 4 to disable automatic deletion using \CodeIn{delete=False}, storing the file path on line~9 before the file handle is closed, and manually cleaning up the temporary file on line 11 after the test completes. This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific behavior is accommodated through careful resource management.
 
 This case demonstrates how seemingly simple operations like temporary file creation can have subtle portability implications that only manifest under specific platform conditions, highlighting the importance of cross-platform testing for robust software development.
 
