@@ -1595,23 +1595,39 @@ system.
 % - Tool support for detecting environment-specific issues
 % - Positioning of this work relative to literature
 
-Several lines of research have explored the detection, characterization, and mitigation of portability and reliability issues in software systems.
+Our work relates to prior research on software portability and cross-platform testing, but differs in scope and methodology.
 
-Pysa~\cite{pysa2021}, developed by Meta, is a static analysis framework for Python that performs data-flow tracking to identify potential security vulnerabilities. By tracing information from sources to sensitive sinks, Pysa enables early detection of flaws in large-scale codebases, reducing security risks without executing the code. Its design illustrates how static analysis can be leveraged to uncover subtle issues in dynamic languages such as Python.
+\noindent
+\textbf{Static Analysis for Python.}~Pysa~\cite{pysa2021}, developed by Meta, is a static analysis framework for Python that performs data-flow tracking to identify potential security vulnerabilities. While Pysa demonstrates the effectiveness of static analysis for Python codebases, it focuses exclusively on security issues (taint analysis, SQL injection, XSS) rather than portability concerns. 
+In contrast, our work addresses cross-platform compatibility issues that manifest at runtime due to OS differences. Moreover, our evaluation shows that existing static analysis tools (including security-focused ones like Pysa) provide minimal support for detecting the portability issues we identify.
 
-Vahabzadeh \etal{}~\cite{vahabzadeh2015empirical} conducted a comprehensive empirical study on defects in test code, revealing that such bugs are both pervasive and detrimental to software quality. They report that approximately 18\% of these issues stem from environmental factors, particularly differences between Windows and Unix platforms. This finding underscores the role of environment-related faults as a major source of unreliability in testing infrastructures.
+\noindent
+\textbf{Cross-Platform Testing and Defect Studies.}~Vahabzadeh \etal{}~\cite{vahabzadeh2015empirical} conducted an empirical study on test code defects, finding that approximately 18\% of test bugs stem from environmental factors, particularly Windows vs. Unix platform differences. 
+While their work acknowledges environment-related testing issues, it focuses on general test code quality and defect classification rather than systematically characterizing portability problems or developing repair strategies. 
+Our work differs in three key ways: (1) we provide the first comprehensive taxonomy of Python portability issues with 7 categories and 24 sub-categories, (2) we develop systematic fix patterns that address these issues, and (3) we evaluate both detection and repair approaches using modern tools (LLMs) that were not available during their study. 
+% Additionally, their work treats environmental issues as one category among many test defects, while our study specifically targets cross-platform portability as the primary research focus.
 
-Rasley \etal{}~\cite{rasley2015detecting} introduced \CodeIn{CheckAPI}, a runtime framework for detecting latent cross-platform API violations by contrasting execution traces against platform-specific interface specifications. Their approach identifies compatibility problems that remain undetected during standard testing yet may trigger failures when software is deployed on different operating systems. This work emphasizes the importance of uncovering non-manifest portability bugs that traditional test suites often overlook.
+\noindent
+\textbf{Dynamic Analysis for Portability.}~Rasley \etal{}~\cite{rasley2015detecting} introduced \CodeIn{CheckAPI}, a runtime framework for detecting latent cross-platform API violations by contrasting execution traces against platform-specific interface specifications. 
+While their approach focuses on API compatibility violations through dynamic analysis, our work addresses a broader scope of portability issues including file systems, encoding, dependencies, and environment differences. 
+Additionally, CheckAPI requires pre-defined API specifications for each platform, whereas our cross-OS test re-execution approach directly observes behavioral differences without requiring prior knowledge of platform-specific interfaces. 
+Our taxonomy also extends beyond API violations to capture the full spectrum of portability problems encountered in practice.
 
-Complementing these efforts, Ghandorh \etal{}~\cite{ghandorh2020systematic} performed a systematic literature review of metrics and methodologies for assessing software portability. Their findings highlight the fragmented nature of current research in this domain and the absence of a standardized framework for quantifying portability across systems and environments.
+\noindent
+\textbf{Portability Measurement and Assessment.}~Ghandorh \etal{}~\cite{ghandorh2020systematic} performed a systematic literature review of metrics and methodologies for assessing software portability. 
+Their work surveys existing approaches for measuring portability but does not provide empirical data on real-world portability issues or concrete solutions. 
+In contrast, our study provides the first large-scale empirical characterization of Python portability problems through systematic testing and issue analysis, developing both a comprehensive taxonomy and practical repair patterns. 
+While their review identifies the fragmented nature of portability research, our work addresses this gap by establishing a unified framework specifically for Python cross-platform issues.
 
-Finally, Sun \etal{}~\cite{sun2016bear} proposed \textit{Bear}, a framework that statistically measures application sensitivity to operating system (OS) variability. By analyzing how nondeterministic OS behaviors affect reliability and performance, they demonstrate that assumptions about OS predictability can lead to unforeseen failures. This perspective complements application-level analyses by reinforcing the need to account for environmental uncertainty in ensuring robust and portable soft
+\noindent
+\textbf{OS Variability and System Reliability.}~Sun \etal{}~\cite{sun2016bear} proposed \textit{Bear}, a framework that statistically measures application sensitivity to operating system (OS) variability. 
+By analyzing how nondeterministic OS behaviors affect reliability and performance, they demonstrate that assumptions about OS predictability can lead to unforeseen failures. 
+While their work focuses on OS-level nondeterminism and statistical reliability analysis, our study addresses deterministic portability issues that arise from platform-specific APIs, file system differences, and library dependencies. 
+Additionally, Bear requires statistical modeling of OS behavior variability, whereas our approach directly identifies concrete portability problems through cross-platform testing and provides actionable fix patterns for developers.
 
 
 
-\Fix{Talk about} \cite{vahabzadeh2015empirical} here. Others: \cite{rasley2015detecting, ghandorh2020systematic}
-
-Maybe: \cite{sun2016bear}. Mobile apps testing: \cite{boushehrinejadmoradi2015testing}
+\Fix{Others}: \cite{sun2016bear}, Mobile apps testing: \cite{boushehrinejadmoradi2015testing}
 
 \section{Conclusions and Future Work}
 \label{sec:conclusions}
