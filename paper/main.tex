@@ -1306,11 +1306,15 @@ When supplied with explicit repair patterns, the models produced significantly m
 
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
-  \textbf{RQ\textsubscript{3}:}~ The results show that the
-  medium-sized LLMs analyzed perform poorly at detecting portability
-  issues. Their performance improves in repair tasks when distinct
-  symptoms can be clearly associated with specific fixes
-  (Table~\ref{tab:symptoms}).
+  \textbf{RQ\textsubscript{3} (tool effectiveness):}~ Static analysis tools 
+  provide minimal portability detection support. LLMs achieve moderate detection 
+  accuracy (40--79\% across three models), with substantial variation in precision 
+  and recall. For repair tasks, LLMs show limited success with generic prompts 
+  (27--43\% accuracy) but improve significantly with pattern-guided prompts 
+  (50--77\% accuracy), yielding an average improvement of 30 percentage points. 
+  These results demonstrate that structured guidance using error signatures and 
+  fix patterns from Table~\ref{tab:symptoms} substantially enhances LLM-based 
+  repair capabilities.
 %% —only Ruff includes a
 %% specific rule related to encoding.
 %% Traditional static analysis tools provide support to detect or fix
@@ -1348,7 +1352,7 @@ portability problem and the proposed solution.\Ali{Minor updates, please review}
 Table~\ref{tab:prs} summarizes the results of this effort. We
 submitted a total of \TotalPROpened{} pull requests spanning 6
 categories of portability issues, of which \TotalPRAccepted{} had been
-accepted at the time of writing. The overall acceptance rate of \TotalPRAprovedPorcent{},
+accepted at the time of writing. The overall acceptance rate of \TotalPRAprovedPercent{},
 along with a zero rejection rate, indicates that the issues we
 identified correspond to genuine portability problems recognized by
 maintainers. Notably, ``File and Directories'' issues were the
@@ -1511,7 +1515,14 @@ This case demonstrates how path operations that work seamlessly on Unix-like sys
 
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
-  \textbf{RQ\textsubscript{4} (community validation):}~ We submitted \TotalPROpened{} pull requests to open-source projects, achieving a \TotalPRAprovedPorcent{} acceptance rate with zero rejections. File and Directories issues were most frequent (15 PRs), while Process and Signals issues had the highest acceptance rate (100\%). The results validate that our identified issues represent genuine portability problems recognized by maintainers, with fixes typically requiring localized changes to either test code (\TotalPRInProgramPorcent{}), application logic (\TotalPRInTestsPorcent{}), or both (\TotalPRInBothPorcent{}).
+  \textbf{RQ\textsubscript{4} (community validation):}~ We submitted \TotalPROpened{} 
+  pull requests to open-source projects, achieving a \TotalPRAprovedPercent{} acceptance 
+  rate with zero rejections. File and Directories issues were most frequent (15 PRs), 
+  while Process and Signals issues had the highest acceptance rate (100\%). The results 
+  validate that our identified issues represent genuine portability problems recognized 
+  by maintainers, with fixes typically requiring localized changes to either test code 
+  (\TotalPRInTestsPercent{}), application logic (\TotalPRInProgramPercent{}), or both 
+  (\TotalPRInBothPercent{}).
 \end{tcolorbox}
 
 
@@ -1604,7 +1615,7 @@ specify \texttt{encoding} when opening text files, and use context managers
 \emph{Mitigation:} We validated our taxonomy through systematic comparison across two independent data sources and community validation via pull requests.
 
 \noindent\textbf{Conclusion validity:} Sample sizes vary across research questions (\NumProjectsReExecution{}, \NumProjectsIssueMining{}, \NumCodeUsedLLM{} snippets), affecting comparison reliability. 
-\emph{Mitigation:} We triangulated findings across multiple independent methods, validated taxonomy through both detection approaches, and achieved \TotalPRAprovedPorcent{} pull request acceptance with zero rejections.
+\emph{Mitigation:} We triangulated findings across multiple independent methods, validated taxonomy through both detection approaches, and achieved \TotalPRAprovedPercent{} pull request acceptance with zero rejections.
 
 
 \section{Related Work}
@@ -1661,7 +1672,7 @@ Other specialized frameworks like Pysa~\cite{pysa2021} (Meta's security-focused 
 \label{sec:conclusions}
 
 This study provides the first comprehensive empirical characterization of portability issues in Python code. Through cross-OS test re-execution and issue mining, we found that 16.8\% of projects exhibit portability problems (11.2\% via test re-execution, 23.8\% via issue mining), with File and Directories operations being most prevalent. 
-Our taxonomy identifies 7 root-cause categories with 24 sub-categories and 4 general fix patterns. LLMs achieve 40-79\% detection accuracy and 50-77\% repair success when guided by structured patterns. Our findings are validated through 33 pull requests with \TotalPRAprovedPorcent{} acceptance rate.
+Our taxonomy identifies 7 root-cause categories with 24 sub-categories and 4 general fix patterns. LLMs achieve 40-79\% detection accuracy and 50-77\% repair success when guided by structured patterns. Our findings are validated through 33 pull requests with \TotalPRAprovedPercent{} acceptance rate.
 
 Future work should develop hybrid detection tools and investigate specialized LLMs for portability patterns.
 
