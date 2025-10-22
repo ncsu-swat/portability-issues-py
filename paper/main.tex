@@ -1597,6 +1597,13 @@ Additionally, CheckAPI requires pre-defined API specifications for each platform
 Our taxonomy also extends beyond API violations to capture the full spectrum of portability problems encountered in practice.
 
 \noindent
+\textbf{API Specification Assumptions and Non-determinism.}~Shi \etal{}~\cite{ShiETAL16NonDex} and Gyori \etal{}~\cite{gyori2016nondex} developed NonDex, a tool for detecting erroneous assumptions about deterministic implementations of non-deterministic API specifications in Java.
+NonDex systematically explores different valid behaviors of APIs (e.g., iteration order of hash-based collections) to reveal bugs that arise from deterministic assumptions about inherently non-deterministic operations.
+While NonDex addresses non-determinism within a single platform (Java/JVM), our work focuses on deterministic differences across different operating system platforms.
+However, both approaches share the insight that software often makes implicit assumptions about platform behavior that lead to failures in different environments.
+NonDex's methodology of systematically varying platform behavior to expose hidden assumptions parallels our cross-OS testing approach, though we focus on inter-platform rather than intra-platform variability.
+
+\noindent
 \textbf{Portability Measurement and Assessment.}~Ghandorh \etal{}~\cite{ghandorh2020systematic} performed a systematic literature review of metrics and methodologies for assessing software portability. 
 Their work surveys existing approaches for measuring portability but does not provide empirical data on real-world portability issues or concrete solutions. 
 In contrast, our study provides the first large-scale empirical characterization of Python portability problems through systematic testing and issue analysis, developing both a comprehensive taxonomy and practical repair patterns. 
@@ -1608,17 +1615,23 @@ By analyzing how nondeterministic OS behaviors affect reliability and performanc
 While their work focuses on OS-level nondeterminism and statistical reliability analysis, our study addresses deterministic portability issues that arise from platform-specific APIs, file system differences, and library dependencies. 
 Additionally, Bear requires statistical modeling of OS behavior variability, whereas our approach directly identifies concrete portability problems through cross-platform testing and provides actionable fix patterns for developers.
 
-
-
 \Fix{Others}: \cite{sun2016bear}, Mobile apps testing: \cite{boushehrinejadmoradi2015testing}
 
 \section{Conclusions and Future Work}
 \label{sec:conclusions}
-% - Recap of findings for each RQ
-% - Key contributions
-% - Long-term impact on research and practice
-% - Future directions
-\Fix{...}
+
+\Den{Ali, please check the numbers below.}
+This study provides the first comprehensive empirical characterization of portability issues in Python code, demonstrating that cross-platform failures are both prevalent and systematically addressable. Through analysis using cross-OS test re-execution and issue mining, we found that 25.7\% of projects exhibit portability problems, with File and Directories operations being the dominant failure category (62 projects). 
+Our taxonomy identifies 7 root-cause categories with 24 sub-categories, revealing that 62.5\% of portability issues produce unique error signatures that enable immediate diagnosis, while the remainder require contextual analysis. We discovered 4 general fix patterns—Defensive checks, Environment handling, Normalization, and Portable APIs—that collectively address all observed portability problems through localized code modifications rather than architectural changes. 
+Our evaluation shows that existing static analysis tools provide minimal portability support, while LLMs achieve moderate detection accuracy (65-79\%) and substantially improved repair success (50-77\%) when guided by structured symptom-pattern mappings. 
+The practical value of our findings is validated through 33 submitted pull requests with a 48\% acceptance rate and zero rejections.
+
+Future work should explore several promising directions to advance automated portability support. First, developing hybrid detection tools that combine static analysis for context-dependent symptoms with dynamic cross-platform testing could provide more comprehensive coverage than either approach alone. 
+Second, investigating fine-tuned or specialized LLMs trained specifically on portability patterns could improve both detection accuracy and repair success rates beyond current general-purpose models. 
+Third, extending our taxonomy to other cross-platform languages (e.g., JavaScript, Java, C++) would enable comparative analysis and identification of language-agnostic portability principles. 
+
+Finally, longitudinal studies tracking how portability issues evolve with language and ecosystem changes could inform proactive development practices. The systematic understanding established by this work provides a foundation for building more robust cross-platform development tools and practices that can significantly reduce the burden of portability maintenance in modern software development.
+
 \section*{Data Availability}
 \Fix{I dont know if we need this section.}
 The artifacts -- including datasets and scripts -- are publicly available~\ourrepo{}.
