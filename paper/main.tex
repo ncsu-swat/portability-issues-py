@@ -812,15 +812,13 @@ def test_special_case():
 
 
 \subsubsection{\textbf{Answering \RQTwoTwo{}}}
-
-\Ali{Updated with new content, please review this section.}
-\noindent Understanding how portability issues manifest during execution 
-is essential for rapid diagnosis and triaging. In this section, we examine 
-the observable symptoms of portability problems—the concrete error messages, 
-exceptions, and behavioral differences that appear in test logs, CI output, 
-and runtime failures. Table~\ref{tab:symptoms} maps each portability 
-sub-category to its characteristic symptom signature --when uniquely identifiable--
-and corresponding fix pattern.
+\noindent Understanding how portability issues manifest during
+execution is essential for rapid diagnosis and triaging. In this
+section, we examine the observable symptoms of portability
+problems—the concrete error messages, exceptions, and behavioral
+differences that appear in test logs, and CI
+output. Table~\ref{tab:symptoms} maps the root causes (of portability
+issues) to the corresponding symptom signature and fix pattern.
 
 \noindent\begin{table*}[t]
     \centering
@@ -1511,18 +1509,17 @@ This case demonstrates how path operations that work seamlessly on Unix-like sys
 % platform-specific adjustments, and inactive projects may resist
 % merging altogether to avoid signaling misleading project vitality.
 
-\Den{new box, please verify:}
-
-
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
-  \textbf{RQ\textsubscript{4} (community validation):}~ We submitted \TotalPROpened{} 
-  pull requests to open-source projects, achieving a \TotalPRAprovedPercent{} acceptance 
-  rate with zero rejections. File and Directories issues were most frequent (15 PRs), 
-  while Process and Signals issues had the highest acceptance rate (100\%). The results 
-  validate that our identified issues represent genuine portability problems recognized 
-  by maintainers, with fixes typically requiring localized changes to either test code 
-  (\TotalPRInTestsPercent{}), application logic (\TotalPRInProgramPercent{}), or both 
-  (\TotalPRInBothPercent{}).
+  %% \textbf{RQ\textsubscript{4} (community validation):}~ We submitted \TotalPROpened{} pull requests to open-source projects, achieving a \TotalPRAprovedPorcent{} acceptance rate with zero rejections. File and Directories issues were most frequent (15 PRs), while Process and Signals issues had the highest acceptance rate (100\%). The results validate that our identified issues represent genuine portability problems recognized by maintainers, with fixes typically requiring localized changes to either test code (\TotalPRInProgramPorcent{}), application logic (\TotalPRInTestsPorcent{}), or both (\TotalPRInBothPorcent{}).
+  \textbf{RQ\textsubscript{4} (community validation):}~ We submitted
+  \TotalPROpened{} pull requests (PRs) to open-source projects,
+  achieving a 48\% acceptance rate with no rejections. Issues related
+  to files and directories were the most common (15 PRs), whereas
+  process and signal issues had the highest acceptance rate
+  (100\%). These results confirm our initial observation that fixes
+  generally involve localized changes—either to test code (51.5\%) or
+  application logic (30.3\%)—and suggest a positive response from
+  developers to the submitted PRs.
 \end{tcolorbox}
 
 
