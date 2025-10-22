@@ -1501,9 +1501,10 @@ portability issues still manifest.
 
 \noindent\textbf{Recommendation.}~When writing cross-platform Python code,
 prefer built-in portable abstractions (\eg{}, \texttt{pathlib} over hardcoded
-separators, \texttt{tempfile} over fixed paths) and use our four fix patterns
-(Table~\ref{tab:symptoms}) to
-address the portability sub-categories in Table~\ref{tab:symptoms}. Maintain
+separators, \texttt{tempfile} over fixed paths).
+% and use our four fix patterns (Table~\ref{tab:symptoms}) to
+% address the portability sub-categories in Table~\ref{tab:symptoms}. 
+Maintain
 cross-OS CI test matrices to catch issues early, regardless of deployment target.
 
 \item \textbf{Portability Fixes Are Localized, Not Architectural}
