@@ -1536,7 +1536,7 @@ differences in how operating systems handle files and paths.
 \noindent\textbf{Recommendation.}~Prioritize file and path portability in code
 reviews and when writing new code. Use \texttt{pathlib.Path} for all path
 construction instead of string concatenation or hardcoded separators, explicitly
-specify \texttt{encoding="utf-8"} when opening text files, and use context
+specify \texttt{encoding} when opening text files, and use context
 managers (\texttt{with} statements) for file operations to ensure proper closure
 and avoid Windows file locking issues. These simple practices prevent the most
 common category of portability failures.
