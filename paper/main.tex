@@ -1475,6 +1475,22 @@ for developers working on cross-platform Python projects.
 \Ali{Updated, please review.}
 
 \begin{packed_enumerate}
+\item \textbf{Native Portability Remains Essential Despite Containers}
+
+\noindent\textbf{Observation.}~Only 19.9\% of projects in our dataset include
+Docker or container configurations, meaning the vast majority (80.1\%) must
+handle portability natively in their code. Even projects targeting containerized
+production often run development and testing on host operating systems, where
+portability issues still manifest.
+
+\noindent\textbf{Recommendation.}~When writing cross-platform Python code,
+prefer built-in portable abstractions (\eg{}, \texttt{pathlib} over hardcoded
+separators, \texttt{tempfile} over fixed paths).
+% and use our four fix patterns (Table~\ref{tab:symptoms}) to
+% address the portability sub-categories in Table~\ref{tab:symptoms}. 
+Maintain
+cross-OS CI test matrices to catch issues early, regardless of deployment target.
+
 \item \textbf{Guided LLM Repair Using Error Signatures and Fix Patterns}
 
 \noindent\textbf{Observation.}~LLMs underperform with generic ``fix this code'' prompts
@@ -1491,21 +1507,7 @@ from Table~\ref{tab:symptoms} in your prompt. This structured approach
 nearly doubles success rates (50--77\%) compared to generic ``fix this code''
 prompts (27--43\%).
 
-\item \textbf{Native Portability Remains Essential Despite Containers}
 
-\noindent\textbf{Observation.}~Only 19.9\% of projects in our dataset include
-Docker or container configurations, meaning the vast majority (80.1\%) must
-handle portability natively in their code. Even projects targeting containerized
-production often run development and testing on host operating systems, where
-portability issues still manifest.
-
-\noindent\textbf{Recommendation.}~When writing cross-platform Python code,
-prefer built-in portable abstractions (\eg{}, \texttt{pathlib} over hardcoded
-separators, \texttt{tempfile} over fixed paths).
-% and use our four fix patterns (Table~\ref{tab:symptoms}) to
-% address the portability sub-categories in Table~\ref{tab:symptoms}. 
-Maintain
-cross-OS CI test matrices to catch issues early, regardless of deployment target.
 
 \item \textbf{Portability Fixes Are Localized, Not Architectural}
 
