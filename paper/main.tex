@@ -12,7 +12,15 @@
 \usepackage{lipsum}
 \input{macros}
 
+%%%%%%%%%%%%%%
+%% remove copyright, acm reference, 
 %% add page numbers
+%%
+%% comment for camera ready -Marcelo
+%%%%%%%%%%%%%%
+\setcopyright{none}
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
 \pagestyle{plain}
 
 \begin{document}
@@ -31,8 +39,9 @@ systematic cross-OS test re-execution and manual analysis
 of GitHub issues. Our cross-platform testing of
 \NumProjectsReExecution{} projects reveals that
 \PercentProjectsWithPortabilityReExecution{} exhibit
-OS-dependent test failures, with \NumTestRunsWithOSDiff{}
-divergent outcomes across \NumTestsExecuted{} test executions.
+OS-dependent test failures.
+%% , with \NumTestRunsWithOSDiff{}
+%% divergent outcomes across \NumTestsExecuted{} test executions.
 Through systematic analysis of \NumIssuesAnalyzed{} GitHub issues,
 we confirm \NumIssuesRelated{} genuine portability problems
 spanning \NumProjectsWithOSDiffInIssues{} additional projects.
@@ -53,25 +62,30 @@ Python portability issues, providing actionable insights
 for developers, tool designers, and the broader research community. 
 \end{abstract}
 
-\begin{CCSXML}
-<ccs2012>
-   <concept>
-       <concept_id>10011007.10011074.10011099</concept_id>
-       <concept_desc>Software and its engineering~Software verification and validation</concept_desc>
-       <concept_significance>500</concept_significance>
-   </concept>
-   <concept>
-       <concept_id>10011007.10010940.10010992.10010993.10010994</concept_id>
-       <concept_desc>Software and its engineering~Functionality</concept_desc>
-       <concept_significance>500</concept_significance>
-   </concept>
-</ccs2012>
-\end{CCSXML}
 
-\ccsdesc[500]{Software and its engineering~Software verification and validation}
-\ccsdesc[500]{Software and its engineering~Functionality}
+%%%%%%%
+%%% Uncomment for camera ready -Marcelo
+%%%%%%%
 
-\keywords{Mining Software Repositories, Python, Cross-Platform, Portability, Test Re-execution, Repair Patterns}
+%% \begin{CCSXML}
+%% <ccs2012>
+%%    <concept>
+%%        <concept_id>10011007.10011074.10011099</concept_id>
+%%        <concept_desc>Software and its engineering~Software verification and validation</concept_desc>
+%%        <concept_significance>500</concept_significance>
+%%    </concept>
+%%    <concept>
+%%        <concept_id>10011007.10010940.10010992.10010993.10010994</concept_id>
+%%        <concept_desc>Software and its engineering~Functionality</concept_desc>
+%%        <concept_significance>500</concept_significance>
+%%    </concept>
+%% </ccs2012>
+%% \end{CCSXML}
+
+%% \ccsdesc[500]{Software and its engineering~Software verification and validation}
+%% \ccsdesc[500]{Software and its engineering~Functionality}
+
+%% \keywords{Mining Software Repositories, Python, Cross-Platform, Portability, Test Re-execution, Repair Patterns}
 
 \maketitle
 
@@ -83,28 +97,60 @@ for developers, tool designers, and the broader research community.
 
 A \emph{portability issue} refers to an observable difference in a
 program’s behavior that arises from variations in the underlying
-platform—for example, inconsistencies in API implementations or
-platform-specific functionality. Python is widely regarded as a
-cross-platform language, powering applications across diverse domains
-such as data science, web development, and automation. It consistently
-ranks among the most popular programming languages
+platform—for example, inconsistencies in API implementations across
+platforms.
+%or platform-specific functionality.
+Python is widely regarded as a cross-platform language, powering
+applications across diverse domains such as data science, web
+development, and automation. It consistently ranks among the most
+popular programming languages
 today~\cite{stackoverflow2025,githuboctoverse2024,pypl2025}. However,
 platform portability is not guaranteed. Mince et al.~\cite{mince2023},
 for instance, reported that roughly 40\% of the functionality in
-popular machine learning libraries (\eg{}, JAX, PyTorch, TensorFlow)
-behaves inconsistently across hardware platforms such as CPUs and
-TPUs. Similar challenges occur at the operating-system level; for
-example, the function \CodeIn{os.geteuid()} is unavailable in Windows
-distributions of Python.
+popular machine learning libraries (\eg{},
+PyTorch~\cite{paszke2019pytorch}) behaves inconsistently across
+hardware platforms such as CPUs and TPUs. Similar challenges occur at
+the operating-system level; for example, the function
+\CodeIn{os.geteuid()} is unavailable in Windows distributions of
+Python.
 
-Portability issues in software projects leads to failed deployments
-and reduces developer's
-productivity~\cite{mince2023,kiuwancodeportability,peng2024,job2024}. Although
-container technologies such as Docker and Singularity/Apptainer can
-mitigate these issues, most open-source Python projects are not
-containerized. In our analysis of \NumProjectsTotal{}
-\github\ repositories, only 19.9\% included Dockerfile or Docker
-compose configuration.
+
+Portability issues in software projects often arise from dependencies
+on platform-specific APIs, system libraries, and environment
+assumptions. These issues commonly lead to deployment failures when
+software is executed in environments differing from those used during
+development or testing. Consequently, developers must spend
+substantial time diagnosing and adapting code, which negatively
+impacts productivity and delays releases. Prior work has shown that
+the availability and usage of platform-specific APIs can directly
+affect the portability and reliability of software
+systems~\cite{job2024}. Industry reports further emphasize that
+ensuring code portability requires deliberate cross-platform design,
+testing, and maintenance
+practices~\cite{kiuwancodeportability}. Systematic investigations
+indicate that defining and quantifying portability remains a
+persistent challenge in software engineering, with no widely adopted
+metrics or automated measurement
+frameworks~\cite{ghandorh2020systematic}. Moreover, empirical studies
+have connected portability-related inconsistencies to unstable or
+flaky test behavior, complicating continuous integration pipelines and
+further burdening
+developers~\cite{vahabzadeh2015empirical,flaky_tests_empirical}.
+%
+Container technologies such as Docker~\cite{docker} and Singularity
+(now Apptainer)~\cite{apptainer} can address software portability
+challenges by encapsulating code, dependencies, and execution
+environments into reproducible units. They minimize configuration
+discrepancies across platforms and facilitates consistent testing and
+deployment. Nevertheless, despite the clear benefits of
+containerization, most open-source Python projects remain
+non-containerized. In our analysis of \NumProjectsTotal{}
+\github\ repositories, we find that only 19.9\% included a Dockerfile
+or Docker Compose configuration.
+
+%% Portability issues in software projects leads to failed deployments
+%% and reduces developer's
+%% productivity~\cite{vahabzadeh2015empirical,sun2016bear,ghandorh2020systematic,kiuwancodeportability,job2024}.
 
 %% A \emph{portability issue} is an observable difference in the
 %% execution of a project caused by the underlying platform, \eg{},
@@ -159,6 +205,7 @@ compose configuration.
 %% reduced software accessibility.
 
 
+\sloppy
 This paper presents a study of portability issues in Python
 projects. Specifically, we analyze \NumProjectsTotal{} repositories to assess the prevalence of such issues,
 their characteristics (e.g., symptoms, root causes, and fixes), the
