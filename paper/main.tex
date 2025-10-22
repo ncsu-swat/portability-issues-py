@@ -138,15 +138,15 @@ further burdening
 developers~\cite{vahabzadeh2015empirical,flaky_tests_empirical}.
 %
 Container technologies such as Docker~\cite{docker} and Singularity
-(now Apptainer)~\cite{apptainer} were introduced to address software
-portability challenges by encapsulating code, dependencies, and
-execution environments into reproducible units. This approach
-minimizes configuration discrepancies across platforms and facilitates
-consistent testing and deployment. Nevertheless, despite the clear
-benefits of containerization, most open-source Python projects remain
+(now Apptainer)~\cite{apptainer} can address software portability
+challenges by encapsulating code, dependencies, and execution
+environments into reproducible units. They minimize configuration
+discrepancies across platforms and facilitates consistent testing and
+deployment. Nevertheless, despite the clear benefits of
+containerization, most open-source Python projects remain
 non-containerized. In our analysis of \NumProjectsTotal{}
-\github\ repositories, only 19.9\% included a Dockerfile or Docker
-Compose configuration.
+\github\ repositories, we find that only 19.9\% included a Dockerfile
+or Docker Compose configuration.
 
 %% Portability issues in software projects leads to failed deployments
 %% and reduces developer's
@@ -205,6 +205,7 @@ Compose configuration.
 %% reduced software accessibility.
 
 
+\sloppy
 This paper presents a study of portability issues in Python
 projects. Specifically, we analyze \NumProjectsTotal{} repositories to assess the prevalence of such issues,
 their characteristics (e.g., symptoms, root causes, and fixes), the
