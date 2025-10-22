@@ -718,29 +718,10 @@ and the curses module is unavailable on Windows (not included in standard Python
 + try:
 +     import readline
 + except ImportError:
-+     readline = None  # Fallback if readline is unavailable
++     readline = None  # fallback if readline is unavailable
 \end{lstlisting}
 \end{subfigure}
-\hfill
-% Portable APIs
-\begin{subfigure}{0.48\textwidth}
-\begin{lstlisting}[caption={Portable APIs: Using pathlib for cross-platform paths}, label={lst:portable}]
-- temp_file = "/tmp/data.txt"  # unix-only path
-+ import tempfile
-+ from pathlib import Path
-+ temp_file = Path(tempfile.gettempdir()) / "data.txt" # cross-platform
-\end{lstlisting}
-\end{subfigure}
-\vspace{0.2cm}
-% Normalization
-\begin{subfigure}{0.48\textwidth}
-\begin{lstlisting}[caption={Normalization: Normalizing file paths}, label={lst:normalization}]
-- file_path = "data/file.txt"
-+ import os
-+ file_path = "data" + os.path.sep + "file.txt"  # Consistent path
-\end{lstlisting}
-\end{subfigure}
-\hfill
+% \hfill
 % Environment Handling
 \begin{subfigure}{0.48\textwidth}
 \begin{lstlisting}[caption={Environment handling: Using pytest skip}, label={lst:environment}]
@@ -750,9 +731,37 @@ def test_special_case():
     ...
 \end{lstlisting}
 \end{subfigure}
+% \hfill
+
+% Normalization
+\begin{subfigure}{0.48\textwidth}
+\begin{lstlisting}[caption={Normalization: Normalizing file paths}, label={lst:normalization}]
+- file_path = "data/file.txt"
++ import os
++ file_path = "data" + os.path.sep + "file.txt"  # consistent path
+\end{lstlisting}
+\end{subfigure}
+% \hfill
+
+% Portable APIs
+% OLD
+% - temp_file = "/tmp/data.txt"  # unix-only path
+% + import tempfile
+% + from pathlib import Path
+% + temp_file = Path(tempfile.gettempdir()) / "data.txt" # cross-platform 
+
+\begin{subfigure}{0.48\textwidth}
+\begin{lstlisting}[caption={Portable APIs: Using platform module for OS detection}, label={lst:portable}]
+- hostname = os.uname()[1]  # unix-only function
++ import platform
++ hostname = platform.uname().node  # cross-platform
+\end{lstlisting}
+\end{subfigure}
+% \vspace{0.2cm}
 \caption{Representative examples of fixes for portability issues: (a) Defensive checks, (b) Portable APIs, (c) Normalization, and (d) Environment handling.}
 \label{fig:patterns}
 \end{figure}
+
 
 
 \subsubsection{\textbf{Answering \RQTwoTwo{}}}
@@ -914,10 +923,9 @@ hardcoded separators, ensuring correct behavior on both Unix (forward slash) and
 Windows (backslash) systems.
 
 \item \textbf{Portable APIs} replace OS-specific constructs with cross-platform 
-abstractions. Listing~\ref{lst:portable} demonstrates replacing a hardcoded Unix 
-path \texttt{"/tmp/data.txt"} with portable abstractions (\texttt{tempfile.gettempdir()} 
-and \texttt{pathlib.Path}), ensuring the code works correctly regardless of the 
-operating system's directory structure.
+abstractions. Listing~\ref{lst:portable} demonstrates replacing the Unix-only 
+\texttt{os.uname()} function with the portable \texttt{platform.uname()} function, 
+ensuring the code works correctly on both Unix-like systems and Windows.
 
 \end{packed_enumerate}  
 
