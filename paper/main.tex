@@ -1610,8 +1610,9 @@ While Bear focuses on statistical modeling of OS nondeterminism, our work addres
 
 
 \noindent
-\textbf{Static Analysis for Python.}~Pysa~\cite{pysa2021}, developed by Meta, is a static analysis framework for Python that performs data-flow tracking to identify potential security vulnerabilities. While Pysa demonstrates the effectiveness of static analysis for Python codebases, it focuses exclusively on security issues (taint analysis, SQL injection, XSS) rather than portability concerns. 
-In contrast, our work addresses cross-platform compatibility issues that manifest at runtime due to OS differences. Moreover, our evaluation shows that existing static analysis tools (including security-focused ones like Pysa) provide minimal support for detecting the portability issues we identify.
+\textbf{Static Analysis for Python.}~As described in Section~\ref{sec:llm-detection}, we examined popular Python static analysis tools including Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright}. These tools primarily focus on code style, type correctness, security vulnerabilities, and general code quality, but provide minimal support for cross-platform portability detection. Only Ruff includes a single rule (\texttt{unspecified-encoding}) that addresses potential portability concerns. 
+
+Other specialized frameworks like Pysa~\cite{pysa2021} (Meta's security-focused static analyzer) demonstrate the effectiveness of static analysis for Python but target different domains (e.g., taint analysis, SQL injection). In contrast, our work addresses cross-platform compatibility issues that manifest at runtime due to OS differences and are largely undetected by existing static analysis approaches.
 
 
 \Fix{Others}: \cite{sun2016bear}, Mobile apps testing: \cite{boushehrinejadmoradi2015testing}
