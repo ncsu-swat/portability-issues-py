@@ -1542,58 +1542,29 @@ issues as code is written.
 % address the portability sub-categories in Table~\ref{tab:symptoms}. 
 
 
-\begin{packed_enumerate}
+\textbf{Guided LLM repair using error signatures and fix patterns.} 
+LLMs underperform with generic "fix this code" prompts (27--43\% success) but 
+achieve 50--77\% success when guided with specific error messages and corresponding 
+fix patterns from Table~\ref{tab:symptoms}.
+\emph{Recommendations.}~Include the specific error message and suggest the 
+corresponding fix pattern in your LLM prompt. This structured approach nearly 
+doubles success rates compared to generic prompts.
 
+\textbf{Portability fixes are localized, not architectural.} 
+Our four fix patterns (Table~\ref{tab:symptoms}) address issues through small, 
+targeted modifications—adding conditional imports, normalizing paths, or wrapping 
+platform-specific calls—rather than redesigning system architecture.
+\emph{Recommendations.}~Treat portability issues as localized problems. Consult 
+Table~\ref{tab:symptoms} to identify the issue type and apply the corresponding 
+fix pattern rather than deferring fixes as ``too invasive''.
 
-\item \textbf{Guided LLM Repair Using Error Signatures and Fix Patterns}
-
-\noindent\textbf{Observation.}~LLMs underperform with generic ``fix this code'' prompts
-(27--43\% success) but become more effective when guided by structure: including the
-portability category and a mapped fix pattern increases repair rates to
-50--77\% (best: 77\% with Grok-4-Fast). In practice, this guidance is often
-available because many portability sub-categories produce distinctive,
-actionable error messages that allow immediate classification from logs
-(Table~\ref{tab:symptoms}).
-
-\noindent\textbf{Recommendation.}~When using LLMs to fix portability issues,
-include the specific error message and suggest the corresponding fix pattern
-from Table~\ref{tab:symptoms} in your prompt. This structured approach
-nearly doubles success rates (50--77\%) compared to generic ``fix this code''
-prompts (27--43\%). Future code generation tools (e.g., GitHub Copilot)
-could prevent these issues by incorporating portability awareness during code authoring.
-
-
-
-\item \textbf{Portability Fixes Are Localized, Not Architectural}
-
-\noindent\textbf{Observation.}~Portability fixes in our study were typically
-small and localized. The four fix
-patterns we identified (Table~\ref{tab:symptoms}) address issues through targeted modifications—adding conditional
-imports, normalizing paths, or wrapping platform-specific calls—rather than
-redesigning system architecture.
-
-\noindent\textbf{Recommendation.}~Treat portability issues as localized problems
-that can be fixed with small, targeted changes. Consult Table~\ref{tab:symptoms}
-to identify the issue type and apply the corresponding fix pattern rather than
-deferring the fix as ``too invasive.'' Most solutions require only adding
-guards, normalizing paths, or using portable APIs.
-
-\item \textbf{File and Path Issues Dominate Cross-Platform Failures}
-
-\noindent\textbf{Observation.}~File and Directories is the most prevalent
-portability category, affecting 62 projects (41\% of all portability issues).
-The most common sub-categories are path separators (34 projects), encoding
-(9 projects), and file locking (11 projects), reflecting fundamental
-differences in how operating systems handle files and paths.
-
-\noindent\textbf{Recommendation.}~Prioritize file and path portability in code
-reviews and when writing new code. Use \texttt{pathlib.Path} for all path
-construction instead of string concatenation or hardcoded separators, explicitly
-specify \texttt{encoding} when opening text files, and use context
-managers (\texttt{with} statements) for file operations to ensure proper closure
-and avoid Windows file locking issues. These simple practices prevent the most
-common category of portability failures.
-\end{packed_enumerate}
+\textbf{File and path issues dominate cross-platform failures.} 
+File and Directories is the most prevalent category, affecting 62 projects (41\% 
+of all portability issues). Path separators, encoding, and file locking are the 
+most common sub-categories.
+\emph{Recommendations.}~Use \texttt{pathlib.Path} for path construction, explicitly 
+specify \texttt{encoding} when opening text files, and use context managers 
+(\texttt{with} statements) to avoid Windows file locking issues.
 
 
 
