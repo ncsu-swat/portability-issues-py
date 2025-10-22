@@ -680,7 +680,7 @@ under a main category. The columns show: (i) the root-cause category name and ac
     \midrule
     
     \multirow[t]{4}{*}{Library Dependencies (LIB)}
-    & Platform-specific libraries (e.g. fcntl) & Unix-only libraries missing elsewhere & 2  & 1 & \multirow{4}{*}{24} \\
+    & Platform-specific libraries (e.g., fcntl) & Unix-only libraries missing elsewhere & 2  & 1 & \multirow{4}{*}{24} \\
     & Missing libraries & Dependencies not universally available & 2 & 11 &                      \\
     & Dynamic library loading & DLL vs. SO file issues & 0 & 5 &                      \\
     & Binary wheel mismatch & Architecture-specific wheel incompatibilities & 0 & 3 &                      \\
@@ -854,7 +854,7 @@ issues) to the corresponding symptom signature and fix pattern.
     & Address already in use & \UniqueSymptom{\texttt{OSError: [Errno 98] Address already in use} (Linux) / \texttt{[WinError 10048]} (Windows)} & \DefensivePattern{} + \EnvPattern{} — catch OS-specific errors, use port 0 \\
     \midrule
     \textbf{LIB} &
-    Platform-specific libraries (e.g. \CodeIn{fcntl}) & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `fcntl'} (Windows)} & \DefensivePattern{} — conditional import provide fallback \\
+    Platform-specific libraries (e.g., fcntl) & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `fcntl'} (Windows)} & \DefensivePattern{} — conditional import provide fallback \\
     & Missing libraries & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `\{library\_name\}'}} & \DefensivePattern{} — optional import with fallback \\
     & Dynamic library loading & \UniqueSymptom{\texttt{OSError: [WinError 126] The specified module could not be found} (Windows)} & \DefensivePattern{} — guard loading prefer pure-Python \\
     & Binary wheel mismatch & \ContextSymptom{Context-dependent: installation succeeds but runtime fails with ABI errors} & \EnvPattern{} — install platform-appropriate wheel \\
@@ -876,7 +876,7 @@ issues) to the corresponding symptom signature and fix pattern.
     & Symlink privileges & \UniqueSymptom{\texttt{OSError: [WinError 1314] A required privilege is not held by the client} (Windows)} & \EnvPattern{} — detect support and use copies \\
     \midrule
     \textbf{SYS} &
-    /proc filesystem & \ContextSymptom{Context-dependent: /proc paths fail on macOS/Windows with generic FileNotFoundError} & \PortablePattern{} — use psutil or platform APIs \\
+    /proc filesystem & \ContextSymptom{Context-dependent: \texttt{/proc}    paths fail on macOS/Windows with generic FileNotFoundError} & \PortablePattern{} — use psutil or platform APIs \\
     & Timezone database & \UniqueSymptom{\texttt{zoneinfo.ZoneInfoNotFoundError: `No time zone found with key \{...\}'}} & \NormPattern{} — install tzdata or fallback \\
     \bottomrule
     \end{tabularx}
