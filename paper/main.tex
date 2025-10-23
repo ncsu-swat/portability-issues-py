@@ -1397,9 +1397,8 @@ Considering the location of the fix, we observe that in
 \TotalPRInProgramCode{} cases only the program code changes, and in
 \TotalPRInBothCode{} cases both the test and program code
 changes. Note that many cases require changes to the application logic
-itself to ensure consistent behavior across platforms.
+to ensure consistent behavior across platforms.
 
-% \Mar{Is there a reason for the two discussed PR to be of the same kind? If you think there is are good representative, justify it.}
 Next, we highlight three representative pull requests that illustrate
 how portability issues manifest in practice and how our identified fix
 patterns address them. These examples span multiple categories and demonstrate
@@ -1479,8 +1478,7 @@ Our fix addresses this issue by modifying line 4 to disable automatic
 deletion using \CodeIn{delete=False}, storing the file path on line~9
 before the file handle is closed, and manually cleaning up the
 temporary file on line 11 after the test completes. This pattern
-exemplifies the \textbf{Environment handling} fix strategy from our
-taxonomy, where platform-specific behavior is accommodated through
+exemplifies the \textbf{Environment handling} fix strategy, where platform-specific behavior is accommodated through
 careful resource management.
 %
 This case demonstrates how seemingly simple operations like temporary
@@ -1559,6 +1557,34 @@ Our fix addresses this Windows-specific limitation by detecting when the OS is W
 This case demonstrates how path operations that work seamlessly on Unix-like systems can encounter fundamental limitations on Windows due to the multi-drive architecture, highlighting the importance of considering platform-specific filesystem constraints in cross-platform development.
 
 
+\subsubsection{The hosteurope-letsencrypt Pull Request}
+
+We demonstrate another portability fix through the project~\cite{hosteuropeletsencrypt}, which has 65 stars and involves system administration functionality. 
+
+The problem we encountered falls into the \textbf{API Availability (API)} category, specifically the ``Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid()'' sub-category. The issue occurred where \CodeIn{os.geteuid()} was used to determine if the script was running with root privileges. This function is unavailable on Windows distributions of Python, causing \texttt{AttributeError: module `os' has no attribute `geteuid'} when the code is executed on Windows systems.
+
+Listing~\ref{lst:shared_fix} shows the diff of our fix applied to the shared module. The original code directly used the Unix-specific \CodeIn{os.geteuid()} function to check for root privileges. However, this approach fails on Windows, where the concept of ``root'' doesn't exist and the function is not available in the \texttt{os} module.
+
+\begin{lstlisting}[caption={Cross-platform admin privilege detection fix.}, label={lst:shared_fix}]
++import platform
++
++def is_admin():
++    try:
++        if platform.system() == "Windows":
++            import ctypes
++            return ctypes.windll.shell32.IsUserAnAdmin() != 0
++        else:
++            return os.geteuid() == 0
++    except:
++        return False
+
+-is_root = os.geteuid() == 0
++is_root = is_admin()
+\end{lstlisting}
+
+Our fix addresses this issue by creating a cross-platform \CodeIn{is_admin()} function that uses platform detection to choose the appropriate method for checking administrative privileges. On Windows systems, it uses the Windows API through \CodeIn{ctypes.windll.shell32.IsUserAnAdmin()} to determine if the current user has administrator privileges. On Unix-like systems (Linux/macOS), it maintains the original \CodeIn{os.geteuid() == 0} approach. The function includes error handling to gracefully fall back to \CodeIn{False} if either method fails. This pattern exemplifies the \textbf{Portable APIs + Defensive checks} fix strategy, where platform-specific APIs are wrapped with conditional logic and appropriate fallbacks.
+
+This case demonstrates how administrative privilege detection requires fundamentally different approaches across operating systems, with Windows using user access tokens and Unix systems using effective user IDs. The fix preserves the original functionality while extending compatibility to all major platforms.
 
 % 
 % OLD:
@@ -1708,19 +1734,36 @@ specify \texttt{encoding} when opening text files, and use context managers
 % - Construct validity: definitions of “portability” and categorization
 % - Conclusion validity: statistical soundness, possible biases
 
-% \Fix{one thing we remember is that we do not explore other versions of OSs}
-\noindent\textbf{Internal validity:} Our cross-OS test re-execution relies on GitHub Actions runners, which may differ from physical machines. Manual GitHub issue analysis involved subjective interpretation. 
-\emph{Mitigation:} We used standardized GitHub runners across three OS configurations and conducted manual analysis independently by multiple researchers with consensus validation.
+% \Fix{one thing we remember is that we do not explore other versions
+% of OSs}
 
-\noindent\textbf{External validity:} Our \NumProjectsTotal{} GitHub projects may not represent private repositories, enterprise software, or domain-specific applications. 
-\emph{Mitigation:} We sampled projects across diverse domains and sizes, our taxonomy emerges from fundamental OS differences that transcend specific domains, and our high pull request acceptance rate validates findings across multiple communities.
 
-\noindent\textbf{Construct validity:} Our ``portability issues'' definition focuses on behavioral differences across Linux, macOS, and Windows, excluding hardware architectures, Python versions, or dependency variations.
-\emph{Mitigation:} We validated our taxonomy through systematic comparison across two independent data sources and community validation via pull requests.
+\noindent\textbf{Internal validity.} Our cross-OS test re-execution relies on GitHub
+Actions runners, which may differ from physical machines. In addition,
+the manual analysis of GitHub issues involved subjective
+interpretation. Mitigation: multiple researchers independently
+conducted the manual analysis, and disagreements were resolved through
+consensus.
 
-\noindent\textbf{Conclusion validity:} Sample sizes vary across research questions (\NumProjectsReExecution{}, \NumProjectsIssueMining{}, \NumCodeUsedLLM{} snippets), affecting comparison reliability. 
-\emph{Mitigation:} We triangulated findings across multiple independent methods, validated taxonomy through both detection approaches, and achieved \TotalPRAprovedPercent{} pull request acceptance with zero rejections.
+\noindent\textbf{External validity.} The 2,042 GitHub projects we
+analyzed may not fully represent all software domains or
+domain-specific applications. Mitigation: we sampled projects of
+diverse domains and sizes. Our taxonomy is derived from fundamental
+operating-system differences and thus transcends specific
+domains. Furthermore, the high pull-request acceptance rate supports
+the generalizability of our findings across multiple developer
+communities.
 
+\noindent\textbf{Conclusion validity.} Sample sizes varied across
+research questions (500, 400, and 90 snippets), which may affect the
+reliability of cross-question comparisons. Mitigation: we triangulated
+results using multiple independent methods, validated the taxonomy
+with both detection approaches, and obtained a 48\% pull-request
+acceptance rate with zero rejections.
+
+Finally, our scope is limited to Linux, macOS, and Windows, which are
+representative platforms. We did not consider portability across
+hardware architectures or Python versions, for instance.
 
 \section{Related Work}
 \label{sec:related}
@@ -1778,14 +1821,21 @@ Other specialized frameworks like Pysa~\cite{pysa2021} (Meta's security-focused 
 \section{Conclusions and Future Work}
 \label{sec:conclusions}
 
-This study provides the first comprehensive empirical characterization of portability issues in Python code. Through cross-OS test re-execution and issue mining, we found that 16.8\% of projects exhibit portability problems (11.2\% via test re-execution, 23.8\% via issue mining), with File and Directories operations being most prevalent. 
-Our taxonomy identifies 7 root-cause categories with 24 sub-categories and 4 general fix patterns. LLMs achieve 40-79\% detection accuracy and 50-77\% repair success when guided by structured patterns. Our findings are validated through 33 pull requests with \TotalPRAprovedPercent{} acceptance rate.
+This study provides the first comprehensive characterization of
+portability issues in Python code. We found that 16.8\% of projects
+exhibit portability problems%(11.2\% via test re-execution and 23.8\%
+via issue mining) , with File and Directories operations being most
+prevalent. Our taxonomy shows 7 root-cause categories (with 24
+sub-categories) and 4 general fix patterns. LLMs achieve 40-79\%
+detection accuracy and 50-77\% repair success when guided by
+structured patterns. Our findings are validated through 33 pull
+requests with \TotalPRAprovedPercent{} acceptance rate.
+%
+Future work should develop hybrid detection tools and investigate
+fine-tune code agents for portability problems.
 
-Future work should develop hybrid detection tools and investigate specialized LLMs for portability patterns.
-
-\section*{Data Availability}
-\Fix{I dont know if we need this section.}
-The artifacts -- including datasets and scripts -- are publicly available~\ourrepo{}.
+\vspace{0.5ex}\noindent\textbf{Data Availability.}
+The artifacts --including datasets and scripts-- are publicly available~\ourrepo{}.
 
 \onecolumn \begin{multicols}{2}
 %\balance
