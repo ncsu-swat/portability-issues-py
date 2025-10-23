@@ -812,6 +812,8 @@ def test_special_case():
 
 
 \subsubsection{\textbf{Answering \RQTwoTwo{}}}
+\label{rq2-2}
+
 \noindent Understanding how portability issues manifest during
 execution is essential for rapid diagnosis and triaging. In this
 section, we examine the observable symptoms of portability
@@ -938,6 +940,8 @@ reliably predicted through static analysis alone.
 \end{tcolorbox}
  
 \subsubsection{\textbf{Answering \RQTwoThree{}}}
+\label{rq2-3}
+
 
 \noindent
 
@@ -1233,9 +1237,17 @@ positives.
 
 \subsubsection{LLMs for fixing.}
 \label{sec:llm-fixing}
-\noindent\textbf{Setup.}~ Following the classification experiment, we designed a complementary evaluation focused on the corrective capabilities of LLMs. In this phase, we used the \NumCodeNonPortableByLLM{} non-portable Python snippets identified earlier and prompted each model with two distinct repair configurations.  
-In the first configuration (\textit{generic prompt}), each model received a general instruction stating that the code exhibited portability issues and was asked to produce a corrected version (see Table~\ref{tab:llm_prompts}).  
-In the second configuration (\textit{pattern-guided prompt}), each non-portable snippet was accompanied by a description of the specific portability issue (derived from our taxonomy in \ref{rq2-1}) and the corresponding \textit{General Fix Pattern} from Table~\ref{tab:symptoms}. 
+\noindent\textbf{Setup.}~ Following the classification experiment, we designed a 
+complementary evaluation focused on the corrective capabilities of LLMs. In this 
+phase, we used the \NumCodeNonPortableByLLM{} non-portable Python snippets identified 
+earlier and prompted each model with two distinct repair configurations.  
+In the first configuration (\textit{generic prompt}), each model received a general 
+instruction stating that the code exhibited portability issues and was asked to 
+produce a corrected version (see Table~\ref{tab:llm_prompts}).  
+In the second configuration (\textit{pattern-guided prompt}), each non-portable 
+snippet was accompanied by the specific symptom (derived from our Unique
+signature symptoms in \ref{rq2-2}) and the corresponding \textit{General Fix Pattern} from 
+Table~\ref{tab:symptoms}. 
 
 The rationale for this approach is: (1) observe symptoms in the code, (2)
  look up the mapping in Table~\ref{tab:symptoms} (Symptom $\rightarrow$ 
