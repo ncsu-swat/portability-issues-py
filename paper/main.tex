@@ -1582,9 +1582,7 @@ Listing~\ref{lst:shared_fix} shows the diff of our fix applied to the shared mod
 +is_root = is_admin()
 \end{lstlisting}
 
-Our fix addresses this issue by creating a cross-platform \CodeIn{is_admin()} function that uses platform detection to choose the appropriate method for checking administrative privileges. On Windows systems, it uses the Windows API through \CodeIn{ctypes.windll.shell32.IsUserAnAdmin()} to determine if the current user has administrator privileges. On Unix-like systems (Linux/macOS), it maintains the original \CodeIn{os.geteuid() == 0} approach. The function includes error handling to gracefully fall back to \CodeIn{False} if either method fails. This pattern exemplifies the \textbf{Portable APIs + Defensive checks} fix strategy, where platform-specific APIs are wrapped with conditional logic and appropriate fallbacks.
-
-This case demonstrates how administrative privilege detection requires fundamentally different approaches across operating systems, with Windows using user access tokens and Unix systems using effective user IDs. The fix preserves the original functionality while extending compatibility to all major platforms.
+Our fix addresses this issue by creating a cross-platform \CodeIn{is_admin()} function that uses platform detection to choose the appropriate method for checking administrative privileges. On Windows systems, it uses the Windows API through \CodeIn{ctypes.windll.shell32.IsUserAnAdmin()} to determine if the current user has administrator privileges. On Unix-like systems (Linux/macOS), it maintains the original \CodeIn{os.geteuid() == 0} approach. The function includes error handling to gracefully fall back to \CodeIn{False} if either method fails. This pattern exemplifies the \textbf{Portable APIs + Defensive checks} fix strategy, where platform-specific APIs are wrapped with conditional logic and appropriate fallbacks. This case demonstrates how privilege detection requires different approaches across platforms. The fix preserves functionality while extending compatibility.
 
 % 
 % OLD:
