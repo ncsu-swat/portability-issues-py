@@ -1509,7 +1509,7 @@ The problem falls into the \textbf{API Availability (API)} category, specificall
 +is_root = is_admin()
 \end{lstlisting}
 
-Our fix creates a cross-platform \CodeIn{is\_admin()} function that uses Windows API for administrator checks on Windows and \CodeIn{os.geteuid()} on Unix-like systems. This exemplifies the \textbf{Portable APIs + Defensive checks} fix strategy, where platform-specific APIs are wrapped with conditional logic and appropriate fallbacks.
+Our fix creates a cross-platform \CodeIn{is\_admin()} function that uses Windows API for administrator checks on Windows and \CodeIn{os.geteuid()} on Unix-like systems. This exemplifies three fix strategies: \textbf{Environment handling} (platform-specific conditional logic), \textbf{Portable APIs} (OS detection), and \textbf{Defensive checks} (fallback handling).
 
 
 \subsubsection{The pydantic-extra-types Pull Request}
@@ -1555,34 +1555,6 @@ resolution errors.
 Our fix addresses this Windows-specific limitation by detecting when the OS is Windows (line 4) and checking whether the absolute path and current working directory have different anchors (drive letters). When this condition is met, the function returns the absolute path instead of attempting the problematic relative path conversion (line 5). This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific limitations are accommodated through conditional logic.
 
 This case demonstrates how path operations that work seamlessly on Unix-like systems can encounter fundamental limitations on Windows due to the multi-drive architecture, highlighting the importance of considering platform-specific filesystem constraints in cross-platform development.
-
-
-\subsubsection{The hosteurope-letsencrypt Pull Request}
-
-We demonstrate another portability fix through the project~\cite{hosteuropeletsencrypt}, which has 65 stars and involves system administration functionality. 
-
-The problem we encountered falls into the \textbf{API Availability (API)} category, specifically the ``Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid()'' sub-category. The issue occurred where \CodeIn{os.geteuid()} was used to determine if the script was running with root privileges. This function is unavailable on Windows distributions of Python, causing \texttt{AttributeError: module `os' has no attribute `geteuid'} when the code is executed on Windows systems.
-
-Listing~\ref{lst:shared_fix} shows the diff of our fix applied to the shared module. The original code directly used the Unix-specific \CodeIn{os.geteuid()} function to check for root privileges. However, this approach fails on Windows, where the concept of ``root'' doesn't exist and the function is not available in the \texttt{os} module.
-
-\begin{lstlisting}[caption={Cross-platform admin privilege detection fix.}, label={lst:shared_fix}]
-+import platform
-+
-+def is_admin():
-+    try:
-+        if platform.system() == "Windows":
-+            import ctypes
-+            return ctypes.windll.shell32.IsUserAnAdmin() != 0
-+        else:
-+            return os.geteuid() == 0
-+    except:
-+        return False
-
--is_root = os.geteuid() == 0
-+is_root = is_admin()
-\end{lstlisting}
-
-Our fix addresses this issue by creating a cross-platform \CodeIn{is_admin()} function that uses platform detection to choose the appropriate method for checking administrative privileges. On Windows systems, it uses the Windows API through \CodeIn{ctypes.windll.shell32.IsUserAnAdmin()} to determine if the current user has administrator privileges. On Unix-like systems (Linux/macOS), it maintains the original \CodeIn{os.geteuid() == 0} approach. The function includes error handling to gracefully fall back to \CodeIn{False} if either method fails. This pattern exemplifies the \textbf{Portable APIs + Defensive checks} fix strategy, where platform-specific APIs are wrapped with conditional logic and appropriate fallbacks. This case demonstrates how privilege detection requires different approaches across platforms. The fix preserves functionality while extending compatibility.
 
 % 
 % OLD:
@@ -1836,8 +1808,8 @@ requests with \TotalPRAprovedPercent{} acceptance rate.
 Future work should develop hybrid detection tools and investigate
 fine-tune code agents for portability problems.
 
-\vspace{0.5ex}\noindent\textbf{Data Availability.}
-The artifacts --including datasets and scripts-- are publicly available~\ourrepo{}.
+% \vspace{0.5ex}\noindent\textbf{Data Availability.}
+% The artifacts --including datasets and scripts-- are publicly available~\ourrepo{}.
 
 \onecolumn \begin{multicols}{2}
 %\balance
