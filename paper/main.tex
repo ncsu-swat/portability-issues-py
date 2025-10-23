@@ -836,9 +836,9 @@ issues) to the corresponding symptom signature and fix pattern.
     \renewcommand{\arraystretch}{1.15}
     \begin{tabularx}{\textwidth}{
         >{\raggedright\arraybackslash}m{0.06\textwidth}
-        >{\raggedright\arraybackslash}m{0.18\textwidth}
+        >{\raggedright\arraybackslash}m{0.13\textwidth}
         >{\raggedright\arraybackslash}X
-        >{\raggedright\arraybackslash}m{0.3\textwidth}
+        >{\raggedright\arraybackslash}m{0.31\textwidth}
     }
     \toprule
     \textbf{Root-cause category} & \textbf{Sub-categories} & \textbf{Symptom (verbatim error / message)} & \textbf{General Fix Pattern} \\
@@ -857,18 +857,21 @@ issues) to the corresponding symptom signature and fix pattern.
     & Address already in use & \UniqueSymptom{\texttt{OSError: [Errno 98] Address already in use} (Linux) / \texttt{[WinError 10048]} (Windows)} & \DefensivePattern{} + \EnvPattern{} — catch OS-specific errors, use port 0 \\
     \midrule
     \textbf{LIB} &
-    Platform-specific libraries (e.g., fcntl) & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `fcntl'} (Windows)} & \DefensivePattern{} — conditional import provide fallback \\
+%%    \MySpace{ (e.g., fcntl)} 
+    Platform-specific libraries& \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `fcntl'} (Windows)} & \DefensivePattern{} — conditional import provide fallback \\
     & Missing libraries & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `\{library\_name\}'}} & \DefensivePattern{} — optional import with fallback \\
     & Dynamic library loading & \UniqueSymptom{\texttt{OSError: [WinError 126] The specified module could not be found} (Windows)} & \DefensivePattern{} — guard loading prefer pure-Python \\
     & Binary wheel mismatch & \ContextSymptom{Context-dependent: installation succeeds but runtime fails with ABI errors} & \EnvPattern{} — install platform-appropriate wheel \\
     \midrule
     \textbf{API} &
-    Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid() &
-    \UniqueSymptom{\texttt{AttributeError: module `os' has no attribute `'\{method\}'} (Windows)} & \PortablePattern{} + \DefensivePattern{} — use platform.uname, hasattr guards \\
-    & Modules: readline, resource & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `\{module\}'} (Windows)} & \DefensivePattern{} — guard import use alternatives \\
+    Methods (e.g., os.uname) & %: os.uname(), os.geteuid(), os.getuid(), os.getpgid()
+    \UniqueSymptom{\texttt{AttributeError: module `os' has no attribute `\{method\}'} (Windows)} & \PortablePattern{} + \DefensivePattern{} — use platform.uname, hasattr guards \\
+    & Modules (e.g., readline)  & % : readline, resource
+    \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `\{module\}'} (Windows)} & \DefensivePattern{} — guard import use alternatives \\
     \midrule
     \textbf{ENV} &
-    No display in github CI (linux) & \UniqueSymptom{\texttt{TclError: no display name and no \$DISPLAY environment variable}} & \EnvPattern{} — skip GUI tests in CI \\
+    No display in github CI & \UniqueSymptom{\texttt{TclError: no
+        display name and no \$DISPLAY environment variable} (Linux)} & \EnvPattern{} — skip GUI tests in CI \\
     & GUI differences & \ContextSymptom{Context-dependent: widgets render or behave differently} & \EnvPattern{} — skip or mock GUI features \\
     & Missing curses & \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `\_curses'} (Windows)} & \DefensivePattern{} — conditional import with stub fallback \\
     & Terminal capabilities & \ContextSymptom{Context-dependent: color codes appear as text or formatting ignored} & \EnvPattern{} — detect capabilities degrade gracefully \\
@@ -925,13 +928,14 @@ filesystem block size problems appear as test assertions on exact byte counts th
 across platforms, and binary wheel mismatches often succeed during installation but fail at 
 runtime with ABI compatibility errors that vary by architecture.
 
-\MyPara{Implications for diagnosis}~Our findings reveal that while unique signatures 
-enable rapid automated triage for 62.5\% of portability issues, the remaining 37.5\% require 
-more sophisticated analysis. This suggests that fully automated portability 
-detection tools must go beyond simple log parsing and incorporate contextual analysis, 
-such as static code analysis to detect potential portability problems (\eg{}, hardcoded paths, shell command patterns, or 
-platform-specific API usage). The presence of context-dependent symptoms also highlights 
-the importance of comprehensive cross-platform testing, as these issues cannot be 
+\MyPara{Implications for diagnosis}~Our findings reveal that while
+unique signatures enable rapid automated triage for 62.5\% of
+portability issues, the remaining 37.5\% require more sophisticated
+analysis. This suggests that detection tools must go beyond simple log
+parsing and incorporate contextual hints (\eg{}, hardcoded paths,
+shell command patterns, or platform-specific API usage). The presence
+of context-dependent symptoms also highlights the importance of
+comprehensive cross-platform testing, as these issues cannot be
 reliably predicted through static analysis alone.
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
@@ -1733,7 +1737,9 @@ While Bear focuses on statistical modeling of OS nondeterminism, our work addres
 Other specialized frameworks like Pysa~\cite{pysa2021} (Meta's security-focused static analyzer) demonstrate the effectiveness of static analysis for Python but target different domains (e.g., taint analysis, SQL injection). In contrast, our work addresses cross-platform compatibility issues that manifest at runtime due to OS differences and are largely undetected by existing static analysis approaches.
 
 
-\Fix{Others}: \cite{sun2016bear}, Mobile apps testing: \cite{boushehrinejadmoradi2015testing}
+\Fix{Others}: \cite{sun2016bear}, Mobile apps testing:
+\cite{boushehrinejadmoradi2015testing}\Mar{@Denini, I don't understand this. Will you leave this here? It's
+  been there for a while}
 
 \section{Conclusions and Future Work}
 \label{sec:conclusions}
