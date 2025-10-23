@@ -1806,11 +1806,15 @@ NonDex's methodology of systematically varying platform behavior to expose hidde
 They show that even minor OS-level variations can propagate to failures or performance drops, revealing hidden fragility in applications that assume predictable OS behavior. 
 While Bear focuses on statistical modeling of OS nondeterminism, our work addresses deterministic portability issues stemming from platform-specific APIs, file systems, and libraries, providing concrete fix patterns through cross-platform testing.
 
-
 \noindent
-\textbf{Static Analysis for Python.}~As described in Section~\ref{sec:llm-detection}, we examined popular Python static analysis tools including Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright}. These tools primarily focus on code style, type correctness, security vulnerabilities, and general code quality, but provide minimal support for cross-platform portability detection. Only Ruff includes a single rule (\texttt{unspecified-encoding}) that addresses potential portability concerns. 
+\textbf{Static Analysis for Python.}~Popular tools such as Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright} focus on style, typing, and security, offering minimal support for portability detection—only Ruff includes \texttt{unspecified-encoding}.
+Specialized analyzers like Pysa~\cite{pysa2021} target security (e.g., taint and injection). Our work instead addresses runtime portability issues caused by OS variability, mostly missed by existing tools.
 
-Other specialized frameworks like Pysa~\cite{pysa2021} (Meta's security-focused static analyzer) demonstrate the effectiveness of static analysis for Python but target different domains (e.g., taint analysis, SQL injection). In contrast, our work addresses cross-platform compatibility issues that manifest at runtime due to OS differences and are largely undetected by existing static analysis approaches.
+
+% \noindent
+% \textbf{Static Analysis for Python.}~As described in Section~\ref{sec:llm-detection}, we examined popular Python static analysis tools including Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright}. These tools primarily focus on code style, type correctness, security vulnerabilities, and general code quality, but provide minimal support for cross-platform portability detection. Only Ruff includes a single rule (\texttt{unspecified-encoding}) that addresses potential portability concerns. 
+
+% Other specialized frameworks like Pysa~\cite{pysa2021} (Meta's security-focused static analyzer) demonstrate the effectiveness of static analysis for Python but target different domains (e.g., taint analysis, SQL injection). In contrast, our work addresses cross-platform compatibility issues that manifest at runtime due to OS differences and are largely undetected by existing static analysis approaches.
 
 
 % \Fix{Others}: \cite{sun2016bear}, Mobile apps testing:
