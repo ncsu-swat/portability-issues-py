@@ -1075,40 +1075,48 @@ Model & Precision & Recall & F1-Score & Accuracy \\
   \end{subtable}
 \end{table}
 
-\begin{table*}[t!]
+
+\begin{table}[t!]
 \centering
 \caption{Prompts used for LLM evaluation.}
 \label{tab:llm_prompts}
-\begin{subtable}[t]{\textwidth}
+
+\begin{subtable}[t]{0.97\columnwidth}
 \centering
 \caption{Generic prompt used for portability detection and fixing.}
 \label{tab:generic_prompt}
-\begin{tabular}{p{0.9\textwidth}}
+\begin{tabular}{p{0.97\columnwidth}}
 \toprule
 \textbf{Generic Prompt} \\
 \midrule
 You are a Python expert. Check the following code and answer: \\
-% \\
 1. Is there any operation in the code that could fail on a specific operating system (Linux, Mac, Windows)? \\
-2. If yes, explain why and on which OS it might fail. If it is fully portable finish saying ``Portable''. \\
+2. If yes, explain why and on which OS it might fail. If it is fully portable, finish saying ``Portable''. \\
 \bottomrule
 \end{tabular}
 \end{subtable}
 
 \vspace{1ex}
 
-\begin{subtable}[t]{\textwidth}
+\begin{subtable}[t]{0.97\columnwidth}
 \centering
 \caption{Pattern-guided prompt template to fix portability issues.}
 \label{tab:specific_prompts}
-\begin{tabular}{p{0.9\textwidth}}
+\begin{tabular}{p{0.97\columnwidth}}
 \toprule
 \textbf{Pattern-Guided Prompt Template} \\
 \midrule
-You are a Python expert. The following code has a portability problem: \\
-% \\
-This code has \texttt{<symptom-description>}.  Consider using one of the 
-following fixes \textit{<list-of-possible-fixes-for-the-symptom>}. \\
+You are a Python expert. The following code has a portability problem:
+\textit{<symptom-description>}. Fix the code, considering the
+following fix options \textit{<list-of-possible-fixes-for-the-symptom>}. \\
+\bottomrule
+\end{tabular}
+\end{subtable}
+\end{table}
+
+
+
+
 % \\
 % \textbf{Concrete Examples:} \\
 % \\
@@ -1120,10 +1128,7 @@ following fixes \textit{<list-of-possible-fixes-for-the-symptom>}. \\
 % \\
 % \textbf{For combined patterns (e.g., OS methods):} \\
 % ``This code has \texttt{AttributeError: module 'os' has no attribute '\{method\}'}. Consider using the \texttt{Portable APIs + Defensive checks} approach: \texttt{use platform.uname, hasattr guards}.'' \\
-\bottomrule
-\end{tabular}
-\end{subtable}
-\end{table*}
+
 
 \subsubsection{LLMs for detection}\sloppy
 \label{sec:llm-detection}
@@ -1164,7 +1169,7 @@ portability violations are less frequent. We used the openrouter.ai
 API~\cite{openrouter} to interact with the models. Each model was
 prompted with a consistent template that included the code snippet and
 a question asking whether the code was portable across Windows, Linux,
-and Mac (see Table~\ref{tab:llm_prompts} for the exact prompts used). The models' responses were parsed to extract their
+and Mac (see Table~\ref{tab:llm_prompts}). We parse the answers to extract 
 classification decisions.
 % 
 %% Unrelated code was treated as portable for classification purposes, since such snippets do not exhibit any portability problems. Consequently, the dataset comprised 60 portable samples (30 corrected + 30 unrelated) and 30 non-portable samples. 
@@ -1250,23 +1255,27 @@ snippet was accompanied by the specific symptom (derived from our Unique
 signature symptoms in \ref{rq2-2}) and the corresponding \textit{General Fix Pattern} from 
 Table~\ref{tab:symptoms}. 
 
-The rationale for this approach is: (1) observe symptoms in the code, (2)
- look up the mapping in Table~\ref{tab:symptoms} (Symptom $\rightarrow$ 
- General Fix Pattern), and (3) prompt the LLM with specific fix pattern 
- guidance. For example, when encountering code that produces 
- \texttt{AttributeError: module `signal' has no attribute `SIGHUP'}, 
- we would prompt: ``This code has \texttt{AttributeError: module `signal' 
- has no attribute `SIGHUP'}. Consider using the \texttt{Defensive checks} 
- pattern: \texttt{guard signals per platform}.'' Table~\ref{tab:llm_prompts} 
- shows the template structure used for these pattern-guided prompts.   
+The rationale for this approach is: (1) observe symptoms in the code,
+(2) look up the mapping in Table~\ref{tab:symptoms} (Symptom
+$\rightarrow$ General Fix Pattern), and (3) prompt the LLM with
+specific fix pattern guidance. For example, when encountering code
+that produces \texttt{AttributeError: module `signal' has no attribute
+  `SIGHUP'}, we would provide that symptom together with corresponding
+fix(es) (Table~\ref{tab:symptoms}). Table~\ref{tab:llm_prompts} shows
+the template structure used for these pattern-guided prompts.  This
+design evaluates whether structured repair guidance improves the
+model's ability to generate functionally portable code. Each model
+attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in
+90 repair attempts per configuration.
 
-This design aimed to evaluate whether structured repair guidance could improve the models' ability to generate functionally portable code. Each model attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in 90 repair attempts per configuration.
-
-\noindent\textbf{Metrics.} ~We evaluated the correctness of each generated fix using two criteria:  
-(i) the modified code must execute successfully without errors across all target platforms (Linux, macOS, Windows), and  
-(ii) the fix must preserve the intended functionality of the original program.  
-Fixes that met both criteria were considered \textit{correct}; otherwise, they were labeled as \textit{incorrect}.  
-Accuracy was computed as the ratio of correct fixes to the total number of attempted repairs per model.
+\noindent\textbf{Metrics.} ~We evaluate the correctness of a generated
+fix with two criteria: (i) the modified code must execute successfully
+without errors across all target platforms (Linux, macOS, Windows),
+and (ii) the fix must preserve the intended functionality of the
+original program.  Fixes that met both criteria were considered
+\textit{correct}; otherwise, they were labeled as \textit{incorrect}.
+Accuracy is the ratio of correct fixes to the total number of repair
+attempts.
 
 \begin{table}[t]
 \centering
@@ -1347,13 +1356,13 @@ This section discusses the pull requests (PRs) we submitted.
 % For example: Figure 4 (Distribution of time-to-fix), Table 5 (Engagement metrics per project)
 
 \subsubsection{Method}
-We applied the cross-OS test re-execution method
+We use the cross-OS test re-execution method
 (\textsection~\ref{sec:methods}) to detect portability problems in our
-application set (\textsection~\ref{sec:projects}). For each identified
-issue, we applied one of the four fix patterns from our taxonomy
-(Table~\ref{tab:symptoms}), tested the fix locally on the affected
-platforms, and submitted a pull request with a detailed explanation of the
-portability problem and the proposed solution.\Ali{Minor updates, please review}
+\emph{application set} (\textsection~\ref{sec:projects}). For each
+issue, we apply one of the four fix patterns from our
+taxonomy~(Table~\ref{tab:symptoms}), tested the fix locally on the
+affected platforms, and submitted a pull request with a detailed
+explanation of the portability problem and the proposed solution.
 
 % \Den{Add a Reference to your PR list in the artifact? \ourrepo{}}\Mar{No}
 % \Den{but we used your personal account to create the PRs.}
@@ -1372,19 +1381,22 @@ and file handling inconsistencies across platforms. Conversely,
 ``Process and Signals'' issues exhibited the highest acceptance rate
 (100\%), likely due to their critical impact on application
 functionality.
-
+%
 Considering the location of the fix, we observe that in
-\TotalPRInTestsCode{} only the test code changes, in
+\TotalPRInTestsCode{} cases only the test code changes, in
 \TotalPRInProgramCode{} cases only the program code changes, and in
 \TotalPRInBothCode{} cases both the test and program code
-changes. This distribution suggests that while some portability issues
-can be resolved by adjusting tests to be more environment-aware, many
-require changes to the application logic itself to ensure consistent
-behavior across platforms.
+changes. Note that many cases require changes to the application logic
+itself to ensure consistent behavior across platforms.
 
-Next, we highlight two representative pull requests that illustrate
-how portability issues manifest in practice and how our identified fix 
+Next, we highlight two representative pull requests\Mar{Is there a
+  reason for the two discussed PR to be of the same kind? If you think
+there is are good representative, justify it.} that illustrate
+how portability issues manifest in practice and how our identified fix
 patterns address them.
+
+%% This distribution suggests that while some portability issues
+%% can be resolved by adjusting tests to be more environment-aware,
 
 
 \begin{table}[t!]
@@ -1416,15 +1428,30 @@ patterns address them.
 \subsubsection{The webassets Pull Request}
 % https://github.com/miracle2k/webassets/pull/562
 
-We illustrate how portability issues manifest and are fixed through the webassets project~\cite{webassets}. Webassets is an asset management library for Python web development with 932 stars, used for bundling and processing web assets like CSS and JavaScript files.
-
-
-The problem we encountered falls into the \textbf{File and Directories (FILE)} category, specifically the ``File locking'' sub-category. The issue occurred in the test suite where \CodeIn{tempfile.NamedTemporaryFile} was used without disabling automatic deletion, causing failures on Windows due to platform-specific file locking behavior~\cite{pythonnamedtemporaryfile}. On Windows, the operating system locks open files more aggressively than on Unix-like systems, preventing the same file from being reopened while still in use.
-
-Listing~\ref{lst:webassets_fix} shows the diff of our fix applied to the test file. The original code created a temporary file within a context manager that automatically deleted the file upon exiting the \texttt{with} block. However, on Windows, attempting to reopen this file (which the test needed to do because it's a fixture) failed because the file was still locked by the previous file handle.
+We illustrate how portability issues manifest and are fixed through
+the webassets project~\cite{webassets}. Webassets is an asset
+management library for Python web development with 932 stars, used for
+bundling and processing web assets like CSS and JavaScript files.
+%
+The problem we encountered falls into the \textbf{File and Directories
+  (FILE)} category, specifically the ``File locking''
+sub-category. The issue occurred in the test suite where
+\CodeIn{tempfile.NamedTemporaryFile} was used without disabling
+automatic deletion, causing failures on Windows due to
+platform-specific file locking
+behavior~\cite{pythonnamedtemporaryfile}. On Windows, the operating
+system locks open files more aggressively than on Unix-like systems,
+preventing the same file from being reopened while still in use.
+%
+Listing~\ref{lst:webassets_fix} shows the diff of our fix applied to
+the test file. The original code created a temporary file within a
+context manager that automatically deleted the file upon exiting the
+\texttt{with} block. However, on Windows, attempting to reopen this
+file (which the test needed to do because it's a fixture) failed
+because the file was still locked by the previous file handle.
  %, language=diff
 
-\begin{lstlisting}[caption={Diff showing our approved PR for temporary file handling issue.}, label={lst:webassets_fix}]
+\begin{lstlisting}[caption={Approved PR for temporary file handling issue.}, label={lst:webassets_fix}]
  @pytest.fixture
  def tmp_file():
 -  with tempfile.NamedTemporaryFile(mode="wt") as f:
@@ -1438,22 +1465,52 @@ Listing~\ref{lst:webassets_fix} shows the diff of our fix applied to the test fi
 +  os.remove(tmp_path)  # clean up after the test
 \end{lstlisting}
 
-Our fix addresses this issue by modifying line 4 to disable automatic deletion using \CodeIn{delete=False}, storing the file path on line~9 before the file handle is closed, and manually cleaning up the temporary file on line 11 after the test completes. This pattern exemplifies the \textbf{Environment handling} fix strategy from our taxonomy, where platform-specific behavior is accommodated through careful resource management.
-
-This case demonstrates how seemingly simple operations like temporary file creation can have subtle portability implications that only manifest under specific platform conditions, highlighting the importance of cross-platform testing for robust software development.
+Our fix addresses this issue by modifying line 4 to disable automatic
+deletion using \CodeIn{delete=False}, storing the file path on line~9
+before the file handle is closed, and manually cleaning up the
+temporary file on line 11 after the test completes. This pattern
+exemplifies the \textbf{Environment handling} fix strategy from our
+taxonomy, where platform-specific behavior is accommodated through
+careful resource management.
+%
+This case demonstrates how seemingly simple operations like temporary
+file creation can have subtle portability implications that only
+manifest under specific platform conditions, highlighting the
+importance of cross-platform testing for robust software development.
 
 
 \subsubsection{The pydantic-extra-types Pull Request}
 % https://github.com/pydantic/pydantic-extra-types/pull/333
 
-We present another case from the pydantic-extra-types project~\cite{pydantic_extra_types}. Pydantic-extra-types is a library that provides additional type validators for Pydantic with 290 stars, used for extending Pydantic's~\cite{pydantic_validation} validation capabilities with specialized data types.
+We show an example from the pydantic-extra-types
+project~\cite{pydantic_extra_types}, a library that provides
+additional type validators for Pydantic with 290 stars, used for
+extending Pydantic's~\cite{pydantic_validation} validation
+capabilities with specialized data types.
+%
+The problem we encountered also falls into the \textbf{File and
+  Directories (FILE)} category, specifically the ``Path separators''
+sub-category. The issue occurred in test fixtures where
+\CodeIn{os.path.relpath} was used to create relative paths from
+absolute paths. On Windows, this function fails when the source and
+target paths are on different drives (e.g., \texttt{C:\textbackslash}
+vs \texttt{D:\textbackslash}), as Windows cannot create relative paths
+between different drive letters~\cite{python-relpath}.
+%
+Listing~\ref{lst:pydantic_fix} shows our fix applied to test
+fixtures. The original code assumed that \CodeIn{os.path.relpath}
+would always succeed, but on Windows this assumption may not hold. For
+example, when tests are executed from a project directory located on
+drive \texttt{D:} while the system temporary directory (used to create
+fixture files) resides on drive \texttt{C:}, the function call fails
+because it attempts to compute a relative path across drives. Since
+the location of temporary directories on Windows is determined by
+environment variables and may differ from the working
+drive~\cite{python-tempfile}, this behavior can lead to path
+resolution errors.
 
-The problem we encountered also falls into the \textbf{File and Directories (FILE)} category, specifically the ``Path separators'' sub-category. The issue occurred in test fixtures where \CodeIn{os.path.relpath} was used to create relative paths from absolute paths. On Windows, this function fails when the source and target paths are on different drives (e.g., \texttt{C:\textbackslash} vs \texttt{D:\textbackslash}), as Windows cannot create relative paths between different drive letters~\cite{python-relpath}.
 
-Listing~\ref{lst:pydantic_fix} shows our fix applied to test fixtures. The original code assumed that \CodeIn{os.path.relpath} would always succeed, but on Windows this assumption may not hold. For example, when tests are executed from a project directory located on drive \texttt{D:} while the system temporary directory (used to create fixture files) resides on drive \texttt{C:}, the function call fails because it attempts to compute a relative path across drives. Since the location of temporary directories on Windows is determined by environment variables and may differ from the working drive~\cite{python-tempfile}, this behavior can lead to path resolution errors and subsequent test failures.
-
-
-\begin{lstlisting}[caption={Diff showing our fix for cross-drive relative path issue.}, label={lst:pydantic_fix}]
+\begin{lstlisting}[caption={Patch for cross-drive relative path issue.}, label={lst:pydantic_fix}]
  @pytest.fixture
  def relative_file_path(absolute_file_path: Path) -> Path:
 + cwd = Path.cwd()
