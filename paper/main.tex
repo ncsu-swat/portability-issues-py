@@ -1393,11 +1393,17 @@ Considering the location of the fix, we observe that in
 changes. Note that many cases require changes to the application logic
 itself to ensure consistent behavior across platforms.
 
-Next, we highlight two representative pull requests\Mar{Is there a
-  reason for the two discussed PR to be of the same kind? If you think
-there is are good representative, justify it.} that illustrate
+\Mar{Is there a reason for the two discussed PR to be of the same kind? If you think there is are good representative, justify it.}
+\Den{I think it's fine to have both examples from the same category, as long as they illustrate different sub-categories and fix patterns. The FILE category is the most prevalent, so it makes sense to highlight examples from there. Please review the next paragraph.}
+
+Next, we highlight two representative pull requests that illustrate
 how portability issues manifest in practice and how our identified fix
-patterns address them.
+patterns address them. Both examples are from the File and Directories (FILE)
+category, which represents the most prevalent portability issue.
+% (62 projects, 41\% of all issues). 
+These cases demonstrate different 
+sub-categories (file locking and path separators) and showcase how the same 
+fix pattern (Environment handling) addresses distinct underlying problems.
 
 %% This distribution suggests that while some portability issues
 %% can be resolved by adjusting tests to be more environment-aware,
@@ -1737,9 +1743,10 @@ While Bear focuses on statistical modeling of OS nondeterminism, our work addres
 Other specialized frameworks like Pysa~\cite{pysa2021} (Meta's security-focused static analyzer) demonstrate the effectiveness of static analysis for Python but target different domains (e.g., taint analysis, SQL injection). In contrast, our work addresses cross-platform compatibility issues that manifest at runtime due to OS differences and are largely undetected by existing static analysis approaches.
 
 
-\Fix{Others}: \cite{sun2016bear}, Mobile apps testing:
-\cite{boushehrinejadmoradi2015testing}\Mar{@Denini, I don't understand this. Will you leave this here? It's
-  been there for a while}
+% \Fix{Others}: \cite{sun2016bear}, Mobile apps testing:
+% \cite{boushehrinejadmoradi2015testing}\Mar{@Denini, I don't understand this. Will you leave this here? It's
+  % been there for a while}
+% \Den{I think this others are out of scope now. We can remove them.}
 
 \section{Conclusions and Future Work}
 \label{sec:conclusions}
