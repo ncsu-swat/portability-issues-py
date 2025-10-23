@@ -829,7 +829,7 @@ issues) to the corresponding symptom signature and fix pattern.
      Symptom cells are color-coded: \colorbox{UniqueSymptomColor}{unique signatures} enable immediate diagnosis;
      \colorbox{ContextSymptomColor}{context-dependent} require code inspection.
      Fix patterns are color-coded to show reuse across 
-     categories: \DefensivePattern{}, \PortablePattern{}, \NormPattern{}, \EnvPattern{}.}
+     categories: \EnvPattern{}, \DefensivePattern{}, \NormPattern{}, \PortablePattern{}.}
     \label{tab:symptoms}
     \scriptsize
     \setlength{\tabcolsep}{3pt}
@@ -865,7 +865,7 @@ issues) to the corresponding symptom signature and fix pattern.
     \midrule
     \textbf{API} &
     Methods (e.g., os.uname) & %: os.uname(), os.geteuid(), os.getuid(), os.getpgid()
-    \UniqueSymptom{\texttt{AttributeError: module `os' has no attribute `\{method\}'} (Windows)} & \PortablePattern{} + \DefensivePattern{} — use platform.uname, hasattr guards \\
+    \UniqueSymptom{\texttt{AttributeError: module `os' has no attribute `\{method\}'} (Windows)} & \PortablePattern{} + \DefensivePattern{} + \EnvPattern{} — use platform.uname, hasattr guards, OS detection \\
     & Modules (e.g., readline)  & % : readline, resource
     \UniqueSymptom{\texttt{ModuleNotFoundError: No module named `\{module\}'} (Windows)} & \DefensivePattern{} — guard import use alternatives \\
     \midrule
@@ -957,42 +957,47 @@ Table~\ref{tab:symptoms}). Figure~\ref{fig:patterns} illustrates these patterns 
 concrete examples:
 
 \begin{packed_enumerate}
+\item \textbf{Environment handling} adapts code and tests to runtime conditions by 
+detecting platform capabilities and adjusting behavior. Listing~\ref{lst:environment} 
+shows this pattern using pytest's \texttt{skipif} decorator to conditionally skip 
+tests on macOS. This allows test suites to adapt to platform-specific capabilities 
+without maintaining separate test files for each operating system. This is the most 
+prevalent pattern, accounting for 35.7\% of all pattern applications.
+
 \item \textbf{Defensive checks} add guards, fallbacks, or conditional imports to handle 
 missing APIs or modules gracefully. Listing~\ref{lst:defensive} demonstrates this 
 pattern by wrapping the \texttt{readline} import (unavailable on Windows) in a 
 \texttt{try/except} block with a fallback value, allowing the code to continue 
 execution rather than crash. This pattern applies when functionality may be unavailable 
-on certain platforms.
-
-\item \textbf{Environment handling} adapts code and tests to runtime conditions by 
-detecting platform capabilities and adjusting behavior. Listing~\ref{lst:environment} 
-shows this pattern using pytest's \texttt{skipif} decorator to conditionally skip 
-tests on macOS. This allows test suites to adapt to platform-specific capabilities 
-without maintaining separate test files for each operating system.
+on certain platforms and accounts for 32.1\% of pattern applications.
 
 \item \textbf{Normalization} standardizes encodings, line endings, paths, or filenames 
 to prevent spurious differences across platforms. Listing~\ref{lst:normalization} 
 illustrates this by constructing file paths using \texttt{os.path.sep} instead of 
 hardcoded separators, ensuring correct behavior on both Unix (forward slash) and 
-Windows (backslash) systems.
+Windows (backslash) systems. This pattern accounts for 21.4\% of applications.
 
 \item \textbf{Portable APIs} replace OS-specific constructs with cross-platform 
 abstractions. Listing~\ref{lst:portable} demonstrates replacing the Unix-only 
 \texttt{os.uname()} function with the portable \texttt{platform.uname()} function, 
-ensuring the code works correctly on both Unix-like systems and Windows.
+ensuring the code works correctly on both Unix-like systems and Windows. While 
+used least frequently (10.7\%), this pattern targets specific, well-defined problems 
+where standard cross-platform abstractions exist.
 
 \end{packed_enumerate}  
 
 
 \MyPara{Pattern
   distribution}~Figure~\ref{fig:fix_pattern_distribution} shows how
-these patterns distribute across the 24 portability
-sub-categories. Defensive checks and Environment handling are the most
-prevalent strategies, each addressing 9 sub-categories (33.3\%),
-together accounting for two-thirds of all portability fixes.
-Normalization applies to 6 sub-categories (22.2\%), primarily
+these patterns distribute across all pattern applications. Some
+sub-categories require multiple patterns, resulting in 28 total
+pattern applications across 24 sub-categories. Environment handling is
+the most prevalent strategy, accounting for 10 applications (35.7\%),
+followed by Defensive checks with 9 applications (32.1\%), together
+representing approximately two-thirds of all pattern applications.
+Normalization accounts for 6 applications (21.4\%), primarily
 addressing file and path-related issues. Portable APIs, while used
-least frequently (3 sub-categories, 11.1\%), targets specific,
+least frequently (3 applications, 10.7\%), targets specific,
 well-defined problems where standard cross-platform abstractions
 exist. This distribution reflects the nature of portability issues:
 most problems arise from platform-environmental differences
@@ -1009,12 +1014,12 @@ developers for both implementation and review.
 \pie[
     text=legend,
     radius=1.8,
-    color={DefensiveColor!80,EnvColor!80,NormColor!80,PortableColor!80}
+    color={EnvColor!80,DefensiveColor!80,NormColor!80,PortableColor!80}
 ]{
-    33.3/Defensive checks (9),
-    33.3/Environment handling (9),
-    22.2/Normalization (6),
-    11.1/Portable APIs (3)
+    35.7/Environment handling (10),
+    32.1/Defensive checks (9),
+    21.4/Normalization (6),
+    10.7/Portable APIs (3)
 }
 \end{tikzpicture}
 % \vspace{-0.5em}
@@ -1026,10 +1031,11 @@ developers for both implementation and review.
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
 \textbf{RQ\textsubscript{2.3} (fixes)}: We identified \NumFixPatterns{} general fix 
 patterns that collectively address all \NumRootCauseSubcategories{} portability 
-sub-categories: Defensive checks and Environment handling are most prevalent (each 
-33.3\%), followed by Normalization (22.2\%) and Portable APIs (11.1\%). These patterns 
-represent recurring, localized code modifications that provide systematic guidance 
-for resolving portability issues across diverse contexts.
+sub-categories. Some sub-categories require multiple patterns, resulting in 28 total 
+pattern applications. Environment handling is most prevalent (35.7\%), followed by 
+Defensive checks (32.1\%), Normalization (21.4\%), and Portable APIs (10.7\%). 
+These patterns represent recurring, localized code modifications that provide 
+systematic guidance for resolving portability issues across diverse contexts.
 \end{tcolorbox}
 
 \subsection{\textbf{Answering} \RQThree{}}
