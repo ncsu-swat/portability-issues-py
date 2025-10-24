@@ -1553,7 +1553,7 @@ drive~\cite{python-tempfile}, this behavior can lead to path
 resolution errors.
 
 
-\begin{lstlisting}[caption={Patch for cross-drive relative path issue.}, label={lst:pydantic_fix}]
+\begin{lstlisting}[float, caption={Patch for cross-drive relative path issue.}, label={lst:pydantic_fix}]
  @pytest.fixture
  def relative_file_path(absolute_file_path: Path) -> Path:
 + cwd = Path.cwd()
@@ -1766,11 +1766,14 @@ While their work acknowledges environment-related testing issues, it focuses on 
 Our work differs in three key ways: (1) we provide the first comprehensive taxonomy of Python portability issues with 7 categories and 24 sub-categories, (2) we develop systematic fix patterns that address these issues, and (3) we evaluate both detection and repair approaches using modern tools (LLMs) that were not available during their study. 
 % Additionally, their work treats environmental issues as one category among many test defects, while our study specifically targets cross-platform portability as the primary research focus.
 
-\noindent
+% \noindent
 % \textbf{Dynamic Analysis for Portability.}~Rasley \etal{}~\cite{rasley2015detecting} introduced \CodeIn{CheckAPI}, a runtime framework for detecting latent cross-platform API violations by contrasting execution traces against platform-specific interface specifications. 
 % While their approach focuses on API compatibility violations through dynamic analysis, our work addresses a broader scope of portability issues including file systems, encoding, dependencies, and environment differences. 
 % Additionally, CheckAPI requires pre-defined API specifications for each platform, whereas our cross-OS test re-execution approach directly observes behavioral differences without requiring prior knowledge of platform-specific interfaces. 
 % Our taxonomy also extends beyond API violations to capture the full spectrum of portability problems encountered in practice.
+
+% SHORT VERSION::
+\noindent
 \textbf{Dynamic Analysis for Portability.}~Rasley \etal{}~\cite{rasley2015detecting} proposed \CodeIn{CheckAPI}, a runtime framework that detects cross-platform API violations by comparing execution traces with platform-specific specifications.
 Unlike CheckAPI, which requires predefined API models and targets API-level compatibility, our work observes behavioral differences directly through cross-OS re-execution and covers broader portability issues such as file systems, encodings, dependencies, and environments.
 
@@ -1781,11 +1784,17 @@ Unlike CheckAPI, which requires predefined API models and targets API-level comp
 % However, both approaches share the insight that software often makes implicit assumptions about platform behavior that lead to failures in different environments.
 % NonDex's methodology of systematically varying platform behavior to expose hidden assumptions parallels our cross-OS testing approach, though we focus on inter-platform rather than intra-platform variability.
 
-
+% Short VERSION::1:
 \noindent
-\textbf{API Specification Assumptions and Non-determinism.}~Shi \etal{}~\cite{ShiETAL16NonDex} and Gyori \etal{}~\cite{gyori2016nondex} developed NonDex, a tool that detects bugs caused by deterministic assumptions about non-deterministic Java API behaviors (e.g., iteration order in hash-based collections).
-While NonDex explores intra-platform variability within the JVM, our work targets deterministic differences across operating systems.
-Both approaches expose how implicit assumptions about platform behavior can lead to failures in different environments.
+\textbf{API Specification Assumptions and Non-determinism.}~Shi \etal{}~\cite{ShiETAL16NonDex} and Gyori \etal{}~\cite{gyori2016nondex} introduced \textit{NonDex}, a tool that systematically explores alternative valid behaviors of Java APIs to uncover bugs caused by deterministic assumptions about inherently non-deterministic specifications (e.g., iteration order in hash-based collections).
+Although NonDex focuses on intra-platform variability within the JVM, our study examines deterministic divergences that emerge across different operating systems.
+Both approaches highlight how subtle, often implicit, assumptions about platform behavior can compromise software reliability under diverse execution environments.
+
+% SHORT VERSION:2:
+% \noindent
+% \textbf{API Specification Assumptions and Non-determinism.}~Shi \etal{}~\cite{ShiETAL16NonDex} and Gyori \etal{}~\cite{gyori2016nondex} developed NonDex, a tool that detects bugs caused by deterministic assumptions about non-deterministic Java API behaviors (e.g., iteration order in hash-based collections).
+% While NonDex explores intra-platform variability within the JVM, our work targets deterministic differences across operating systems.
+% Both approaches expose how implicit assumptions about platform behavior can lead to failures in different environments.
 
 \noindent
 \textbf{OS Variability and System Reliability.}~Sun \etal{}~\cite{sun2016bear} proposed \textit{Bear}, a framework that quantifies how nondeterministic OS behaviors (e.g., scheduling and I/O timing) affect application reliability. 
@@ -1825,9 +1834,11 @@ requests with \TotalPRAprovedPercent{} acceptance rate.
 Future work should develop hybrid detection tools and investigate
 fine-tune code agents for portability problems.
 
-\vspace{0.5ex}
+\vspace{0.7ex}
 \noindent\textbf{Data Availability.}
-The artifacts --including datasets and scripts-- are publicly available~\ourrepo{}.
+The artifacts --including datasets and scripts-- are publicly available:
+
+\ourrepo{}.
 
 \onecolumn \begin{multicols}{2}
 %\balance
