@@ -5,9 +5,9 @@
 | Category                | Opened | Accepted | Rejected |
 | ----------------------- | :----: | :------: | :------: |
 | File and Directories    |   15   |    9     |    0     |
-| API Availability        |   12   |    3     |    0     |
+| API Availability        |   13   |    3     |    0     |
 | Process and Signals     |   2    |    2     |    0     |
 | System Information      |   2    |    1     |    0     |
 | Library Dependencies    |   1    |    1     |    0     |
 | Environment and Display |   1    |    0     |    0     |
-| **Total**               | **33** |  **16**  |  **0**   |
+| **Total**               | **33** |  **17**  |  **0**   |
