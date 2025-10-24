@@ -2,6 +2,38 @@
 
 This artifact contains data for our paper analyzing portability issues in Python projects.
 
+## Setup
+
+To run our scripts, you need to install the required dependencies. We recommend using a virtual environment.
+
+### Installation Instructions
+
+#### Unix/Linux/macOS
+
+```bash
+# create virtual environment
+python -m venv env
+
+# activate virtual environment
+source env/bin/activate
+
+# install requirements
+pip install -r requirements.txt
+```
+
+#### Windows
+
+```cmd
+# create virtual environment
+python -m venv env
+
+# activate virtual environment
+env\Scripts\activate
+
+# install requirements
+pip install -r requirements.txt
+```
+
 ## Structure
 
 - `data/` - 2,042 analyzed projects

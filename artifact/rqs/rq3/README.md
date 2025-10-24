@@ -20,10 +20,21 @@ This folder contains data for evaluating static analysis tools and Large Languag
 ### Repair Results
 
 - `fix_results/fix_generic_summary.csv` - Repair results with generic prompts
-- `fix_results/fix_specific_summary.csv` - Repair results with pattern-guided prompts
-- `fix_results/fix_generic_analysis.py` - Script for correctness verification
+- `fix_results/fix_guided_summary.csv` - Repair results with pattern-guided prompts
+- `fix_results/fix_generic_analysis.py` - Script for generic repair correctness verification
+- `fix_results/fix_guided_analysis.py` - Script for guided repair correctness verification
+
+### Generated Fixes
+
+- `fixes/generic/` - Generated fixes using generic prompts
+- `fixes/guided/` - Generated fixes using pattern-guided prompts
 
 ### Scripts
 
 - `run_detection.py` - Script to run detection evaluation
-- `run_fix_generic.py` - Script to run the generict repair evaluation
+- `run_fix_generic.py` - Script to run the generic repair evaluation
+- `run_fix_guided.py` - Script to run the pattern-guided repair evaluation
+
+### Additional Files
+
+- `guided.csv` - Pattern guidance data for repair evaluation

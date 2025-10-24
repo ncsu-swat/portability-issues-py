@@ -1,4 +1,4 @@
-## Row Do Developers Respond to Reported Portability Issues
+## How Do Developers Respond to Reported Portability Issues
 
 **Note:** We used our personal accounts to submit pull requests for this study. To maintain the double-blind review process, PR links will be made available upon paper acceptance.
 
