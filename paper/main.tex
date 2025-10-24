@@ -280,7 +280,7 @@ Section~\ref{sec:pr-discussion} elaborates the validation stage.
 \hline
 Statistic & \#Tests & SLOC & \#Sha & Age & $\star$ \\
 \hline
-Mean & 583.94 & 42,467.26 & 2,883.25 & 6.24 & 6,147.88 \\
+Mean & 572.51 & 42,467.26 & 2,883.25 & 6.24 & 6,147.88 \\
 Median & 72 & 7,478 & 426.50 & 5.87 & 83.50 \\
 Min & 1 & 2 & 2 & 0.3 & 2 \\
 Max & 36,588 & 3,237,895 & 194,153 & 17.27 & 366,472 \\
@@ -1796,10 +1796,11 @@ Specialized analyzers like Pysa~\cite{pysa2021} target security (e.g., taint and
 \label{sec:conclusions}
 
 This study provides the first comprehensive characterization of
-portability issues in Python code. We found that 16.8\% of projects
-exhibit portability problems%(11.2\% via test re-execution and 23.8\%
-via issue mining) , with File and Directories operations being most
-prevalent. Our taxonomy shows 7 root-cause categories (with 24
+portability issues in Python code. Across 900 projects, we found that
+16.8\% exhibit portability problems: 11.2\% (56/500) via cross-OS test
+re-execution and 23.8\% (95/400) via issue mining. File and Directories
+operations are the most prevalent category. 
+Our taxonomy shows 7 root-cause categories (with 24
 sub-categories) and 4 general fix patterns. LLMs achieve 40-79\%
 detection accuracy and 50-77\% repair success when guided by
 structured patterns. Our findings are validated through 33 pull
