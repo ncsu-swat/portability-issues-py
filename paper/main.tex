@@ -280,7 +280,7 @@ Section~\ref{sec:pr-discussion} elaborates the validation stage.
 \hline
 Statistic & \#Tests & SLOC & \#Sha & Age & $\star$ \\
 \hline
-Mean & 572.51 & 42,467.26 & 2,883.25 & 6.24 & 6,147.88 \\
+Mean & 572.51 & 41,635.39 & 2,883.25 & 6.24 & 6,147.88 \\
 Median & 72 & 7,478 & 426.50 & 5.87 & 83.50 \\
 Min & 1 & 2 & 2 & 0.3 & 2 \\
 Max & 36,588 & 3,237,895 & 194,153 & 17.27 & 366,472 \\
@@ -292,7 +292,7 @@ Sum & 1,169,056 & 85,019,457 & - & - & - \\
 
 Table~\ref{tab:project-stats} summarizes key characteristics of the
 \NumProjectsTotal{} evaluated projects.  On average, each project comprises
-approximately 584 tests and 42K lines of Python code (SLOC), with a
+approximately 573 tests and 41.6K lines of Python code (SLOC), with a
 median of 72 tests and 7.5K SLOC, indicating a distribution skewed by
 a few very large systems. Regarding repository activity, projects have
 on average 2.9K commits, a median of 427, and span a mean lifetime of
@@ -1486,12 +1486,14 @@ file creation can have subtle portability implications that only
 manifest under specific platform conditions, highlighting the
 importance of cross-platform testing for robust software development.
 
-\Den{New:}
 \subsubsection{The hosteurope-letsencrypt Pull Request}
 
 We demonstrate another portability fix through the hosteurope-letsencrypt project~\cite{hosteuropeletsencrypt}, which has 67 stars and involves system administration functionality. 
 % 
-The problem falls into the \textbf{API Availability (API)} category, specifically the ``Methods: os.uname(), os.geteuid(), os.getuid(), os.getpgid()'' sub-category. The issue occurred where \CodeIn{os.geteuid()} was used to check for root privileges, but this function is unavailable on Windows, causing \texttt{AttributeError: module `os' has no attribute `geteuid'}.
+The problem falls into the \textbf{API Availability (API)} category. 
+The issue occurred where \CodeIn{os.geteuid()} was used to check for 
+root privileges, but this function is unavailable on Windows, causing 
+\texttt{AttributeError: module `os' has no attribute `geteuid'}.
 % 
 \begin{lstlisting}[caption={Cross-platform admin privilege detection fix.}, label={lst:shared_fix}]
 +import platform
@@ -1509,7 +1511,13 @@ The problem falls into the \textbf{API Availability (API)} category, specificall
 +is_root = is_admin()
 \end{lstlisting}
 
-Our fix creates a cross-platform \CodeIn{is\_admin()} function that uses Windows API for administrator checks on Windows and \CodeIn{os.geteuid()} on Unix-like systems. This exemplifies three fix strategies: \textbf{Environment handling} (platform-specific conditional logic), \textbf{Portable APIs} (OS detection), and \textbf{Defensive checks} (fallback handling).
+Our fix creates a cross-platform \CodeIn{is\_admin()} function that 
+replaces the Unix-only \CodeIn{os.geteuid()} call. The fix uses 
+\textbf{Portable APIs} (line 4: \CodeIn{platform.system()} for OS detection), 
+\textbf{Environment handling} (lines 6, 8: conditional logic that calls 
+\CodeIn{ctypes.windll.shell32.IsUserAnAdmin()} for Windows or 
+\CodeIn{os.geteuid()} for Unix), and \textbf{Defensive checks} 
+(lines 3--9: try-except wrapper with safe fallback).
 
 
 \subsubsection{The pydantic-extra-types Pull Request}
@@ -1809,8 +1817,8 @@ requests with \TotalPRAprovedPercent{} acceptance rate.
 Future work should develop hybrid detection tools and investigate
 fine-tune code agents for portability problems.
 
-% \vspace{0.5ex}\noindent\textbf{Data Availability.}
-% The artifacts --including datasets and scripts-- are publicly available~\ourrepo{}.
+\vspace{0.5ex}\noindent\textbf{Data Availability.}
+The artifacts --including datasets and scripts-- are publicly available~\ourrepo{}.
 
 \onecolumn \begin{multicols}{2}
 %\balance
