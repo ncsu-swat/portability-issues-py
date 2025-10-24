@@ -1437,10 +1437,11 @@ different sub-categories and fix patterns from our taxonomy.
 \subsubsection{The webassets Pull Request}
 % https://github.com/miracle2k/webassets/pull/562
 
-We illustrate how portability issues manifest and are fixed through
-the webassets project~\cite{webassets}. Webassets is an asset
-management library for Python web development with 932 stars, used for
-bundling and processing web assets like CSS and JavaScript files.
+% We illustrate how portability issues manifest and are fixed through
+% the webassets project~\cite{webassets}. Webassets is an asset
+% management library for Python web development with 932 stars, used for
+% bundling and processing web assets like CSS and JavaScript files.
+We illustrate how portability issues manifest and are fixed using the \textit{webassets} project~\cite{webassets}, a Python library for managing and bundling web assets such as CSS and JavaScript, with 932 stars.
 %
 The problem we encountered falls into the \textbf{File and Directories
   (FILE)} category, specifically the ``File locking''
@@ -1765,10 +1766,12 @@ Our work differs in three key ways: (1) we provide the first comprehensive taxon
 % Additionally, their work treats environmental issues as one category among many test defects, while our study specifically targets cross-platform portability as the primary research focus.
 
 \noindent
-\textbf{Dynamic Analysis for Portability.}~Rasley \etal{}~\cite{rasley2015detecting} introduced \CodeIn{CheckAPI}, a runtime framework for detecting latent cross-platform API violations by contrasting execution traces against platform-specific interface specifications. 
-While their approach focuses on API compatibility violations through dynamic analysis, our work addresses a broader scope of portability issues including file systems, encoding, dependencies, and environment differences. 
-Additionally, CheckAPI requires pre-defined API specifications for each platform, whereas our cross-OS test re-execution approach directly observes behavioral differences without requiring prior knowledge of platform-specific interfaces. 
-Our taxonomy also extends beyond API violations to capture the full spectrum of portability problems encountered in practice.
+% \textbf{Dynamic Analysis for Portability.}~Rasley \etal{}~\cite{rasley2015detecting} introduced \CodeIn{CheckAPI}, a runtime framework for detecting latent cross-platform API violations by contrasting execution traces against platform-specific interface specifications. 
+% While their approach focuses on API compatibility violations through dynamic analysis, our work addresses a broader scope of portability issues including file systems, encoding, dependencies, and environment differences. 
+% Additionally, CheckAPI requires pre-defined API specifications for each platform, whereas our cross-OS test re-execution approach directly observes behavioral differences without requiring prior knowledge of platform-specific interfaces. 
+% Our taxonomy also extends beyond API violations to capture the full spectrum of portability problems encountered in practice.
+\textbf{Dynamic Analysis for Portability.}~Rasley \etal{}~\cite{rasley2015detecting} proposed \CodeIn{CheckAPI}, a runtime framework that detects cross-platform API violations by comparing execution traces with platform-specific specifications.
+Unlike CheckAPI, which requires predefined API models and targets API-level compatibility, our work observes behavioral differences directly through cross-OS re-execution and covers broader portability issues such as file systems, encodings, dependencies, and environments.
 
 % \noindent
 % \textbf{API Specification Assumptions and Non-determinism.}~Shi \etal{}~\cite{ShiETAL16NonDex} and Gyori \etal{}~\cite{gyori2016nondex} developed NonDex, a tool for detecting erroneous assumptions about deterministic implementations of non-deterministic API specifications in Java.
