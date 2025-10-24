@@ -1762,14 +1762,18 @@ While their approach focuses on API compatibility violations through dynamic ana
 Additionally, CheckAPI requires pre-defined API specifications for each platform, whereas our cross-OS test re-execution approach directly observes behavioral differences without requiring prior knowledge of platform-specific interfaces. 
 Our taxonomy also extends beyond API violations to capture the full spectrum of portability problems encountered in practice.
 
+% \noindent
+% \textbf{API Specification Assumptions and Non-determinism.}~Shi \etal{}~\cite{ShiETAL16NonDex} and Gyori \etal{}~\cite{gyori2016nondex} developed NonDex, a tool for detecting erroneous assumptions about deterministic implementations of non-deterministic API specifications in Java.
+% NonDex systematically explores different valid behaviors of APIs (e.g., iteration order of hash-based collections) to reveal bugs that arise from deterministic assumptions about inherently non-deterministic operations.
+% While NonDex addresses non-determinism within a single platform (Java/JVM), our work focuses on deterministic differences across different operating system platforms.
+% However, both approaches share the insight that software often makes implicit assumptions about platform behavior that lead to failures in different environments.
+% NonDex's methodology of systematically varying platform behavior to expose hidden assumptions parallels our cross-OS testing approach, though we focus on inter-platform rather than intra-platform variability.
+
+
 \noindent
-\textbf{API Specification Assumptions and Non-determinism.}~Shi \etal{}~\cite{ShiETAL16NonDex} and Gyori \etal{}~\cite{gyori2016nondex} developed NonDex, a tool for detecting erroneous assumptions about deterministic implementations of non-deterministic API specifications in Java.
-NonDex systematically explores different valid behaviors of APIs (e.g., iteration order of hash-based collections) to reveal bugs that arise from deterministic assumptions about inherently non-deterministic operations.
-While NonDex addresses non-determinism within a single platform (Java/JVM), our work focuses on deterministic differences across different operating system platforms.
-However, both approaches share the insight that software often makes implicit assumptions about platform behavior that lead to failures in different environments.
-NonDex's methodology of systematically varying platform behavior to expose hidden assumptions parallels our cross-OS testing approach, though we focus on inter-platform rather than intra-platform variability.
-
-
+\textbf{API Specification Assumptions and Non-determinism.}~Shi \etal{}~\cite{ShiETAL16NonDex} and Gyori \etal{}~\cite{gyori2016nondex} developed NonDex, a tool that detects bugs caused by deterministic assumptions about non-deterministic Java API behaviors (e.g., iteration order in hash-based collections).
+While NonDex explores intra-platform variability within the JVM, our work targets deterministic differences across operating systems.
+Both approaches expose how implicit assumptions about platform behavior can lead to failures in different environments.
 
 \noindent
 \textbf{OS Variability and System Reliability.}~Sun \etal{}~\cite{sun2016bear} proposed \textit{Bear}, a framework that quantifies how nondeterministic OS behaviors (e.g., scheduling and I/O timing) affect application reliability. 
@@ -1777,7 +1781,7 @@ They show that even minor OS-level variations can propagate to failures or perfo
 While Bear focuses on statistical modeling of OS nondeterminism, our work addresses deterministic portability issues stemming from platform-specific APIs, file systems, and libraries, providing concrete fix patterns through cross-platform testing.
 
 \noindent
-\textbf{Static Analysis for Python.}~Popular tools such as Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright} focus on style, typing, and security, offering minimal support for portability detection—only Ruff includes \texttt{unspecified-encoding}.
+\textbf{Static Analysis for Python.}~Popular tools such as Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright} focus on style, typing, and security, offering minimal support for portability detection—only Ruff includes \texttt{unspecified-encoding}~\cite{encruff}.
 Specialized analyzers like Pysa~\cite{pysa2021} target security (e.g., taint and injection). Our work instead addresses runtime portability issues caused by OS variability, mostly missed by existing tools.
 
 
@@ -1809,8 +1813,9 @@ requests with \TotalPRAprovedPercent{} acceptance rate.
 Future work should develop hybrid detection tools and investigate
 fine-tune code agents for portability problems.
 
-% \vspace{0.5ex}\noindent\textbf{Data Availability.}
-% The artifacts --including datasets and scripts-- are publicly available~\ourrepo{}.
+\vspace{0.5ex}
+\noindent\textbf{Data Availability.}
+The artifacts --including datasets and scripts-- are publicly available~\ourrepo{}.
 
 \onecolumn \begin{multicols}{2}
 %\balance
