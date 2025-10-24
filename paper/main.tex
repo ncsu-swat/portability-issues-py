@@ -327,7 +327,7 @@ and execute tests in the wild across multiple virtual machines.
 
 % \textbf{Methodology.} \Fix{Describe here the methodology to answer RQ1.}
 
-\MyPara{\RQTwo{}}~\textbf{Rationale.}~Assuming that identifying and
+\MyPara{\RQTwo{}}~Assuming that identifying and
 resolving portability issues is an important problem, it is also
 essential to understand how these issues manifest (i.e., their
 symptoms), what their root causes are, and how they are typically
@@ -970,7 +970,7 @@ missing APIs or modules gracefully. Listing~\ref{lst:defensive} demonstrates thi
 pattern by wrapping the \texttt{readline} import (unavailable on Windows) in a 
 \texttt{try/except} block with a fallback value, allowing the code to continue 
 execution rather than crash. This pattern applies when functionality may be unavailable 
-on certain platforms and accounts for 32.1\% of pattern applications.
+on certain platforms and accounts for 32.2\% of pattern applications.
 
 \item \textbf{Normalization} standardizes encodings, line endings, paths, or filenames 
 to prevent spurious differences across platforms. Listing~\ref{lst:normalization} 
@@ -994,7 +994,7 @@ these patterns distribute across all pattern applications. Some
 sub-categories require multiple patterns, resulting in 28 total
 pattern applications across 24 sub-categories. Environment handling is
 the most prevalent strategy, accounting for 10 applications (35.7\%),
-followed by Defensive checks with 9 applications (32.1\%), together
+followed by Defensive checks with 9 applications (32.2\%), together
 representing approximately two-thirds of all pattern applications.
 Normalization accounts for 6 applications (21.4\%), primarily
 addressing file and path-related issues. Portable APIs, while used
@@ -1018,7 +1018,7 @@ developers for both implementation and review.
     color={EnvColor!80,DefensiveColor!80,NormColor!80,PortableColor!80}
 ]{
     35.7/Environment handling (10),
-    32.1/Defensive checks (9),
+    32.2/Defensive checks (9),
     21.4/Normalization (6),
     10.7/Portable APIs (3)
 }
@@ -1034,7 +1034,7 @@ developers for both implementation and review.
 patterns that collectively address all \NumRootCauseSubcategories{} portability 
 sub-categories. Some sub-categories require multiple patterns, resulting in 28 total 
 pattern applications. Environment handling is most prevalent (35.7\%), followed by 
-Defensive checks (32.1\%), Normalization (21.4\%), and Portable APIs (10.7\%). 
+Defensive checks (32.2\%), Normalization (21.4\%), and Portable APIs (10.7\%). 
 These patterns represent recurring, localized code modifications that provide 
 systematic guidance for resolving portability issues across diverse contexts.
 \end{tcolorbox}
@@ -1186,9 +1186,7 @@ classification decisions.
 %% Unrelated code was treated as portable for classification purposes, since such snippets do not exhibit any portability problems. Consequently, the dataset comprised 60 portable samples (30 corrected + 30 unrelated) and 30 non-portable samples. 
 % 
 
-\noindent\textbf{Metrics.}~We used standard metrics to measure
-performance of binary classifiers (e.g., precision, recall, accuracy,
-etc.). Table~\ref{tab:llm_detection_results} shows
+\noindent\textbf{Metrics.}~We used standard metrics to measure the performance of binary classifiers (e.g., precision, recall, accuracy, etc.)~\cite{saito2015precision}. Table~\ref{tab:llm_detection_results} shows
 results. Table~\ref{tab:confusion_matrices_combined} shows the
 confusion matrices associated with each LLM, illustrating the
 classification of the \NumCodeUsedLLM{} samples.
