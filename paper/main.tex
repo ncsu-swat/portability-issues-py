@@ -1753,10 +1753,15 @@ hardware architectures or Python versions, for instance.
 Our work relates to prior research on software portability and cross-platform testing, but differs in scope and methodology.
 
 \noindent
-\textbf{Empirical Studies on portability.}~Ghandorh \etal{}~\cite{ghandorh2020systematic} performed a systematic literature review of metrics and methodologies for assessing software portability. 
+\textbf{Empirical Studies on Software Portability.}~Ghandorh \etal{}~\cite{ghandorh2020systematic} performed a systematic literature review of metrics and methodologies for assessing software portability. 
 Their work surveys existing approaches for measuring portability but does not provide empirical data on real-world portability issues or concrete solutions. 
 In contrast, our study provides the first large-scale empirical characterization of Python portability problems through systematic testing and issue analysis, developing both a comprehensive taxonomy and practical repair patterns. 
 While their review identifies the fragmented nature of portability research, our work addresses this gap by establishing a unified framework specifically for Python cross-platform issues.
+
+\Den{New after review:}Wang \etal{}~\cite{wang2023compatibility} present an empirical study of compatibility issues in deep learning systems, analyzing thousands of posts to categorize common problems and their causes. 
+While their findings relate to cross-environment inconsistencies, the scope is broader than portability and centered on DL ecosystems. 
+Our work instead focuses directly on Python cross-platform portability, providing a targeted taxonomy and concrete repair strategies.
+
 
 \noindent
 \textbf{Cross-Platform Testing and Defect Studies.}~Vahabzadeh \etal{}~\cite{vahabzadeh2015empirical} conducted an empirical study on test code defects, finding that approximately 18\% of test bugs stem from environmental factors, particularly Windows vs. Unix platform differences. 
@@ -1802,6 +1807,12 @@ While Bear focuses on statistical modeling of OS nondeterminism, our work addres
 \noindent
 \textbf{Static Analysis for Python.}~Popular tools such as Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright} focus on style, typing, and security, offering minimal support for portability detection—only Ruff includes \texttt{unspecified-encoding}~\cite{encruff}.
 Specialized analyzers like Pysa~\cite{pysa2021} target security (e.g., taint and injection). Our work instead addresses runtime portability issues caused by OS variability, mostly missed by existing tools.
+
+\Den{New after review:}
+\noindent
+\textbf{Performance Portability.}~Complementary to OS-level portability, prior work has examined achieving portable performance across heterogeneous hardware through data-centric intermediate representations and automatic optimizations~\cite{ziogas2021productivity}. While performance portability aims at maintaining efficiency across architectures, our study instead targets OS-level portability, a distinct space focused on functional correctness.
+
+Al Awar \etal{} present PyKokkos, a Python framework that attains performance portability by translating Python kernels into optimized C++ Kokkos code~\cite{al2021performance}. Their approach enables near-native execution while keeping development in Python. Like other performance-portable systems, PyKokkos addresses architectural efficiency, whereas our work focuses on OS-level inconsistencies across operating systems.
 
 
 % \noindent
