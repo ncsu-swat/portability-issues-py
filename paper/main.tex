@@ -29,7 +29,8 @@
 
 \begin{abstract}
   \sloppy
-While Python is designed as a cross-platform language,
+\Den{Title changed}
+  While Python is designed as a cross-platform language,
 real-world applications encounter portability failures
 when deployed across different operating systems.
 We present the first large-scale empirical study of
@@ -592,9 +593,15 @@ issue mining, we analyzed issue titles, descriptions, developer
 discussions, and comments to understand the root causes and symptoms.
 Through iterative open coding~\cite{strauss1990basics} across both
 data sources, we identified recurring patterns and grouped instances
-with similar underlying causes. This process was conducted by the
-authors, with regular discussions to resolve ambiguities and refine
-category definitions.
+with similar underlying causes. 
+\Den{New:}
+The coding process was conducted independently 
+by two co-authors, with regular discussions to resolve 
+ambiguities and refine category definitions. To ensure reliability, we computed 
+inter-coder agreement on a subset of the data, achieving 96.4\% agreement with a 
+Cohen's kappa of 0.89, reflecting almost perfect inter-coder reliability. During the later phases of the coding process,
+new issues no longer produced new categories, indicating that the taxonomy 
+had reached theoretical saturation. \Den{(need some cite?)}
 
 The resulting taxonomy of root causes consists of \textbf{\NumRootCauseCategories{}}
 high-level categories (e.g., FILE, PROC, LIB) with \textbf{\NumRootCauseSubcategories{}}
@@ -1275,7 +1282,9 @@ the template structure used for these pattern-guided prompts.  This
 design evaluates whether structured repair guidance improves the
 model's ability to generate functionally portable code. Each model
 attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in
-90 repair attempts per configuration.
+90 repair attempts per configuration. \Den{New:} We also examine repair performance 
+separately for cases with explicit symptom descriptions versus cases with 
+empty symptom fields to understand how input characteristics influence model effectiveness.
 
 \noindent\textbf{Metrics.} ~We evaluate the correctness of a generated
 fix with two criteria: (i) the modified code must execute successfully
@@ -1320,6 +1329,40 @@ attempts.
 \end{subtable}
 \end{table}
 
+\begin{table}[t]
+\centering
+\caption{\Den{New table:}Pattern-guided repair performance breakdown: cases with symptom descriptions vs.\ empty symptom fields.}
+\label{tab:llm_fix_results_symptom_breakdown}
+
+\begin{subtable}[t]{0.47\textwidth}
+\centering
+\caption{With symptom descriptions ($n=23$).}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Model} & \textbf{Correct} & \textbf{Incorrect} & \textbf{Accuracy} \\
+\midrule
+\texttt{grok-4-fast} & 19 & 4 & 0.83 \\
+\texttt{gpt-4o-mini} & 16 & 7 & 0.70 \\
+\texttt{llama-3.3} & 12 & 11 & 0.52 \\
+\bottomrule
+\end{tabular}
+\end{subtable}
+\hfill
+\begin{subtable}[t]{0.47\textwidth}
+\centering
+\caption{Without symptom descriptions ($n=7$).}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Model} & \textbf{Correct} & \textbf{Incorrect} & \textbf{Accuracy} \\
+\midrule
+\texttt{grok-4-fast} & 4 & 3 & 0.57 \\
+\texttt{gpt-4o-mini} & 5 & 2 & 0.71 \\
+\texttt{llama-3.3} & 3 & 4 & 0.43 \\
+\bottomrule
+\end{tabular}
+\end{subtable}
+\end{table}
+
 \noindent\textbf{Analysis of results.}~ The results in Table~\ref{tab:llm_fix_results_combined} show that all models exhibited limited success under the generic prompt setting, with accuracies ranging from 27\% to 43\%.  
 This indicates that, when provided with only minimal context, most LLMs struggle to infer the exact nature of portability issues and to produce appropriate cross-platform corrections.  
 While the \texttt{grok-4-fast} model outperformed the others, its success rate remained below 50\%, suggesting that general-purpose reasoning alone is insufficient for precise code repair in this domain.
@@ -1329,6 +1372,11 @@ The inclusion of explicit problem descriptions and generalized fix patterns incr
 The \texttt{grok-4-fast} model achieved the highest accuracy (76.67\%), demonstrating a clear ability to integrate structured repair hints into its reasoning process.  
 Similarly, \texttt{gpt-4o-mini} reached 70\%, producing fixes that were more consistent with the intended patterns while preserving functional correctness.  
 The \texttt{llama-3.3} model also showed moderate improvement (50\%), particularly in cases involving straightforward path and API adjustments, though it still struggled with more complex logic integration.
+
+\Den{New:}A closer examination of the pattern-guided results (Table~\ref{tab:llm_fix_results_symptom_breakdown}) reveals that the availability of symptom descriptions significantly influences LLM performance.  
+Among the 23 cases with explicit symptom descriptions, \texttt{grok-4-fast} achieves notably higher accuracy (0.83), while \texttt{gpt-4o-mini} and \texttt{llama-3.3} maintain similar or slightly improved performance (0.70 and 0.52, respectively).  
+In contrast, for the 7 cases where symptom descriptions were not available due to context-dependent or unstable symptoms, the prompt contained only the code snippet and general instructions to apply the relevant fix pattern. In these cases, performance generally declines: \texttt{grok-4-fast} drops to 0.57, while \texttt{gpt-4o-mini} remains robust at 0.71 and \texttt{llama-3.3} falls to 0.43.  
+This pattern demonstrates that explicit symptom descriptions provide valuable context that particularly benefits more sophisticated models, whereas some cases can still be addressed even without rich contextual information.
 
 Overall, these findings highlight the strong impact of guided contextualization on LLM-based repair.  
 When supplied with explicit repair patterns, the models produced significantly more reliable and semantically consistent fixes, confirming that structured guidance can substantially enhance cross-platform reasoning capabilities in code generation tasks.
@@ -1365,13 +1413,17 @@ This section discusses the pull requests (PRs) we submitted.
 % For example: Figure 4 (Distribution of time-to-fix), Table 5 (Engagement metrics per project)
 
 \subsubsection{Method}
+\Den{New: updated as RBQ2 requested}
 We use the cross-OS test re-execution method
 (\textsection~\ref{sec:methods}) to detect portability problems in our
 \emph{application set} (\textsection~\ref{sec:projects}). For each
-issue, we apply one of the four fix patterns from our
-taxonomy~(Table~\ref{tab:symptoms}), tested the fix locally on the
-affected platforms, and submitted a pull request with a detailed
-explanation of the portability problem and the proposed solution.
+identified issue, we manually apply one of the four fix patterns from our
+taxonomy~(Table~\ref{tab:symptoms}). We then validate each fix by re-running 
+the affected tests on all three operating systems (Linux, macOS, Windows) to 
+confirm consistent behavior across platforms. Once the fix is validated, we 
+submit a pull request to the project, providing a clear description of the 
+portability issue, the root cause, and an explanation of how the proposed change 
+resolves the problem.
 
 % \Den{Add a Reference to your PR list in the artifact? \ourrepo{}}\Mar{No}
 % \Den{but we used your personal account to create the PRs.}
@@ -1812,7 +1864,7 @@ Specialized analyzers like Pysa~\cite{pysa2021} target security (e.g., taint and
 \noindent
 \textbf{Performance Portability.}~Complementary to OS-level portability, prior work has examined achieving portable performance across heterogeneous hardware through data-centric intermediate representations and automatic optimizations~\cite{ziogas2021productivity}. While performance portability aims at maintaining efficiency across architectures, our study instead targets OS-level portability, a distinct space focused on functional correctness.
 
-Al Awar \etal{} present PyKokkos, a Python framework that attains performance portability by translating Python kernels into optimized C++ Kokkos code~\cite{al2021performance}. Their approach enables near-native execution while keeping development in Python. Like other performance-portable systems, PyKokkos addresses architectural efficiency, whereas our work focuses on OS-level inconsistencies across operating systems.
+Al Awar \etal{} present PyKokkos~\cite{al2021performance}, a Python framework that attains performance portability by translating Python kernels into optimized C++ Kokkos code~\cite{kokkos}. Their approach enables near-native execution while keeping development in Python. Like other performance-portable systems, PyKokkos addresses architectural efficiency, whereas our work focuses on OS-level inconsistencies across operating systems.
 
 
 % \noindent
@@ -1845,9 +1897,12 @@ fine-tune code agents for portability problems.
 
 \vspace{0.7ex}
 \noindent\textbf{Data Availability.}
-The artifacts --including datasets and scripts-- are publicly available:
+\Den{Updated:}
+The artifacts --including datasets, submitted PRs and scripts-- are publicly available: \ourrepo
 
-\ourrepo{}.
+
+\section*{Acknowledgments}
+We thank the anonymous reviewers for their valuable feedback. This work was supported in part by ... \Den{To be filled}
 
 \onecolumn \begin{multicols}{2}
 %\balance
