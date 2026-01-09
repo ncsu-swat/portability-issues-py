@@ -1,5 +1,37 @@
 % \documentclass[acmsmall,screen,review]{acmart} % OOPSLA
-\documentclass[sigconf,review,anonymous]{acmart} % MSR
+% \documentclass[sigconf,review,anonymous]{acmart} % MSR
+\documentclass[sigconf]{acmart} % MSR
+
+% --- Author 1 (NC State) ---
+\author{Author One}
+\affiliation{%
+  \institution{North Carolina State University}
+  \city{Raleigh}
+  \state{NC}
+  \country{USA}
+}
+\email{author1@ncsu.edu}
+
+% --- Author 2 (NC State) ---
+\author{Author Two}
+\affiliation{%
+  \institution{North Carolina State University}
+  \city{Raleigh}
+  \state{NC}
+  \country{USA}
+}
+\email{author2@ncsu.edu}
+
+% --- Author 3 (UFPE, Brazil) ---
+\author{Author Three}
+\affiliation{%
+  \institution{Federal University of Pernambuco}
+  \city{Recife}
+  \state{PE}
+  \country{Brazil}
+}
+\email{author3@ufpe.br}
+
 
 %%%%%
 %% We will need to add this in camera-ready
@@ -29,12 +61,11 @@
 
 \begin{abstract}
   \sloppy
-\Den{Title changed}
   While Python is designed as a cross-platform language,
 real-world applications encounter portability failures
 when deployed across different operating systems.
 We present the first large-scale empirical study of
-\Den{cross-OS} portability issues in Python, analyzing \NumProjectsTotal{}
+cross-OS portability issues in Python, analyzing \NumProjectsTotal{}
 open-source repositories using two complementary approaches:
 systematic cross-OS test re-execution and manual analysis
 of GitHub issues. Our cross-platform testing of
@@ -59,7 +90,7 @@ when provided with structured guidance. Through \TotalPROpened{} contributed pul
 we demonstrate practical applicability and developer acceptance 
 (\TotalPRAccepted{} merged, zero rejected) of our findings. This work establishes
 the first comprehensive baseline for understanding and addressing
-\Den{cross-OS} portability issues in Python, providing actionable insights
+cross-OS portability issues in Python, providing actionable insights
 for developers, tool designers, and the broader research community. 
 \end{abstract}
 
@@ -207,7 +238,7 @@ or Docker Compose configuration.
 
 
 \sloppy
-This paper presents a study of \Den{cross-OS} portability issues in Python
+This paper presents a study of cross-OS portability issues in Python
 projects. Specifically, we analyze \NumProjectsTotal{} repositories to assess the prevalence of such issues,
 their characteristics (e.g., symptoms, root causes, and fixes), the
 effectiveness of existing tools (e.g., static analyzers and large
@@ -594,14 +625,13 @@ discussions, and comments to understand the root causes and symptoms.
 Through iterative open coding~\cite{strauss1990basics} across both
 data sources, we identified recurring patterns and grouped instances
 with similar underlying causes. 
-\Den{New:}
 The coding process was conducted independently 
-by two co-authors, with regular discussions to resolve 
+by two co-authors, with regular discussion to resolve 
 ambiguities and refine category definitions. To ensure reliability, we computed 
 inter-coder agreement on a subset of the data, achieving 96.4\% agreement with a 
 Cohen's kappa of 0.89, reflecting almost perfect inter-coder reliability. During the later phases of the coding process,
 new issues no longer produced new categories, indicating that the taxonomy 
-had reached theoretical saturation. \Den{(need some cite?)}
+had reached theoretical saturation. 
 
 The resulting taxonomy of root causes consists of \textbf{\NumRootCauseCategories{}}
 high-level categories (e.g., FILE, PROC, LIB) with \textbf{\NumRootCauseSubcategories{}}
@@ -1282,7 +1312,7 @@ the template structure used for these pattern-guided prompts.  This
 design evaluates whether structured repair guidance improves the
 model's ability to generate functionally portable code. Each model
 attempted to fix all \NumCodeNonPortableByLLM{} snippets, resulting in
-90 repair attempts per configuration. \Den{New:} We also examine repair performance 
+90 repair attempts per configuration. We also examine repair performance 
 separately for cases with explicit symptom descriptions versus cases with 
 empty symptom fields to understand how input characteristics influence model effectiveness.
 
@@ -1331,7 +1361,7 @@ attempts.
 
 \begin{table}[t]
 \centering
-\caption{\Den{New table:}Pattern-guided repair performance breakdown: cases with symptom descriptions vs.\ empty symptom fields.}
+\caption{Pattern-guided repair performance breakdown: cases with symptom descriptions vs.\ empty symptom fields.}
 \label{tab:llm_fix_results_symptom_breakdown}
 
 \begin{subtable}[t]{0.47\textwidth}
@@ -1373,7 +1403,8 @@ The \texttt{grok-4-fast} model achieved the highest accuracy (76.67\%), demonstr
 Similarly, \texttt{gpt-4o-mini} reached 70\%, producing fixes that were more consistent with the intended patterns while preserving functional correctness.  
 The \texttt{llama-3.3} model also showed moderate improvement (50\%), particularly in cases involving straightforward path and API adjustments, though it still struggled with more complex logic integration.
 
-\Den{New:}A closer examination of the pattern-guided results (Table~\ref{tab:llm_fix_results_symptom_breakdown}) reveals that the availability of symptom descriptions significantly influences LLM performance.  
+Table~\ref{tab:llm_fix_results_symptom_breakdown} reports on an
+experiment where \Mar{...complete...}. Results indicate that the availability of symptom descriptions significantly influences LLM performance.  
 Among the 23 cases with explicit symptom descriptions, \texttt{grok-4-fast} achieves notably higher accuracy (0.83), while \texttt{gpt-4o-mini} and \texttt{llama-3.3} maintain similar or slightly improved performance (0.70 and 0.52, respectively).  
 In contrast, for the 7 cases where symptom descriptions were not available due to context-dependent or unstable symptoms, the prompt contained only the code snippet and general instructions to apply the relevant fix pattern. In these cases, performance generally declines: \texttt{grok-4-fast} drops to 0.57, while \texttt{gpt-4o-mini} remains robust at 0.71 and \texttt{llama-3.3} falls to 0.43.  
 This pattern demonstrates that explicit symptom descriptions provide valuable context that particularly benefits more sophisticated models, whereas some cases can still be addressed even without rich contextual information.
@@ -1413,7 +1444,6 @@ This section discusses the pull requests (PRs) we submitted.
 % For example: Figure 4 (Distribution of time-to-fix), Table 5 (Engagement metrics per project)
 
 \subsubsection{Method}
-\Den{New: updated as RBQ2 requested}
 We use the cross-OS test re-execution method
 (\textsection~\ref{sec:methods}) to detect portability problems in our
 \emph{application set} (\textsection~\ref{sec:projects}). For each
@@ -1864,7 +1894,17 @@ Specialized analyzers like Pysa~\cite{pysa2021} target security (e.g., taint and
 \noindent
 \textbf{Performance Portability.}~Complementary to OS-level portability, prior work has examined achieving portable performance across heterogeneous hardware through data-centric intermediate representations and automatic optimizations~\cite{ziogas2021productivity}. While performance portability aims at maintaining efficiency across architectures, our study instead targets OS-level portability, a distinct space focused on functional correctness.
 
-Al Awar \etal{} present PyKokkos~\cite{al2021performance}, a Python framework that attains performance portability by translating Python kernels into optimized C++ Kokkos code~\cite{kokkos}. Their approach enables near-native execution while keeping development in Python. Like other performance-portable systems, PyKokkos addresses architectural efficiency, whereas our work focuses on OS-level inconsistencies across operating systems.
+Al Awar \etal{} present PyKokkos~\cite{al2021performance}, a Python
+framework that attains performance portability by translating Python
+kernels into optimized C++ Kokkos code~\cite{kokkos}. Their approach
+enables near-native execution while keeping development in
+Python. Like other performance-portable systems, PyKokkos addresses
+architectural efficiency,\Mar{(We need space)I don't see why you need to elaborate
+  all this text (previously) if they are really unrelated to us. Can
+  you write a single generic sentence saying that ``prior work focused
+  on cross-OS translation for performance gains...''} whereas our work focuses on OS-level
+inconsistencies across operating systems.
+
 
 
 % \noindent
@@ -1881,8 +1921,8 @@ Al Awar \etal{} present PyKokkos~\cite{al2021performance}, a Python framework th
 \section{Conclusions and Future Work}
 \label{sec:conclusions}
 
-This study provides the first comprehensive characterization of
-\Den{cross-OS} portability issues in Python code. Across 900 projects, we found that
+This paper provides the first comprehensive characterization of
+cross-OS portability issues in Python code. Across 900 projects, we found that
 16.8\% exhibit portability problems: 11.2\% (56/500) via cross-OS test
 re-execution and 23.8\% (95/400) via issue mining. File and Directories
 operations are the most prevalent category. 
@@ -1897,12 +1937,22 @@ fine-tune code agents for portability problems.
 
 \vspace{0.7ex}
 \noindent\textbf{Data Availability.}
-\Den{Updated:}
-The artifacts --including datasets, submitted PRs and scripts-- are publicly available: \ourrepo
+The artifacts --including datasets, submitted PRs and scripts-- are
+publicly available: \ourrepo
 
+\begin{acks}
+\label{sec:acks}
+This work is partially supported by the United States National Science
+Foundation (NSF) under Grant Nos. CCF-2349961 and CCF-2319472. Denini
+was supported by a FACEPE fellowship.
+%% We thank Google
+%% for the Google Cloud Platform credits. We also thank the anonymous reviewers for
+%% their valuable feedback.
+\end{acks}
+%% \sectio
 
-\section*{Acknowledgments}
-We thank the anonymous reviewers for their valuable feedback. This work was supported in part by ... \Den{To be filled}
+%\section*{Acknowledgments}
+%We thank the anonymous reviewers for their valuable feedback. This work was supported in part by ... \Den{To be filled}
 
 \onecolumn \begin{multicols}{2}
 %\balance
