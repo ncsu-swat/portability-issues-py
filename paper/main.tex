@@ -1330,12 +1330,12 @@ Accuracy is the ratio of correct fixes to the total number of repair
 attempts.
 
 \begin{table}[t]
-\centering
+  \centering
 \caption{Performance of LLMs in generating portability fixes across both prompt configurations (\NumCodeNonPortableByLLM{} samples per model).}
 \label{tab:llm_fix_results_combined}
-
 \begin{subtable}[t]{0.47\textwidth}
-\centering
+  \centering
+    \vspace{-2ex}
 \caption{Generic prompt.}
 \begin{tabular}{lrrr}
 \toprule
@@ -1361,13 +1361,14 @@ attempts.
 \bottomrule
 \end{tabular}
 \end{subtable}
+  \vspace{-3ex}
 \end{table}
 
 \begin{table}[t]
 \centering
 \caption{Pattern-guided repair performance breakdown: cases with symptom descriptions vs.\ empty symptom fields.}
 \label{tab:llm_fix_results_symptom_breakdown}
-
+  \vspace{-2ex}
 \begin{subtable}[t]{0.47\textwidth}
 \centering
 \caption{With symptom descriptions ($n=23$).}
@@ -1395,6 +1396,7 @@ attempts.
 \bottomrule
 \end{tabular}
 \end{subtable}
+  \vspace{-5ex}
 \end{table}
 
 \noindent\textbf{Analysis of results.}~ The results in Table~\ref{tab:llm_fix_results_combined} show that all models exhibited limited success under the generic prompt setting, with accuracies ranging from 27\% to 43\%.  
@@ -1419,14 +1421,14 @@ When supplied with explicit repair patterns, the models produced significantly m
 
 \begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
   \textbf{RQ\textsubscript{3} (tool effectiveness):}~ Static analysis tools 
-  provide minimal portability detection support. LLMs achieve moderate detection 
+  show poor ability to detect portability problems. LLMs achieve moderate detection 
   accuracy (40--79\% across three models), with substantial variation in precision 
   and recall. For repair tasks, LLMs show limited success with generic prompts 
   (27--43\% accuracy) but improve significantly with pattern-guided prompts 
   (50--77\% accuracy), yielding an average improvement of 30 percentage points. 
-  These results demonstrate that structured guidance using error signatures and 
-  fix patterns from Table~\ref{tab:symptoms} substantially enhances LLM-based 
-  repair capabilities.
+  These results show that structured guidance using error signatures and 
+  fix patterns (Table~\ref{tab:symptoms}) substantially enhances LLM-based 
+  repair.
 %% —only Ruff includes a
 %% specific rule related to encoding.
 %% Traditional static analysis tools provide support to detect or fix
