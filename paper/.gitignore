@@ -61,3 +61,4 @@ main.synctex(busy)
 main.fdb_latexmk
 main.fls
 ~*.pptx
+**/comment.cut
