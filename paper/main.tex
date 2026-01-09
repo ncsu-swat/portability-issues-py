@@ -3,42 +3,44 @@
 \documentclass[sigconf]{acmart} % MSR
 
 % --- Author 1 (NC State) ---
-\author{Author One}
-\affiliation{%
-  \institution{North Carolina State University}
-  \city{Raleigh}
-  \state{NC}
-  \country{USA}
-}
-\email{author1@ncsu.edu}
-
-% --- Author 2 (NC State) ---
-\author{Author Two}
-\affiliation{%
-  \institution{North Carolina State University}
-  \city{Raleigh}
-  \state{NC}
-  \country{USA}
-}
-\email{author2@ncsu.edu}
-
-% --- Author 3 (UFPE, Brazil) ---
-\author{Author Three}
+\author{Denini Silva}
 \affiliation{%
   \institution{Federal University of Pernambuco}
   \city{Recife}
   \state{PE}
   \country{Brazil}
 }
-\email{author3@ufpe.br}
+\email{dgs@cin.ufpe.br}
+
+\author{MohamadAli Farahat}
+\affiliation{%
+  \institution{North Carolina State University}
+  \city{Raleigh}
+  \state{NC}
+  \country{USA}
+}
+\email{mfaraha3@ncsu.edu}
+
+% --- Author 2 (NC State) ---
+\author{Marcelo d'Amorim}
+\affiliation{%
+  \institution{North Carolina State University}
+  \city{Raleigh}
+  \state{NC}
+  \country{USA}
+}
+\email{mdamori@ncsu.edu}
+
+% --- Author 3 (UFPE, Brazil) ---
+
 
 
 %%%%%
 %% We will need to add this in camera-ready
 %%%%%
-%% \setcopyright{none} % to remove the copyright notice
-%% \settopmatter{printacmref=false} % to remove the ACM Reference Format
-%% \renewcommand\footnotetextcopyrightpermission[1]{} % to remove copyright box
+% \setcopyright{none} % to remove the copyright notice
+% \settopmatter{printacmref=false} % to remove the ACM Reference Format
+% \renewcommand\footnotetextcopyrightpermission[1]{} % to remove copyright box
 \usepackage{comment}
 
 \usepackage{lipsum}
@@ -50,10 +52,10 @@
 %%
 %% comment for camera ready -Marcelo
 %%%%%%%%%%%%%%
-\setcopyright{none}
-\settopmatter{printacmref=false}
-\renewcommand\footnotetextcopyrightpermission[1]{}
-\pagestyle{plain}
+% \setcopyright{none}
+% \settopmatter{printacmref=false}
+% \renewcommand\footnotetextcopyrightpermission[1]{}
+% \pagestyle{plain}
 
 \begin{document}
 
@@ -99,25 +101,27 @@ for developers, tool designers, and the broader research community.
 %%% Uncomment for camera ready -Marcelo
 %%%%%%%
 
-%% \begin{CCSXML}
-%% <ccs2012>
-%%    <concept>
-%%        <concept_id>10011007.10011074.10011099</concept_id>
-%%        <concept_desc>Software and its engineering~Software verification and validation</concept_desc>
-%%        <concept_significance>500</concept_significance>
-%%    </concept>
-%%    <concept>
-%%        <concept_id>10011007.10010940.10010992.10010993.10010994</concept_id>
-%%        <concept_desc>Software and its engineering~Functionality</concept_desc>
-%%        <concept_significance>500</concept_significance>
-%%    </concept>
-%% </ccs2012>
-%% \end{CCSXML}
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10011007.10011074.10011099</concept_id>
+       <concept_desc>Software and its engineering~Software verification and validation</concept_desc>
+       <concept_significance>500</concept_significance>
+   </concept>
+   <concept>
+       <concept_id>10011007.10010940.10010992.10010993.10010994</concept_id>
+       <concept_desc>Software and its engineering~Functionality</concept_desc>
+       <concept_significance>500</concept_significance>
+   </concept>
+</ccs2012>
+\end{CCSXML}
 
-%% \ccsdesc[500]{Software and its engineering~Software verification and validation}
-%% \ccsdesc[500]{Software and its engineering~Functionality}
+\ccsdesc[500]{Software and its engineering~Software verification and validation}
+\ccsdesc[500]{Software and its engineering~Functionality}
 
-%% \keywords{Mining Software Repositories, Python, Cross-Platform, Portability, Test Re-execution, Repair Patterns}
+\keywords{Mining Software Repositories, Python, Cross-Platform, Portability, Test Re-execution, Repair Patterns,  Large Language Models}
+
+%% \keywords{Cross-platform portability, Python, Empirical software engineering, Mining software repositories, Test re-execution, Large language models, Static analysis, Software reliability}
 
 \maketitle
 
@@ -1840,7 +1844,8 @@ Their work surveys existing approaches for measuring portability but does not pr
 In contrast, our study provides the first large-scale empirical characterization of Python portability problems through systematic testing and issue analysis, developing both a comprehensive taxonomy and practical repair patterns. 
 While their review identifies the fragmented nature of portability research, our work addresses this gap by establishing a unified framework specifically for Python cross-platform issues.
 
-\Den{New after review:}Wang \etal{}~\cite{wang2023compatibility} present an empirical study of compatibility issues in deep learning systems, analyzing thousands of posts to categorize common problems and their causes. 
+% \Den{New after review:}
+Wang \etal{}~\cite{wang2023compatibility} present an empirical study of compatibility issues in deep learning systems, analyzing thousands of posts to categorize common problems and their causes. 
 While their findings relate to cross-environment inconsistencies, the scope is broader than portability and centered on DL ecosystems. 
 Our work instead focuses directly on Python cross-platform portability, providing a targeted taxonomy and concrete repair strategies.
 
@@ -1890,7 +1895,7 @@ While Bear focuses on statistical modeling of OS nondeterminism, our work addres
 \textbf{Static Analysis for Python.}~Popular tools such as Ruff~\cite{ruffref}, Flake8~\cite{flake8}, Pylint~\cite{pylint}, MyPy~\cite{mypy}, Bandit~\cite{bandit}, and Pyright~\cite{pyright} focus on style, typing, and security, offering minimal support for portability detection—only Ruff includes \texttt{unspecified-encoding}~\cite{encruff}.
 Specialized analyzers like Pysa~\cite{pysa2021} target security (e.g., taint and injection). Our work instead addresses runtime portability issues caused by OS variability, mostly missed by existing tools.
 
-\Den{New after review:}
+% \Den{New after review:}
 \noindent
 \textbf{Performance Portability.}~Complementary to OS-level portability, prior work has examined achieving portable performance across heterogeneous hardware through data-centric intermediate representations and automatic optimizations~\cite{ziogas2021productivity}. While performance portability aims at maintaining efficiency across architectures, our study instead targets OS-level portability, a distinct space focused on functional correctness.
 
@@ -1899,10 +1904,13 @@ framework that attains performance portability by translating Python
 kernels into optimized C++ Kokkos code~\cite{kokkos}. Their approach
 enables near-native execution while keeping development in
 Python. Like other performance-portable systems, PyKokkos addresses
-architectural efficiency,\Mar{(We need space)I don't see why you need to elaborate
-  all this text (previously) if they are really unrelated to us. Can
-  you write a single generic sentence saying that ``prior work focused
-  on cross-OS translation for performance gains...''} whereas our work focuses on OS-level
+architectural efficiency,
+% \Mar{(We need space)I don't see why you need to elaborate
+% all this text (previously) if they are really unrelated to us. Can
+% you write a single generic sentence saying that ``prior work focused
+% on cross-OS translation for performance gains...''} 
+% \Den{We have space}
+whereas our work focuses on OS-level
 inconsistencies across operating systems.
 
 
@@ -1942,9 +1950,9 @@ publicly available: \ourrepo
 
 \begin{acks}
 \label{sec:acks}
-This work is partially supported by the United States National Science
-Foundation (NSF) under Grant Nos. CCF-2349961 and CCF-2319472. Denini
-was supported by a FACEPE fellowship.
+This work is partially supported by the NSF under Grant Nos. CCF-2349961 and CCF-2319472. 
+Denini was supported by CNPq Grant No. 140220/2022-4.
+We thank Mohammed Yaseen for his assistance with experimental setup.
 %% We thank Google
 %% for the Google Cloud Platform credits. We also thank the anonymous reviewers for
 %% their valuable feedback.
