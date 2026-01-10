@@ -1335,7 +1335,7 @@ attempts.
 \label{tab:llm_fix_results_combined}
 \begin{subtable}[t]{0.47\textwidth}
   \centering
-    \vspace{-2ex}
+    \vspace{-3ex}
 \caption{Generic prompt.}
 \begin{tabular}{lrrr}
 \toprule
@@ -1361,14 +1361,14 @@ attempts.
 \bottomrule
 \end{tabular}
 \end{subtable}
-  \vspace{-3ex}
+  \vspace{-5ex}
 \end{table}
 
 \begin{table}[t]
 \centering
 \caption{Pattern-guided repair performance breakdown: cases with symptom descriptions vs.\ empty symptom fields.}
 \label{tab:llm_fix_results_symptom_breakdown}
-  \vspace{-2ex}
+  \vspace{-3ex}
 \begin{subtable}[t]{0.47\textwidth}
 \centering
 \caption{With symptom descriptions ($n=23$).}
@@ -1396,7 +1396,7 @@ attempts.
 \bottomrule
 \end{tabular}
 \end{subtable}
-  \vspace{-5ex}
+  \vspace{-7ex}
 \end{table}
 
 \noindent\textbf{Analysis of results.}~ The results in Table~\ref{tab:llm_fix_results_combined} show that all models exhibited limited success under the generic prompt setting, with accuracies ranging from 27\% to 43\%.  
@@ -1410,7 +1410,9 @@ Similarly, \texttt{gpt-4o-mini} reached 70\%, producing fixes that were more con
 The \texttt{llama-3.3} model also showed moderate improvement (50\%), particularly in cases involving straightforward path and API adjustments, though it still struggled with more complex logic integration.
 
 Table~\ref{tab:llm_fix_results_symptom_breakdown} reports on an
-experiment where \Mar{...complete...}. Results indicate that the availability of symptom descriptions significantly influences LLM performance.  
+experiment where we analyzed repair performance separately for cases with explicit 
+symptom descriptions versus cases lacking such descriptions due to context-dependent symptoms. 
+Results indicate that the availability of symptom descriptions significantly influences LLM performance.  
 Among the 23 cases with explicit symptom descriptions, \texttt{grok-4-fast} achieves notably higher accuracy (0.83), while \texttt{gpt-4o-mini} and \texttt{llama-3.3} maintain similar or slightly improved performance (0.70 and 0.52, respectively).  
 In contrast, for the 7 cases where symptom descriptions were not available due to context-dependent or unstable symptoms, the prompt contained only the code snippet and general instructions to apply the relevant fix pattern. In these cases, performance generally declines: \texttt{grok-4-fast} drops to 0.57, while \texttt{gpt-4o-mini} remains robust at 0.71 and \texttt{llama-3.3} falls to 0.43.  
 This pattern demonstrates that explicit symptom descriptions provide valuable context that particularly benefits more sophisticated models, whereas some cases can still be addressed even without rich contextual information.
@@ -1419,7 +1421,7 @@ Overall, these findings highlight the strong impact of guided contextualization 
 When supplied with explicit repair patterns, the models produced significantly more reliable and semantically consistent fixes, confirming that structured guidance can substantially enhance cross-platform reasoning capabilities in code generation tasks.
 
 
-\begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=2pt,left=2pt,right=2pt,top=2.5pt,bottom=2pt]
+\begin{tcolorbox}[boxrule=0pt,sharp corners,boxsep=1pt,left=1pt,right=1pt,top=1pt,bottom=1pt]
   \textbf{RQ\textsubscript{3} (tool effectiveness):}~ Static analysis tools 
   show poor ability to detect portability problems. LLMs achieve moderate detection 
   accuracy (40--79\% across three models), with substantial variation in precision 
@@ -1639,7 +1641,7 @@ drive~\cite{python-tempfile}, this behavior can lead to path
 resolution errors.
 
 
-\begin{lstlisting}[float, caption={Patch for cross-drive relative path issue.}, label={lst:pydantic_fix}]
+\begin{lstlisting}[caption={Patch for cross-drive relative path issue.}, label={lst:pydantic_fix}]
  @pytest.fixture
  def relative_file_path(absolute_file_path: Path) -> Path:
 + cwd = Path.cwd()
@@ -1931,19 +1933,45 @@ inconsistencies across operating systems.
 \section{Conclusions and Future Work}
 \label{sec:conclusions}
 
+%%%%%%%%%
+% This paper provides the first comprehensive characterization of
+% cross-OS portability issues in Python code. Across 900 projects, we found that
+% 16.8\% exhibit portability problems: 11.2\% (56/500) via cross-OS test
+% re-execution and 23.8\% (95/400) via issue mining. File and Directories
+% operations are the most prevalent category. 
+% Our taxonomy shows 7 root-cause categories (with 24
+% sub-categories) and 4 general fix patterns. LLMs achieve 40-79\%
+% detection accuracy and 50-77\% repair success when guided by
+% structured patterns. Our findings are validated through 33 pull
+% requests with \TotalPRAprovedPercent{} acceptance rate.
+% %
+% Future work should develop hybrid detection tools and investigate
+% fine-tune code agents for portability problems.
+%%%%%%%%%
+
+
+
 This paper provides the first comprehensive characterization of
-cross-OS portability issues in Python code. Across 900 projects, we found that
-16.8\% exhibit portability problems: 11.2\% (56/500) via cross-OS test
-re-execution and 23.8\% (95/400) via issue mining. File and Directories
-operations are the most prevalent category. 
-Our taxonomy shows 7 root-cause categories (with 24
-sub-categories) and 4 general fix patterns. LLMs achieve 40-79\%
-detection accuracy and 50-77\% repair success when guided by
-structured patterns. Our findings are validated through 33 pull
-requests with \TotalPRAprovedPercent{} acceptance rate.
+cross-OS portability issues in Python code. Across 900 projects, we find
+that 16.8\% exhibit portability problems: 11.2\% (56/500) via cross-OS
+test re-execution and 23.8\% (95/400) via issue mining. File and
+Directories operations are the most prevalent category. Our taxonomy
+captures 7 root-cause categories (with 24 sub-categories) and 4 general
+fix patterns. 
+LLMs achieve 40-79\% detection accuracy and 50-77\% repair success when
+guided by structured patterns, and our practical validation through 33
+pull requests with \TotalPRAprovedPercent{} acceptance. These results complement the limited support available in
+popular static tools and show the value of combining cross-OS
+re-execution with issue mining to surface real-world portability
+failures.
 %
-Future work should develop hybrid detection tools and investigate
-fine-tune code agents for portability problems.
+
+Future work should develop hybrid detection tools that combine
+cross-OS re-execution, symptom signatures, and lightweight static
+signals, and investigate fine-tune code agents for portability problems
+using pattern-guided prompts. It is also important to broaden the scope
+of evaluation to additional OS versions, hardware architectures, and
+Python versions. 
 
 \vspace{0.7ex}
 \noindent\textbf{Data Availability.}
