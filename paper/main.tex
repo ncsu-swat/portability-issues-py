@@ -1954,33 +1954,46 @@ inconsistencies across operating systems.
 
 
 % \Den{review all:}
+\Mar{Denini, please check. I updated this paragraph.}
 This paper provides the first comprehensive characterization of
-cross-OS portability issues in Python code. Across 900 projects, we find
-that 16.8\% exhibit portability problems: 11.2\% (56/500) via cross-OS
-test re-execution and 23.8\% (95/400) via issue mining. File and
-Directories operations are the most prevalent category. Our taxonomy
-captures 7 root-cause categories (with 24 sub-categories) and 4 general
-fix patterns. 
-LLMs achieve 40-79\% detection accuracy and 50-77\% repair success when
-guided by structured patterns. Our practical validation through 33
-pull requests with \TotalPRAprovedPercent{} acceptance. These results complement the limited support available in
-popular static tools and show the value of combining cross-OS
-re-execution with issue mining to surface real-world portability
-failures.
+cross-OS portability issues in Python code. We employ two methods to
+find these issues: cross-OS test re-execution and issue mining.  We
+analyze 900 projects and find that 16.8\% exhibit portability
+problems.
+%% we find 56 cases 500~(11.2\%)
+%% via cross-OS test re-execution and find 95/400~(23.8\%) via issue
+%% mining.
+Issues related to File and Directory operations are the most
+prevalent. Overall, our taxonomy captures seven categories of root
+causes of issues (with 24 sub-categories) and four fix patterns for
+those issues.  We find that LLMs achieve 40-79\% detection accuracy
+and 50-77\% repair success when guided by structured patterns. Our
+validation through 33 pull requests showed an acceptance rate of
+\TotalPRAprovedPercent{}, indicating that developers care about these
+issues.
 %
 
-Future work can extend this study by developing hybrid detection tools that 
-integrate cross-OS re-execution, symptom signatures, and lightweight static 
-analyses. Another promising direction is the fine-tuning of code agents for 
-portability issues using pattern-guided prompts. Additionally, it is 
-important to broaden the evaluation to cover a wider range of operating 
-system versions, hardware architectures, Python versions and even other programming languages.
+%% These
+%% results highlight the importance of combining cross-OS re-execution
+%% with issue mining to surface real-world portability failures.  
+
+Future work can extend this study by developing hybrid detection tools
+that integrate cross-OS re-execution, symptom signatures, and
+lightweight static analyses. Another promising direction is the
+fine-tuning of code agents for portability issues using pattern-guided
+prompts. Finally, it is important to broaden the evaluation to cover a
+wider range of operating system versions, hardware architectures,
+Python versions and even other programming languages.
 
 
 \vspace{0.7ex}
-\noindent\textbf{Data Availability.}
+\section*{Data Availability}
 The artifacts --including datasets, submitted PRs and scripts-- are
-publicly available: \ourrepo
+publicly available: \ourrepo\Mar{Denini, is this the repo?
+  https://github.com/ncsu-swat/portability-issues-project As I said, I
+need to create another repo only for the paper and move the paper
+there so that you can cite here the repo above (not an anonymous thing
+anymore).}
 
 \begin{acks}
 \label{sec:acks}
