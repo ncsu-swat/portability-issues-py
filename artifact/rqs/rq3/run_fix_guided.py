@@ -17,9 +17,21 @@ OUTPUT_SUMMARY = "fix_guided_summary.csv"
 FIXES_BASE = "fixes"+ os.sep + "guided"
 GUIDED_CSV = "guided.csv"
 
+# for cases without symptom descriptions 
+# PROMPT_TEMPLATE = """
+# You are a Python expert. The following code has portability issues (it may fail on Linux, macOS or Windows).
+
+# Your task:
+# - Identify the problem(s) related to portability.
+# - Produce a corrected version of the code that is portable across major OSes.
+# - Return ONLY the corrected code, nothing else.
+
+# Code:
+# {}
+# """
 
 GUIDED_PROMPT_TEMPLATE = """
-You are a Python expert. This code has {}. Consider using one of the following fixes: {}.
+You are a Python expert. The following code has a portability problem: {}. Consider using one of the following fixes: {}.
 
 Your task:
 - Identify the problem(s) related to portability.
